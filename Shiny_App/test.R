@@ -156,21 +156,20 @@ for(i in 1: length(names_city)){
 df_n <- curr_length - num_na 
 df_n <- data.frame(df_n)
 id<- as.factor(unlist(id))
-before_df <- data.table(y_city_year, x_year, id)
+input_df <- data.table(y_city_year, x_year, id)
 city<- data.table(city, stringsAsFactors = TRUE)
 city$id <- rownames(city) 
 city$prov <- "AB"
 df_n<- data.frame(df_n, city[,1])
 test <- data.frame(y_city_year)
 
-before_df <- merge(x = before_df, y = city, by = 'id', all = TRUE)
-fit_2 <- lm(y_city_year~ city-1 + city*x_year , data = before_df)
+input_df <- merge(x = input_df, y = city, by = 'id', all = TRUE)
+fit_2 <- lm(y_city_year~ city-1 + city*x_year , data = input_df)
 b_2 <- fit_2$coefficients
 R_2_2 <- list()
 
 for(i in 1: length(names_city))
   R_2_2[i] <- as.numeric(unlist(summary(fit_2)$r.squared))
-
 
 CI_lower <- summary(fit_2)$coef[,1] - summary(fit_2)$coef[,2]
 CI_upper <- summary(fit_2)$coef[,1] + summary(fit_2)$coef[,2]
@@ -179,7 +178,8 @@ CI_upper_slope <- CI_upper[(length(names_city)+1):length(CI_upper)]
 city_matrix <- city[order(city), ] 
 intercept <- data.frame("intercept"=b_2[1:length(names_city)])
 slope <- data.frame("slope" = b_2[(length(names_city)+1):length(b_2)])
-split <- matrix(unlist(strsplit(rownames(check),'city')),ncol = 2,byrow = TRUE)
+variance <- summary(fit_2)
+# split <- matrix(unlist(strsplit(rownames(check),'city')),ncol = 2,byrow = TRUE)
 r_1 <- data.frame(city_matrix, intercept, slope, CI_lower_slope, CI_upper_slope)
 r_2 <- merge(x = df_n, y = r_1, by= 'city' , all  = TRUE)
 r_3 <- results[,c(1,3,4,7,8,2,5)]
