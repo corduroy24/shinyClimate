@@ -161,8 +161,6 @@ city<- data.table(city, stringsAsFactors = TRUE)
 city$id <- rownames(city) 
 city$prov <- "AB"
 df_n<- data.frame(df_n, city[,1])
-# df_n$city <- city[,1]
-# df_n$id <- city[,2]
 test <- data.frame(y_city_year)
 
 before_df <- merge(x = before_df, y = city, by = 'id', all = TRUE)
@@ -178,22 +176,14 @@ CI_lower <- summary(fit_2)$coef[,1] - summary(fit_2)$coef[,2]
 CI_upper <- summary(fit_2)$coef[,1] + summary(fit_2)$coef[,2]
 CI_lower_slope  <- CI_lower[(length(names_city)+1):length(CI_lower)]
 CI_upper_slope <- CI_upper[(length(names_city)+1):length(CI_upper)]
-
 city_matrix <- city[order(city), ] 
-intercept <- b_2[1:length(names_city)]
-slope <- b_2[(length(names_city)+1):length(b_2)]
-check <- data.frame(intercept)
-check_3 <- data.frame(slope)
+intercept <- data.frame("intercept"=b_2[1:length(names_city)])
+slope <- data.frame("slope" = b_2[(length(names_city)+1):length(b_2)])
 split <- matrix(unlist(strsplit(rownames(check),'city')),ncol = 2,byrow = TRUE)
-check$city <- split[,2]
-check_3$city <- split[,2]
-check_5 <- data.frame(df_n)
-cc <- merge(x = check, y = check_3, by = 'city', all = TRUE)
-check_2 <- merge(x = cc, y = city_matrix, by = 'city' , all  = TRUE)
-check_4 <- merge(x = df_n, y = check_2, by= 'city' , all  = TRUE)
-results <- data.frame(city_matrix, intercept, slope, df_n)
+r_1 <- data.frame(city_matrix, intercept, slope, CI_lower_slope, CI_upper_slope)
+r_2 <- merge(x = df_n, y = r_1, by= 'city' , all  = TRUE)
+r_3 <- results[,c(1,3,4,7,8,2,5)]
 
-results <- check_4[,c(1,3,4,5,2)]
 provs <- c("BC","YT","NT","NU", "AB","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL")
 
 
