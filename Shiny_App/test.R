@@ -178,11 +178,12 @@ CI_upper_slope <- CI_upper[(length(names_city)+1):length(CI_upper)]
 city_matrix <- city[order(city), ] 
 intercept <- data.frame("intercept"=b_2[1:length(names_city)])
 slope <- data.frame("slope" = b_2[(length(names_city)+1):length(b_2)])
-variance <- summary(fit_2)
+variance <- (summary(fit_2)$coef[,2])^2
+variance_slope <- data.frame("variance" = variance[(length(names_city)+1):length(variance)])
 # split <- matrix(unlist(strsplit(rownames(check),'city')),ncol = 2,byrow = TRUE)
-r_1 <- data.frame(city_matrix, intercept, slope, CI_lower_slope, CI_upper_slope)
+r_1 <- data.frame(city_matrix, intercept, slope, CI_lower_slope, CI_upper_slope, variance_slope)
 r_2 <- merge(x = df_n, y = r_1, by= 'city' , all  = TRUE)
-r_3 <- results[,c(1,3,4,7,8,2,5)]
+# r_3 <- r_2[,c(1,3,4,7,8,2,5)]
 
 provs <- c("BC","YT","NT","NU", "AB","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL")
 
