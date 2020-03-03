@@ -40,7 +40,7 @@ clean_data <- function(temp_meas, dir)
     # dat <- dat[rowSums(is.na(dat))==0, ]
     
     total = rbind(hdr, dat)
-    parentPath = "C:/Shiny_App/"
+    parentPath = "C:/Environment_Canada_Shiny_App/Shiny_App/"
     filePath= sprintf("%s%s_cleaned/%s.txt", parentPath,dir,stationNum_city_prov)
     write.table(total, filePath, append = FALSE, sep = " ", dec = ".",
                 row.names = FALSE, col.names = FALSE)
@@ -155,13 +155,14 @@ for(i in 1: length(names_city)){
 
 df_n <- curr_length - num_na 
 df_n <- data.frame(df_n)
-df_n$city <- city[,1]
-df_n$id <- city[,2]
 id<- as.factor(unlist(id))
 before_df <- data.table(y_city_year, x_year, id)
 city<- data.table(city, stringsAsFactors = TRUE)
 city$id <- rownames(city) 
 city$prov <- "AB"
+df_n<- data.frame(df_n, city[,1])
+# df_n$city <- city[,1]
+# df_n$id <- city[,2]
 test <- data.frame(y_city_year)
 
 before_df <- merge(x = before_df, y = city, by = 'id', all = TRUE)
@@ -186,12 +187,13 @@ check_3 <- data.frame(slope)
 split <- matrix(unlist(strsplit(rownames(check),'city')),ncol = 2,byrow = TRUE)
 check$city <- split[,2]
 check_3$city <- split[,2]
+check_5 <- data.frame(df_n)
 cc <- merge(x = check, y = check_3, by = 'city', all = TRUE)
 check_2 <- merge(x = cc, y = city_matrix, by = 'city' , all  = TRUE)
-check_4 <- merge(x = check_2, y = df_n, by = 'id' , all  = TRUE)
+check_4 <- merge(x = df_n, y = check_2, by= 'city' , all  = TRUE)
 results <- data.frame(city_matrix, intercept, slope, df_n)
 
-results <- results[,c(1,4,5,3,2)]
+results <- check_4[,c(1,3,4,5,2)]
 provs <- c("BC","YT","NT","NU", "AB","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL")
 
 
