@@ -71,7 +71,7 @@ list_prov = list()
 names_city = list()
 j = 1
 for (i in 1:length(txt_files_ls))
-  if(ns[i,3] == "BC.txt"){
+  if(ns[i,3] == "YT.txt"){
     list_prov[j] <- txt_files_ls[i]
     names_city[j] <- ns[i,2]
     j = j+1
@@ -190,15 +190,14 @@ r_2 <- merge(x = df_n, y = r_1, by= 'city' , all  = TRUE)
 
 
 
-hist(r_2$slope, freq = TRUE, main  = "Histogram of Slope - BC", xlab = "Slope")
-hist(r_2$slope, prob = TRUE, main  = "Histogram of Slope - BC", xlab = "Slope")
+hist(r_2$slope, freq = TRUE, main  = "Histogram of Slope - YT", xlab = "Slope")
+hist(r_2$slope, prob = TRUE, main  = "Histogram of Slope - YT", xlab = "Slope")
 lines(density(r_2$slope), col = "red")
 
 # hist(x = CI_lower_slope, prob = TRUE)
 # lines(density(CI_lower_slope), col = "red")
 
-
-write.csv(r_2,'reg_results_BC.csv')
+write.csv(r_2,'reg_results_YT.csv')
 
 
 
