@@ -60,63 +60,33 @@ tempMin  = list.files(path=minTempDir, pattern="*.txt", full.names=TRUE)
 clean_data(tempMin,minTempDir)
 # tempMean = list.files(path=meanTempDir, pattern="*.txt", full.names=TRUE)
 # clean_data(tempMean,meanTempDir)
-# 
-# # Create list of text files
-# txt_files_ls = list.files(path="Homog_monthly_min_temp_cleaned", pattern="*.txt", full.names = TRUE)
-# names = list.files(path="Homog_monthly_min_temp_cleaned", pattern="*.txt")
-# ns = matrix(unlist(strsplit(names,'_')),ncol = 3,byrow = TRUE)
-# trim.leading <- function (x)  sub("^\\s+", "", x)
-# 
-# provs <- c("AB","BC","YT","NT","NU","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL")
-# list_prov = data.frame()
-# names_city = data.frame()
-# j = 1
-# year_to_start <- 1980
-# month <- 'Feb'
-# # load_cleaned_data <- function(year, month)
-# for (i in 1:length(txt_files_ls))
-#   if(ns[i,3] == "AB.txt"){
-#     list_prov <- txt_files_ls[i]
-#     names_city <- ns[i,2]
-#     # Non-breaking spaces...trim.white doesnt work... 
-#     txt_files_df <- read.table(file = txt_files_ls[i], header = TRUE, sep = "\t",dec = ".", check.names = FALSE,colClasses = "factor" )
-#     names(txt_files_df) <- trim.leading(txt_files_df[2])
-#     years_greater<-txt_files_df[as.numeric(as.character(txt_files_df$Year))>1979,]
-#     y_city_year <- as.numeric(as.character(unlist(years_1980_greater$month)))
-#     test_df <- data.frame(txt_files_df, names_city) 
-#   }
-# 
-# # Combine them
-# combined_df <- do.call("rbind", lapply(txt_files_df, as.data.frame)) 
-# 
-# 
-# # 
-# # # Peak data to make sure there are no NA values 
-# # # %between%
-# # years_1980_greater<-combined_df[combined_df$X.Year>1979,]
-# # # years_1980_greater = setDT(combined_df)[X.Year > 1979]
-# # (is.na(years_1980_greater))
-# # 
-# # x_year <- as.numeric(as.character(unlist(years_1980_greater$X.Year)))
-# # y_temp <- as.numeric(as.character(unlist(years_1980_greater$X.....Feb)))
-# # 
-# # # data_1980_greater_Feb <- data.frame(cbind(x_year,y_temp))
-# # 
-# # fit_3  <- lm(y_temp ~ x_year, data = data_1980_greater_Feb)
-# # fit_3
-# # summary(fit_3)
-# # anova(fit_3)
-# # plot(y_temp~x_year, data = data_1980_greater_Feb, main ="Min Temperatures - February - AB", xlab = "year", ylab = "temp")
-# # abline(fit_3, col = "red")
-# 
-# city <- data.frame(names_city)
-# city <- as.matrix(city)
-# city <- matrix(city, ncol = ncol(city), dimnames = NULL)
-# city <- t(city)
-# city <- factor(city)
-# city <- as.matrix(city)
-# city <- as.character(city)
-# city <- factor(city)
+
+# Create list of text files
+txt_files_ls = list.files(path="Homog_monthly_min_temp_cleaned", pattern="*.txt", full.names = TRUE)
+names = list.files(path="Homog_monthly_min_temp_cleaned", pattern="*.txt")
+ns = matrix(unlist(strsplit(names,'_')),ncol = 3,byrow = TRUE)
+
+provs <- c("AB","BC","YT","NT","NU","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL")
+list_prov = data.frame()
+names_city = data.frame()
+j = 1
+year_to_start <- 1980
+month <- 'Feb'
+combined_df <- data.frame()
+# load_cleaned_data <- function(year, month)
+for (i in 1:length(txt_files_ls)){
+  if(ns[i,3] == "AB.txt"){
+    nprov <- unlist(strsplit(ns[i,3],'.txt'))
+    ncity <- ns[i,2]
+    # Non-breaking spaces...trim.white doesnt work... 
+    txt_files_df <- read.table(file = txt_files_ls[i], header = TRUE, sep = " ",dec = ".", colClasses = "factor")
+    years_greater<-txt_files_df[as.numeric(as.character(txt_files_df$Year))>=year_to_start,]
+    y_city_year <- years_greater[,c(month, 'Year')]
+    test_df <- data.frame(y_city_year, "city" = ncity, "prov" = nprov ) 
+    combined_df <- rbind(combined_df, test_df) 
+  }
+  return(combined_df)
+}
 # 
 # # fit_1 <- list()
 # # R_2 <- list()
