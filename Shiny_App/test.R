@@ -1,77 +1,77 @@
-# comments 
-# still buggy when a file/folder already exists
-
-require(data.table)
-require(tidyr)
-library(plyr)
-library(dplyr)
-library(readr)
-library(stringr)
-library(gmodels)
-
-
- # dir = "Homog_monthly_mean_temp"
- # temp_meas = list.files(path=dir, pattern="*.txt", full.names=TRUE)
- # i = 286;
-
-
-clean_data <- function(temp_meas, dir)
-  for (i in 1:length(temp_meas)){
-    title = read.table(temp_meas[i], nrow = 1, sep = ",",dec = ".", as.is = TRUE,quote = "\"", na.strings=c(" "), header = FALSE)
-    stationNum_city_prov = sprintf("%s_%s_%s", title[1],trimws(title[2]),strtrim(title[3],2))
-    assign(stationNum_city_prov, read.delim(temp_meas[i],skip = 2, header = FALSE))
-    (stationNum_city_prov)
-    hdr = read.table(temp_meas[i], skip = 2, nrow = 1, sep = ",", as.is = TRUE, na.strings=c(" "))
-    hdr <- hdr[, colSums(is.na(hdr)) == 0]
-    (hdr)
-    dat = read.delim(temp_meas[i], skip = 4, header= FALSE, as.is=TRUE, dec = ",", sep = ",", na.strings=c(" "))
-    dat <- dat[ ,colSums(is.na(dat)) == 0]
-
-    dat <- data.frame(lapply(dat, function(x){
-      gsub("[a-zA-Z]", NA, x)
-    }))
-    #tempDat = dat
-     dat <- dat[,colSums(is.na(dat))==0 ]
-    
-    #filter out -9999.9 - default values 
-    dat <- data.frame(lapply(dat, function(x){
-      gsub("-9999.9", "NA", x)
-    }))
-    # dat <- dat[rowSums(is.na(dat))==0, ]
-    
-    total = rbind(hdr, dat)
-    parentPath = "C:/Environment_Canada_Shiny_App/Shiny_App/"
-    filePath= sprintf("%s%s_cleaned/%s.txt", parentPath,dir,stationNum_city_prov)
-    write.table(total, filePath, append = FALSE, sep = " ", dec = ".",
-                row.names = FALSE, col.names = FALSE)
-   }
-
-
-
-minTempDir = "Homog_monthly_min_temp"
-maxTempDir = "Homog_monthly_max_temp"
-meanTempDir = "Homog_monthly_mean_temp" 
-
-
-#temp_meas <- array(c(minTempDir,maxTempDir,meanTempDir))
-# tempMax = list.files(path=maxTempDir, pattern="*.txt", full.names=TRUE)
-# clean_data(tempMax,maxTempDir)
-tempMin  = list.files(path=minTempDir, pattern="*.txt", full.names=TRUE)
-clean_data(tempMin,minTempDir)
-# tempMean = list.files(path=meanTempDir, pattern="*.txt", full.names=TRUE)
-# clean_data(tempMean,meanTempDir)
-
-# Create list of text files
-txt_files_ls = list.files(path="Homog_monthly_min_temp_cleaned", pattern="*.txt", full.names = TRUE)
-names = list.files(path="Homog_monthly_min_temp_cleaned", pattern="*.txt")
-ns = matrix(unlist(strsplit(names,'_')),ncol = 3,byrow = TRUE)
+# # comments 
+# # still buggy when a file/folder already exists
+# 
+# require(data.table)
+# require(tidyr)
+# library(plyr)
+# library(dplyr)
+# library(readr)
+# library(stringr)
+# library(gmodels)
+# 
+# 
+#  # dir = "Homog_monthly_mean_temp"
+#  # temp_meas = list.files(path=dir, pattern="*.txt", full.names=TRUE)
+#  # i = 286;
+# 
+# 
+# clean_data <- function(temp_meas, dir)
+#   for (i in 1:length(temp_meas)){
+#     title = read.table(temp_meas[i], nrow = 1, sep = ",",dec = ".", as.is = TRUE,quote = "\"", na.strings=c(" "), header = FALSE)
+#     stationNum_city_prov = sprintf("%s_%s_%s", title[1],trimws(title[2]),strtrim(title[3],2))
+#     assign(stationNum_city_prov, read.delim(temp_meas[i],skip = 2, header = FALSE))
+#     (stationNum_city_prov)
+#     hdr = read.table(temp_meas[i], skip = 2, nrow = 1, sep = ",", as.is = TRUE, na.strings=c(" "))
+#     hdr <- hdr[, colSums(is.na(hdr)) == 0]
+#     (hdr)
+#     dat = read.delim(temp_meas[i], skip = 4, header= FALSE, as.is=TRUE, dec = ",", sep = ",", na.strings=c(" "))
+#     dat <- dat[ ,colSums(is.na(dat)) == 0]
+# 
+#     dat <- data.frame(lapply(dat, function(x){
+#       gsub("[a-zA-Z]", NA, x)
+#     }))
+#     #tempDat = dat
+#      dat <- dat[,colSums(is.na(dat))==0 ]
+#     
+#     #filter out -9999.9 - default values 
+#     dat <- data.frame(lapply(dat, function(x){
+#       gsub("-9999.9", "NA", x)
+#     }))
+#     # dat <- dat[rowSums(is.na(dat))==0, ]
+#     
+#     total = rbind(hdr, dat)
+#     parentPath = "C:/Environment_Canada_Shiny_App/Shiny_App/"
+#     filePath= sprintf("%s%s_cleaned/%s.txt", parentPath,dir,stationNum_city_prov)
+#     write.table(total, filePath, append = FALSE, sep = " ", dec = ".",
+#                 row.names = FALSE, col.names = FALSE)
+#    }
+# 
+# 
+# 
+# minTempDir = "Homog_monthly_min_temp"
+# maxTempDir = "Homog_monthly_max_temp"
+# meanTempDir = "Homog_monthly_mean_temp" 
+# 
+# 
+# #temp_meas <- array(c(minTempDir,maxTempDir,meanTempDir))
+# # tempMax = list.files(path=maxTempDir, pattern="*.txt", full.names=TRUE)
+# # clean_data(tempMax,maxTempDir)
+# tempMin  = list.files(path=minTempDir, pattern="*.txt", full.names=TRUE)
+# clean_data(tempMin,minTempDir)
+# # tempMean = list.files(path=meanTempDir, pattern="*.txt", full.names=TRUE)
+# # clean_data(tempMean,meanTempDir)
+# 
+# # Create list of text files
+# txt_files_ls = list.files(path="Homog_monthly_min_temp_cleaned", pattern="*.txt", full.names = TRUE)
+# names = list.files(path="Homog_monthly_min_temp_cleaned", pattern="*.txt")
+# ns = matrix(unlist(strsplit(names,'_')),ncol = 3,byrow = TRUE)
 
 provs <- c("AB","BC","YT","NT","NU","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL")
 list_prov = list()
 names_city = list()
 j = 1
 for (i in 1:length(txt_files_ls))
-  if(ns[i,3] == "SK.txt"){
+  if(ns[i,3] == "ON.txt"){
     list_prov[j] <- txt_files_ls[i]
     names_city[j] <- ns[i,2]
     j = j+1
@@ -157,7 +157,7 @@ df_n <- data.frame(df_n)
 city<- data.table(city, stringsAsFactors = TRUE)
 id<- as.factor(unlist(id))
 city$id <- rownames(city) 
-city$prov <- "SK"
+city$prov <- "ON"
 df_n<- data.frame(df_n, city[,1])
 
 input_df <- data.table(y_city_year, x_year, id)
@@ -190,14 +190,14 @@ r_2 <- merge(x = df_n, y = r_1, by= 'city' , all  = TRUE)
 
 
 
-hist(r_2$slope, freq = TRUE, main  = "Histogram of Slope - SK", xlab = "Slope")
-hist(r_2$slope, prob = TRUE, main  = "Histogram of Slope - SK", xlab = "Slope")
+hist(r_2$slope, freq = TRUE, main  = "Histogram of Slope - ON", xlab = "Slope")
+hist(r_2$slope, prob = TRUE, main  = "Histogram of Slope - ON", xlab = "Slope")
 lines(density(r_2$slope), col = "red")
 
 # hist(x = CI_lower_slope, prob = TRUE=)
 # lines(density(CI_lower_slope), col = "red")
 
-write.csv(r_2,'reg_results_SK.csv')
+write.csv(r_2,'reg_results_ON.csv')
 
 
 
