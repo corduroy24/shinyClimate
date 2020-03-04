@@ -71,7 +71,7 @@ list_prov = list()
 names_city = list()
 j = 1
 for (i in 1:length(txt_files_ls))
-  if(ns[i,3] == "ON.txt"){
+  if(ns[i,3] == "NL.txt"){
     list_prov[j] <- txt_files_ls[i]
     names_city[j] <- ns[i,2]
     j = j+1
@@ -157,7 +157,7 @@ df_n <- data.frame(df_n)
 city<- data.table(city, stringsAsFactors = TRUE)
 id<- as.factor(unlist(id))
 city$id <- rownames(city) 
-city$prov <- "ON"
+city$prov <- "NL"
 df_n<- data.frame(df_n, city[,1])
 
 input_df <- data.table(y_city_year, x_year, id)
@@ -190,14 +190,15 @@ r_2 <- merge(x = df_n, y = r_1, by= 'city' , all  = TRUE)
 
 
 
-hist(r_2$slope, freq = TRUE, main  = "Histogram of Slope - ON", xlab = "Slope")
-hist(r_2$slope, prob = TRUE, main  = "Histogram of Slope - ON", xlab = "Slope")
+hist(r_2$slope, freq = TRUE, main  = "Histogram of Slope - NL", xlab = "Slope")
+
+hist(r_2$slope, prob = TRUE, main  = "Histogram of Slope - NL", xlab = "Slope")
 lines(density(r_2$slope), col = "red")
 
 # hist(x = CI_lower_slope, prob = TRUE=)
 # lines(density(CI_lower_slope), col = "red")
 
-write.csv(r_2,'reg_results_ON.csv')
+write.csv(r_2,'reg_results_NL.csv')
 
 
 
