@@ -66,11 +66,12 @@ txt_files_ls = list.files(path="Homog_monthly_min_temp_cleaned", pattern="*.txt"
 names = list.files(path="Homog_monthly_min_temp_cleaned", pattern="*.txt")
 ns = matrix(unlist(strsplit(names,'_')),ncol = 3,byrow = TRUE)
 
+provs <- c("AB","BC","YT","NT","NU","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL")
 list_prov = list()
 names_city = list()
 j = 1
 for (i in 1:length(txt_files_ls))
-  if(ns[i,3] == "AB.txt"){
+  if(ns[i,3] == "BC.txt"){
     list_prov[j] <- txt_files_ls[i]
     names_city[j] <- ns[i,2]
     j = j+1
@@ -111,31 +112,22 @@ city <- as.matrix(city)
 city <- as.character(city)
 city <- factor(city)
 
-idk_test <- list()
-fit <- list()
-test_y_temp <- list()
-test_x_year <- list()
-fit_1 <- list()
-R_2 <- list()
-b <- list()
-CIs <-list()
-y_city <- list()
-x_year <- data.frame(x_year)
-
-for (i in 1:length(names_city)){
-  temp_file <- txt_files_df[[i]]
-  test_data_1980_greater<-temp_file[as.numeric(as.character(temp_file$X.Year)) > 1979,]
-  idk_test[[i]] <- test_data_1980_greater
-  index <- which(input_df[, "city"] == unlist(names_city)[i])
-  # test_y_temp[[i]] <- as.numeric(as.character(unlist(idk_test[[i]]$X.....Feb)))
-  # test_x_year[[i]] <- as.numeric(as.character(unlist(idk_test[[i]]$X.Year)))
-  fit_1 <- lm(y_city_year[index]~x_year[index], data = input_df )
-  b[[i]] <- fit_1$coefficients
-  R_2[i] <- as.numeric(unlist(summary(fit_1)$r.squared))
-  CIs[[i]] <- ci(fit_1, 0.95, alpha=1-0.95, na.rm = TRUE)
-  # x_city <- cbind(1,test_x_year[[i]])
-  # y_city[[i]] <- x_city%*%as.matrix(b[[i]])
-}
+# fit_1 <- list()
+# R_2 <- list()
+# b <- list()
+# CIs <-list()
+# y_city <- list()
+# x_year <- data.frame(x_year)
+# 
+# for (i in 1:length(names_city)){
+#   index <- which(input_df[, "city"] == unlist(names_city)[i])
+#   fit_1 <- lm(y_city_year[index]~x_year[index], data = input_df )
+#   b[[i]] <- fit_1$coefficients
+#   R_2[i] <- as.numeric(unlist(summary(fit_1)$r.squared))
+#   CIs[[i]] <- ci(fit_1, 0.95, alpha=1-0.95, na.rm = TRUE)
+#   # x_city <- cbind(1,test_x_year[[i]])
+#   # y_city[[i]] <- x_city%*%as.matrix(b[[i]])
+# }
 
 
 # Interaction Model - Regression Results 
@@ -145,30 +137,35 @@ years_1980_greater<-combined_df[as.numeric(as.character(combined_df$X.Year))>197
 x_year <- as.numeric(as.character(unlist(years_1980_greater$X.Year)))
 y_city_year <- as.numeric(as.character(unlist(years_1980_greater$X.....Feb)))
 
-input_df <- data.table(y_city_year, x_year, id)
-input_df <- merge(x = input_df, y = city, by = 'id', all = TRUE)
-
 
 id <- list()
 num_na <- c()
 curr_length <- c()
 
 for(i in 1: length(names_city)){
-  index <- which(input_df[, "city"] == unlist(names_city)[i])
-  num_na[i] <- sum(is.na(y_city_year[index]))
-  curr_length[i] <- length(y_city_year[index])
+  # index <- which(input_df[, "city"] == unlist(names_city)[i])
+  curr_df <- txt_files_df[[i]]
+  curr_df_1980<-curr_df[as.numeric(as.character(curr_df$X.Year))>1979,]
+  y_curr_df <- as.numeric(as.character(unlist(curr_df_1980$X.....Feb)))
+  num_na[i] <- sum(is.na(y_curr_df))
+  curr_length[i] <- length(y_curr_df)
   id[i] <- list(rep.int(i, curr_length[i]))
 }
 
 df_n <- curr_length - num_na 
 df_n <- data.frame(df_n)
-id<- as.factor(unlist(id))
 city<- data.table(city, stringsAsFactors = TRUE)
+id<- as.factor(unlist(id))
 city$id <- rownames(city) 
-city$prov <- "AB"
+city$prov <- "BC"
 df_n<- data.frame(df_n, city[,1])
 
+input_df <- data.table(y_city_year, x_year, id)
+input_df <- merge(x = input_df, y = city, by = 'id', all = TRUE)
+
 fit_2 <- lm(y_city_year~ city-1 + city*x_year , data = input_df)
+
+
 
 b_2 <- fit_2$coefficients
 r.squared <- summary(fit_2)$r.squared
@@ -187,14 +184,21 @@ slope <- data.frame("slope" = b_2[(length(names_city)+1):length(b_2)])
 variance <- (summary(fit_2)$coef[,2])^2
 variance_slope <- data.frame("variance" = variance[(length(names_city)+1):length(variance)])
 # split <- matrix(unlist(strsplit(rownames(check),'city')),ncol = 2,byrow = TRUE)
-r_1 <- data.frame(city_matrix, intercept, slope, CI_lower_slope, CI_upper_slope, variance_slope, r.squared)
+r_1 <- data.frame(city_matrix, intercept, slope, CI_lower, CI_upper, variance_slope, r.squared)
 r_2 <- merge(x = df_n, y = r_1, by= 'city' , all  = TRUE)
 # r_3 <- r_2[,c(1,3,4,7,8,2,5)]
 
-provs <- c("BC","YT","NT","NU", "AB","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL")
 
 
+hist(r_2$slope, freq = TRUE, main  = "Histogram of Slope - BC", xlab = "Slope")
+hist(r_2$slope, prob = TRUE, main  = "Histogram of Slope - BC", xlab = "Slope")
+lines(density(r_2$slope), col = "red")
 
+# hist(x = CI_lower_slope, prob = TRUE)
+# lines(density(CI_lower_slope), col = "red")
+
+
+write.csv(r_2,'reg_results_BC.csv')
 
 
 
