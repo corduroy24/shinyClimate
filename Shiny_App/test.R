@@ -140,38 +140,35 @@ for (i in 1:length(names_city)){
 
 # Interaction Model - Regression Results 
 
-id <- list()
-# %between%
+
 years_1980_greater<-combined_df[as.numeric(as.character(combined_df$X.Year))>1979,]
 x_year <- as.numeric(as.character(unlist(years_1980_greater$X.Year)))
 y_city_year <- as.numeric(as.character(unlist(years_1980_greater$X.....Feb)))
+
+input_df <- data.table(y_city_year, x_year, id)
+input_df <- merge(x = input_df, y = city, by = 'id', all = TRUE)
+
+
+id <- list()
 num_na <- c()
 curr_length <- c()
+
 for(i in 1: length(names_city)){
-  curr_city_df <- txt_files_df[[i]]
-  curr_city_1980_greater_df <- curr_city_df[as.numeric(as.character(curr_city_df$X.Year))>1979, ]
-  curr_temp_feb_df <- as.numeric(as.character(unlist(curr_city_1980_greater_df$X.....Feb)))
-  num_na[i] <- sum(is.na(curr_temp_feb_df ))
-  curr_length[i] <- nrow(curr_city_1980_greater_df)
+  index <- which(input_df[, "city"] == unlist(names_city)[i])
+  num_na[i] <- sum(is.na(y_city_year[index]))
+  curr_length[i] <- length(y_city_year[index])
   id[i] <- list(rep.int(i, curr_length[i]))
 }
-
 
 df_n <- curr_length - num_na 
 df_n <- data.frame(df_n)
 id<- as.factor(unlist(id))
-input_df <- data.table(y_city_year, x_year, id)
 city<- data.table(city, stringsAsFactors = TRUE)
 city$id <- rownames(city) 
 city$prov <- "AB"
 df_n<- data.frame(df_n, city[,1])
-test <- data.frame(y_city_year)
-
-input_df <- merge(x = input_df, y = city, by = 'id', all = TRUE)
 
 fit_2 <- lm(y_city_year~ city-1 + city*x_year , data = input_df)
-
-
 
 b_2 <- fit_2$coefficients
 r.squared <- summary(fit_2)$r.squared
