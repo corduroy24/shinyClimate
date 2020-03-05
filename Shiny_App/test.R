@@ -31,10 +31,11 @@ meanTempDir = "Homog_monthly_mean_temp"
 # clean_data(tempMean,meanTempDir)
 
 
-# provs <- data.frame("provs" = c("AB","BC","YT","NT","NU","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL"))
+all_provs <- data.frame("provs" = c("AB","BC","YT","NT","NU","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL"))
+# single_prov <- data.frame("provs" = c('AB'))
+# provs <-data.frame("provs" = c("AB", "BC")) #convert to preset regions...
 
-
-provs <-data.frame("provs" = c("AB", "BC"))
+provs <- all_provs
 year_to_start <- 1980
 month <- 'Feb'
 temp_meas <- 'min_temp'
@@ -45,10 +46,14 @@ for(i in 1:nrow(provs)){
   
   output_df <- regression(input_df) #reg results 
   
-  
+  make_hist(output_df)
+  save(output_df, file = paste(temp_meas, month, year_to_start, provs[i,],'.RData'))
+  # make_boxplot(output_df)
   combined_df <- rbind(combined_df, output_df) 
+  save(combined_df, file = paste(temp_meas, month, year_to_start,provs[,],'.RData'))
 }
 
+load(paste(temp_meas,month, year_to_start,'.RData'))
 clean_data <- function(temp_meas, dir)
   for (i in 1:length(temp_meas)){
     title = read.table(temp_meas[i], nrow = 1, sep = ",",dec = ".", as.is = TRUE,quote = "\"", na.strings=c(" "), header = FALSE)
@@ -144,12 +149,11 @@ regression <- function(input_df){
 # city<- data.table(city_vector, stringsAsFactors = TRUE)
 # fit_2 <- lm(y_temp~ city-1 + city*x_year , data = input_df)
 
-make_boxplot<- function(output_df){
+make_hist<- function(output_df){
+  hist(output_df$slope, freq = TRUE, main  = "Histogram of Slope", xlab = "Slope")
+  # save(test)
+}
 
-  new_data <- subset(output_df, prov == 'AB')
-  provs <- unique(output_df[,"prov"])
-  for(i in 1: length)
-hist(output_df$slope, freq = TRUE, main  = "Histogram of Slope - NL", xlab = "Slope")
 #
 # hist(r_2$slope, prob = TRUE, main  = "Histogram of Slope - NL", xlab = "Slope")
 # lines(density(r_2$slope), col = "red")
@@ -161,13 +165,9 @@ hist(output_df$slope, freq = TRUE, main  = "Histogram of Slope - NL", xlab = "Sl
 
 # boxplot(reg_results_AB$slope~reg_results_AB$prov)
   
-}
 
 
 
-combined_reg_results <- do.call("rbind", lapply(reg_results, as.data.frame))
-
-
-boxplot(combined_reg_results$slope~combined_reg_results$prov)
+# boxplot(combined_reg_results$slope~combined_reg_results$prov)
 
 # missing - CI plots, r.squared?
