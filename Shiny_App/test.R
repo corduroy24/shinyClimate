@@ -11,10 +11,43 @@ library(gmodels)
 #reproduce code, -> software engineering
 
 
- # dir = "Homog_monthly_min_temp"
- # temp_meas = list.files(path=dir, pattern="*.txt", full.names=TRUE)
- # i = 1;
+# dir = "Homog_monthly_min_temp"
+# temp_meas = list.files(path=dir, pattern="*.txt", full.names=TRUE)
+# i = 1;
 
+# main function later... 
+# handling new data ?
+#
+minTempDir = "Homog_monthly_min_temp"
+maxTempDir = "Homog_monthly_max_temp"
+meanTempDir = "Homog_monthly_mean_temp"
+
+
+# tempMax = list.files(path=maxTempDir, pattern="*.txt", full.names=TRUE)
+# clean_data(tempMax,maxTempDir)
+# tempMin  = list.files(path=minTempDir, pattern="*.txt", full.names=TRUE)
+# clean_data(tempMin,minTempDir)
+# tempMean = list.files(path=meanTempDir, pattern="*.txt", full.names=TRUE)
+# clean_data(tempMean,meanTempDir)
+
+
+# provs <- data.frame("provs" = c("AB","BC","YT","NT","NU","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL"))
+
+
+provs <-data.frame("provs" = c("AB", "BC"))
+year_to_start <- 1980
+month <- 'Feb'
+temp_meas <- 'min_temp'
+
+combined_df <-data.frame()
+for(i in 1:nrow(provs)){
+  input_df <- load_cleaned_data(year_to_start, month, temp_meas, provs[i,]) #data matrix X
+  
+  output_df <- regression(input_df) #reg results 
+  
+  
+  combined_df <- rbind(combined_df, output_df) 
+}
 
 clean_data <- function(temp_meas, dir)
   for (i in 1:length(temp_meas)){
@@ -47,24 +80,9 @@ clean_data <- function(temp_meas, dir)
                 row.names = FALSE, col.names = FALSE)
    }
 
-
-
-minTempDir = "Homog_monthly_min_temp"
-maxTempDir = "Homog_monthly_max_temp"
-meanTempDir = "Homog_monthly_mean_temp"
-
-
-# tempMax = list.files(path=maxTempDir, pattern="*.txt", full.names=TRUE)
-# clean_data(tempMax,maxTempDir)
-# tempMin  = list.files(path=minTempDir, pattern="*.txt", full.names=TRUE)
-# clean_data(tempMin,minTempDir)
-# tempMean = list.files(path=meanTempDir, pattern="*.txt", full.names=TRUE)
-# clean_data(tempMean,meanTempDir)
-
-
 # Load data from cleaning step
 
-load_cleaned_data <- function(year, month, temp_meas, provs){
+load_cleaned_data <- function(year, month, temp_meas, nom_prov){
   if(temp_meas == 'min_temp'){
     txt_files_ls = list.files(path="Homog_monthly_min_temp_cleaned", pattern="*.txt", full.names = TRUE)
     names = list.files(path="Homog_monthly_min_temp_cleaned", pattern="*.txt")
@@ -79,36 +97,27 @@ load_cleaned_data <- function(year, month, temp_meas, provs){
   }
   
   ns = matrix(unlist(strsplit(names,'_',)),ncol = 3,byrow = TRUE)
-  combined_df <- data.frame()
-  for(i in 1: nrow(provs)){
-    for (j in 1:length(txt_files_ls)){
-      if(unlist(strsplit(ns[j,3],'.txt')) == provs[i,]){
-        nom_prov <- unlist(strsplit(ns[j,3],'.txt'))
-        nom_city <- ns[j,2]
-        # Non-breaking spaces...trim.white doesnt work... 
-        txt_files_df <- read.table(file = txt_files_ls[j], header = TRUE, sep = " ",dec = ".", colClasses = "factor")
-        years_greater<-txt_files_df[as.numeric(as.character(txt_files_df$Year))>=year_to_start,]
-        y_temp <- suppressWarnings(as.numeric(as.character(unlist(years_greater[,month]))))
-        x_year <- suppressWarnings(as.numeric(as.character(unlist(years_greater[,'Year']))))
-        temp_df <- data.frame(y_temp, x_year, "city" = nom_city, "prov" = nom_prov ) 
-        combined_df <- rbind(combined_df, temp_df) 
-      }
+  input_df <- data.frame()
+  for (i in 1:length(txt_files_ls)){
+    if(unlist(strsplit(ns[i,3],'.txt')) == nom_prov){
+      nom_city <- ns[i,2]
+      nom_prov <- unlist(strsplit(ns[i,3],'.txt'))
+      # Non-breaking spaces...trim.white doesnt work... 
+      txt_files_df <- read.table(file = txt_files_ls[i], header = TRUE, sep = " ",dec = ".", colClasses = "factor")
+      years_greater<-txt_files_df[as.numeric(as.character(txt_files_df$Year))>=year_to_start,]
+      y_temp <- suppressWarnings(as.numeric(as.character(unlist(years_greater[,month]))))
+      x_year <- suppressWarnings(as.numeric(as.character(unlist(years_greater[,'Year']))))
+      temp_df <- data.frame(y_temp, x_year, "city" = nom_city, "prov" = nom_prov) 
+      input_df <- rbind(input_df, temp_df) 
     }
   }
-  return(combined_df)
+  return(input_df)
 }
 
-# provs <- data.frame("provs" = c("AB","BC","YT","NT","NU","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL"))
-provs <-data.frame("provs" = c("AB", "BC"))
-year_to_start <- 1980
-month <- 'Feb'
-temp_meas <- 'max_temp'
-input_df = load_cleaned_data(year_to_start, month, temp_meas, provs)
-
-output_df <- regression(input_df)
 
 regression <- function(input_df){
   city_vector <- unique(input_df[,"city"])
+  prov <- unique(input_df[, 'prov'])
   output_df <- data.frame()
   for (i in 1:length(city_vector)){
     index <- which(input_df[, "city"] == city_vector[i])
@@ -123,8 +132,8 @@ regression <- function(input_df){
     CI_lower <-  estimate - margin_error
     CI_upper <- estimate + margin_error
     variance <- (standard_error)^2
-    prov <- unique(as.character(input_df[, 'prov'][index]))
-    curr_results_df <- data.frame("city"=city_vector[i],'prov' = p,  b,"r.squared"=R_2,CI_lower, CI_upper,variance,"n"=nrow(fit$model), row.names = NULL)
+    # prov <- unique(as.character(input_df[, 'prov'][index]))
+    curr_results_df <- data.frame("city"=city_vector[i],'prov' = prov,  b,"r.squared"=R_2,CI_lower, CI_upper,variance,"n"=nrow(fit$model), row.names = NULL)
     output_df <- rbind(output_df,curr_results_df) 
   }
   return(output_df)
@@ -135,8 +144,12 @@ regression <- function(input_df){
 # city<- data.table(city_vector, stringsAsFactors = TRUE)
 # fit_2 <- lm(y_temp~ city-1 + city*x_year , data = input_df)
 
+make_boxplot<- function(output_df){
 
-# hist(r_2$slope, freq = TRUE, main  = "Histogram of Slope - NL", xlab = "Slope")
+  new_data <- subset(output_df, prov == 'AB')
+  provs <- unique(output_df[,"prov"])
+  for(i in 1: length)
+hist(output_df$slope, freq = TRUE, main  = "Histogram of Slope - NL", xlab = "Slope")
 #
 # hist(r_2$slope, prob = TRUE, main  = "Histogram of Slope - NL", xlab = "Slope")
 # lines(density(r_2$slope), col = "red")
@@ -147,10 +160,10 @@ regression <- function(input_df){
 # write.csv(r_2,'reg_results_NL.csv')
 
 # boxplot(reg_results_AB$slope~reg_results_AB$prov)
+  
+}
 
-reg_results <- list(reg_results_AB, reg_results_BC, reg_results_MB, reg_results_NB, reg_results_NL, reg_results_NS, reg_results_NT, reg_results_NU, reg_results_ON, reg_results_PE, reg_results_QC, reg_results_SK, reg_results_YT)
 
-names(reg_results[[1]]) <- names(reg_results[[2]])
 
 combined_reg_results <- do.call("rbind", lapply(reg_results, as.data.frame))
 
