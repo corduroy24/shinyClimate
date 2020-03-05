@@ -1,4 +1,4 @@
-" Year" "     Jan" "     Feb" "     Mar" "     Apr" "     May" "     Jun" "     Jul" "     Aug" "     Sep" "     Oct" "     Nov" "     Dec" "  Annual" "  Winter" "  Spring" "  Summer" "  Autumn"
+"Year" "Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec" "Annual" "Winter" "Spring" "Summer" "Autumn"
 "1951" " NA" " NA" " NA" " NA" " NA" " NA" " NA" " NA" "    17.2" "     4.0" "    -3.4" "   -13.7" " NA" " NA" " NA" " NA" "     5.9"
 "1952" "   -13.9" "    -3.2" "     2.0" "     7.5" "    15.8" "    16.7" "    22.0" "    21.1" "    16.9" " NA" "    -1.9" "    -6.4" " NA" "   -10.3" "     8.4" "    19.9" " NA"
 "1953" "   -15.3" "     0.5" "     3.5" " NA" " NA" " NA" " NA" "    19.5" "    13.4" "     7.8" "     0.4" "    -4.1" " NA" "    -7.1" " NA" " NA" "     7.2"

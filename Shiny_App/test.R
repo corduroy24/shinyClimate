@@ -102,7 +102,7 @@ load_cleaned_data <- function(year, month, temp_meas, provs){
 provs <-data.frame("provs" = c("AB", "BC"))
 year_to_start <- 1980
 month <- 'Feb'
-temp_meas <- 'minTemp'
+temp_meas <- 'max_temp'
 input_df = load_cleaned_data(year_to_start, month, temp_meas, provs)
 
 output_df <- regression(input_df)
