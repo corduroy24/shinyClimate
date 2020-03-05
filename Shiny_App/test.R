@@ -40,20 +40,28 @@ year_to_start <- 1980
 month <- 'Feb'
 temp_meas <- 'min_temp'
 
-combined_df <-data.frame()
-for(i in 1:nrow(provs)){
-  input_df <- load_cleaned_data(year_to_start, month, temp_meas, provs[i,]) #data matrix X
-  
-  output_df <- regression(input_df) #reg results 
-  
-  make_hist(output_df)
-  save(output_df, file = paste(temp_meas, month, year_to_start, provs[i,],'.RData'))
-  # make_boxplot(output_df)
-  combined_df <- rbind(combined_df, output_df) 
-  save(combined_df, file = paste(temp_meas, month, year_to_start,provs[,],'.RData'))
+if(file.exists(paste(temp_meas, month, year_to_start))){
+  file.exists(paste(temp_meas,month, year_to_start,'.RData'))
+  load(paste(temp_meas,month, year_to_start,'.RData'))
+} else {
+  combined_df <-data.frame()
+  for(i in 1:nrow(provs)){
+    input_df <- load_cleaned_data(year_to_start, month, temp_meas, provs[i,]) #data matrix X
+    output_df <- regression(input_df) #reg results 
+    # make_boxplot(output_df)
+    combined_df <- rbind(combined_df, output_df)
+  }
+  save(combined_df, file = paste(temp_meas, month, year_to_start,'.RData'))
 }
 
-load(paste(temp_meas,month, year_to_start,'.RData'))
+
+provs <- unique(combined_df[, 'prov'])
+for (i in 1:length(provs)){
+  index <- which(combined_df[, "prov"] == provs[i])
+  output_df <- combined_df[index,]
+  make_hist(output_df)
+}
+  
 clean_data <- function(temp_meas, dir)
   for (i in 1:length(temp_meas)){
     title = read.table(temp_meas[i], nrow = 1, sep = ",",dec = ".", as.is = TRUE,quote = "\"", na.strings=c(" "), header = FALSE)
@@ -150,8 +158,8 @@ regression <- function(input_df){
 # fit_2 <- lm(y_temp~ city-1 + city*x_year , data = input_df)
 
 make_hist<- function(output_df){
-  hist(output_df$slope, freq = TRUE, main  = "Histogram of Slope", xlab = "Slope")
-  # save(test)
+  hist <-hist(output_df$slope, freq = TRUE, main  = paste("Histogram of Slope - ",unique(output_df[,"prov"])), xlab = "Slope")
+  save(hist, file = paste(temp_meas, month, year_to_start,'.RData'))
 }
 
 #
