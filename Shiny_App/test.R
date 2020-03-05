@@ -1,6 +1,3 @@
-# comments
-# still buggy when a file/folder already exists
-
 require(data.table)
 require(tidyr)
 library(plyr)
@@ -8,6 +5,10 @@ library(dplyr)
 library(readr)
 library(stringr)
 library(gmodels)
+
+# comments
+# still buggy when a file/folder already exists
+#reproduce code, -> software engineering
 
 
  # dir = "Homog_monthly_min_temp"
@@ -53,56 +54,67 @@ maxTempDir = "Homog_monthly_max_temp"
 meanTempDir = "Homog_monthly_mean_temp"
 
 
-#temp_meas <- array(c(minTempDir,maxTempDir,meanTempDir))
 # tempMax = list.files(path=maxTempDir, pattern="*.txt", full.names=TRUE)
 # clean_data(tempMax,maxTempDir)
-tempMin  = list.files(path=minTempDir, pattern="*.txt", full.names=TRUE)
-clean_data(tempMin,minTempDir)
+# tempMin  = list.files(path=minTempDir, pattern="*.txt", full.names=TRUE)
+# clean_data(tempMin,minTempDir)
 # tempMean = list.files(path=meanTempDir, pattern="*.txt", full.names=TRUE)
 # clean_data(tempMean,meanTempDir)
 
 
-# Create list of text files
-txt_files_ls = list.files(path="Homog_monthly_min_temp_cleaned", pattern="*.txt", full.names = TRUE)
-names = list.files(path="Homog_monthly_min_temp_cleaned", pattern="*.txt")
-ns = matrix(unlist(strsplit(names,'_')),ncol = 3,byrow = TRUE)
+# Load data from cleaning step
 
-load_cleaned_data <- function(year, month){
-  provs <- c("AB","BC","YT","NT","NU","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL")
-  combined_df <- data.frame()
+load_cleaned_data <- function(year, month, temp_meas, provs){
+  if(temp_meas == 'min_temp'){
+    txt_files_ls = list.files(path="Homog_monthly_min_temp_cleaned", pattern="*.txt", full.names = TRUE)
+    names = list.files(path="Homog_monthly_min_temp_cleaned", pattern="*.txt")
+  }
+  else if(temp_meas == 'max_temp'){
+    txt_files_ls = list.files(path="Homog_monthly_max_temp_cleaned", pattern="*.txt", full.names = TRUE)
+    names = list.files(path="Homog_monthly_max_temp_cleaned", pattern="*.txt")
+  }
+  else if(temp_meas == 'mean_temp'){
+    txt_files_ls = list.files(path="Homog_monthly_mean_temp_cleaned", pattern="*.txt", full.names = TRUE)
+    names = list.files(path="Homog_monthly_mean_temp_cleaned", pattern="*.txt")
+  }
   
-  for (i in 1:length(txt_files_ls)){
-    if(ns[i,3] == "AB.txt"){
-      nprov <- unlist(strsplit(ns[i,3],'.txt'))
-      ncity <- ns[i,2]
-      # Non-breaking spaces...trim.white doesnt work... 
-      txt_files_df <- read.table(file = txt_files_ls[i], header = TRUE, sep = " ",dec = ".", colClasses = "factor")
-      years_greater<-txt_files_df[as.numeric(as.character(txt_files_df$Year))>=year_to_start,]
-      y_temp <- suppressWarnings(as.numeric(as.character(unlist(years_greater[,month]))))
-      x_year <- suppressWarnings(as.numeric(as.character(unlist(years_greater[,'Year']))))
-      temp_df <- data.frame(y_temp, x_year, "city" = ncity, "prov" = nprov ) 
-      combined_df <- rbind(combined_df, temp_df) 
+  ns = matrix(unlist(strsplit(names,'_',)),ncol = 3,byrow = TRUE)
+  combined_df <- data.frame()
+  for(i in 1: nrow(provs)){
+    for (j in 1:length(txt_files_ls)){
+      if(unlist(strsplit(ns[j,3],'.txt')) == provs[i,]){
+        nom_prov <- unlist(strsplit(ns[j,3],'.txt'))
+        nom_city <- ns[j,2]
+        # Non-breaking spaces...trim.white doesnt work... 
+        txt_files_df <- read.table(file = txt_files_ls[j], header = TRUE, sep = " ",dec = ".", colClasses = "factor")
+        years_greater<-txt_files_df[as.numeric(as.character(txt_files_df$Year))>=year_to_start,]
+        y_temp <- suppressWarnings(as.numeric(as.character(unlist(years_greater[,month]))))
+        x_year <- suppressWarnings(as.numeric(as.character(unlist(years_greater[,'Year']))))
+        temp_df <- data.frame(y_temp, x_year, "city" = nom_city, "prov" = nom_prov ) 
+        combined_df <- rbind(combined_df, temp_df) 
+      }
     }
   }
   return(combined_df)
 }
 
+# provs <- data.frame("provs" = c("AB","BC","YT","NT","NU","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL"))
+provs <-data.frame("provs" = c("AB", "BC"))
 year_to_start <- 1980
 month <- 'Feb'
-input_df = load_cleaned_data(year_to_start, month)
+temp_meas <- 'minTemp'
+input_df = load_cleaned_data(year_to_start, month, temp_meas, provs)
 
 output_df <- regression(input_df)
 
 regression <- function(input_df){
   city_vector <- unique(input_df[,"city"])
-  prov <- unique(input_df[,"prov"])
   output_df <- data.frame()
-  # i = 1
   for (i in 1:length(city_vector)){
     index <- which(input_df[, "city"] == city_vector[i])
     fit <- lm(y_temp[index]~x_year[index], data = input_df)
     b <- data.frame("intercept" = fit$coefficients[1], "slope" = fit$coefficients[2])
-    R_2 <- data.frame("r.squared" = as.numeric(unlist(summary(fit_1)$r.squared)))
+    R_2 <- data.frame("r.squared" = as.numeric(unlist(summary(fit)$r.squared)))
     # CIs <- ci(fit, 0.95, alpha=1-0.95, na.rm = TRUE)
     critical_value <- qt((1-0.95)/2, (nrow(fit$model)-1))
     standard_error <- summary(fit)$coef[,2][2]
@@ -111,47 +123,17 @@ regression <- function(input_df){
     CI_lower <-  estimate - margin_error
     CI_upper <- estimate + margin_error
     variance <- (standard_error)^2
-    curr_results_df <- data.frame("city"=city_vector[i],prov,b,"r.squared"=R_2,CI_lower, CI_upper,variance,"n"=nrow(fit$model), row.names = NULL)
+    prov <- unique(as.character(input_df[, 'prov'][index]))
+    curr_results_df <- data.frame("city"=city_vector[i],'prov' = p,  b,"r.squared"=R_2,CI_lower, CI_upper,variance,"n"=nrow(fit$model), row.names = NULL)
     output_df <- rbind(output_df,curr_results_df) 
   }
   return(output_df)
 }
 
-
-
-# Interaction Model - Regression Results
-
-#reproduce code, -> software engineering
-
-
-
-
-
-city<- data.table(city_vector, stringsAsFactors = TRUE)
-fit_2 <- lm(y_temp~ city-1 + city*x_year , data = input_df)
-
-
-
-b_2 <- fit_2$coefficients
-r.squared <- summary(fit_2)$r.squared
-critical_value <- qt(0.95, (df_n[,1]-2))
-standard_error <- summary(fit_2)$coef[,2]
-standard_error_slope <- standard_error[(length(names_city)+1):length(standard_error)]
-margin_error <- critical_value*standard_error_slope
-estimate <- summary(fit_2)$coef[,1]
-estimate_slope <- estimate[(length(names_city)+1):length(estimate)]
-CI_lower <-  estimate_slope - margin_error
-CI_upper <- estimate_slope + margin_error
-CI <- data.frame(CI_lower, CI_upper)
-city_matrix <- city[order(city), ]
-intercept <- data.frame("intercept"=b_2[1:length(names_city)])
-slope <- data.frame("slope" = b_2[(length(names_city)+1):length(b_2)])
-variance <- (summary(fit_2)$coef[,2])^2
-variance_slope <- data.frame("variance" = variance[(length(names_city)+1):length(variance)])
-r_1 <- data.frame(city_matrix, intercept, slope, CI_lower, CI_upper, variance_slope, r.squared)
-r_2 <- merge(x = df_n, y = r_1, by= 'city' , all  = TRUE)
-# r_3 <- r_2[,c(1,3,4,7,8,2,5)]
-
+# Interaction Model - Confirm Regression Results
+# 
+# city<- data.table(city_vector, stringsAsFactors = TRUE)
+# fit_2 <- lm(y_temp~ city-1 + city*x_year , data = input_df)
 
 
 # hist(r_2$slope, freq = TRUE, main  = "Histogram of Slope - NL", xlab = "Slope")
