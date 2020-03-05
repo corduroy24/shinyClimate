@@ -72,18 +72,19 @@ names_city = data.frame()
 j = 1
 year_to_start <- 1980
 month <- 'Feb'
-combined_df <- data.frame()
-# load_cleaned_data <- function(year, month)
-for (i in 1:length(txt_files_ls)){
-  if(ns[i,3] == "AB.txt"){
-    nprov <- unlist(strsplit(ns[i,3],'.txt'))
-    ncity <- ns[i,2]
-    # Non-breaking spaces...trim.white doesnt work... 
-    txt_files_df <- read.table(file = txt_files_ls[i], header = TRUE, sep = " ",dec = ".", colClasses = "factor")
-    years_greater<-txt_files_df[as.numeric(as.character(txt_files_df$Year))>=year_to_start,]
-    y_city_year <- years_greater[,c(month, 'Year')]
-    test_df <- data.frame(y_city_year, "city" = ncity, "prov" = nprov ) 
-    combined_df <- rbind(combined_df, test_df) 
+load_cleaned_data <- function(year, month){
+  combined_df <- data.frame()
+  for (i in 1:length(txt_files_ls)){
+    if(ns[i,3] == "AB.txt"){
+      nprov <- unlist(strsplit(ns[i,3],'.txt'))
+      ncity <- ns[i,2]
+      # Non-breaking spaces...trim.white doesnt work... 
+      txt_files_df <- read.table(file = txt_files_ls[i], header = TRUE, sep = " ",dec = ".", colClasses = "factor")
+      years_greater<-txt_files_df[as.numeric(as.character(txt_files_df$Year))>=year_to_start,]
+      y_city_year <- years_greater[,c(month, 'Year')]
+      test_df <- data.frame(y_city_year, "city" = ncity, "prov" = nprov ) 
+      combined_df <- rbind(combined_df, test_df) 
+    }
   }
   return(combined_df)
 }
