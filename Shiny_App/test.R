@@ -43,32 +43,32 @@ temp_meas <- 'min_temp'
 if(file.exists(paste(temp_meas,month, year_to_start,'.RData'))){
   load(paste(temp_meas,month, year_to_start,'.RData'))
 } else {
-  combined_df <-data.frame()
+  input_df_all <-data.frame()
+  output_df_all <-data.frame()
   for(i in 1:nrow(provs)){
     input_df <- load_cleaned_data(year_to_start, month, temp_meas, provs[i,]) #data matrix X
     output_df <- regression(input_df) #reg results 
-    # make_boxplot(output_df)
-    combined_df <- rbind(combined_df, output_df)
+    input_df_all <- rbind(input_df_all, input_df)
+    output_df_all <- rbind(output_df_all, output_df)
   }
-  save(combined_df, file = paste(temp_meas, month, year_to_start,'.RData'))
+  save(input_df_all, file = paste(temp_meas, month, year_to_start,'.RData'))
+  save(output_df_all, file = paste(temp_meas, month, year_to_start,'.RData'))
 }
 
 
-provs <- unique(combined_df[, 'prov'])
+provs <- unique(output_df_all[, 'prov'])
 for (i in 1:length(provs)){
-  index <- which(combined_df[, "prov"] == provs[i])
-  output_df <- combined_df[index,]
+  index <- which(output_df_all[, "prov"] == provs[i])
+  output_df <- output_df_all[index,]
   hist(output_df$slope, freq = TRUE, main  = paste("Histogram of Slope - ",unique(output_df[,"prov"])), xlab = "Slope")
   #histogram for CIs
 }
 
-hist(combined_df$slope, freq = TRUE, main  = paste("Histogram of Slope(Canada)"), xlab = "Slope")
+hist(output_df_all$slope, freq = TRUE, main  = paste("Histogram of Slope(Canada)"), xlab = "Slope")
 abline(h=0, col = 'red')
-boxplot(combined_df$r.squared~combined_df$prov, xlab = "Province", ylab= 'r.squared', main = 'Boxplot of R_2')
-boxplot(combined_df$slope~combined_df$prov, xlab = 'Province',ylab = 'Slope', main = 'Boxplot of slope')
+boxplot(output_df_all$r.squared~output_df_all$prov, xlab = "Province", ylab= 'r.squared', main = 'Boxplot of R_2')
+boxplot(output_df_all$slope~output_df_all$prov, xlab = 'Province',ylab = 'Slope', main = 'Boxplot of slope')
 
-
-  
 
 clean_data <- function(temp_meas, dir)
   for (i in 1:length(temp_meas)){
@@ -82,6 +82,7 @@ clean_data <- function(temp_meas, dir)
     dat = read.delim(temp_meas[i], skip = 4, header= FALSE, as.is=TRUE, dec = ",", sep = ",", na.strings=c(" "))
     dat <- dat[ ,colSums(is.na(dat)) == 0]
 
+    #clean random data... 
     dat <- data.frame(lapply(dat, function(x){
       gsub("[a-zA-Z]", NA, x)
     }))
@@ -118,6 +119,8 @@ load_cleaned_data <- function(year, month, temp_meas, nom_prov){
   }
   
   ns = matrix(unlist(strsplit(names,'_',)),ncol = 3,byrow = TRUE)
+  
+  #build data frame. 
   input_df <- data.frame()
   for (i in 1:length(txt_files_ls)){
     if(unlist(strsplit(ns[i,3],'.txt')) == nom_prov){
