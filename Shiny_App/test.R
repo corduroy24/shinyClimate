@@ -40,8 +40,7 @@ year_to_start <- 1980
 month <- 'Feb'
 temp_meas <- 'min_temp'
 
-if(file.exists(paste(temp_meas, month, year_to_start))){
-  file.exists(paste(temp_meas,month, year_to_start,'.RData'))
+if(file.exists(paste(temp_meas,month, year_to_start,'.RData'))){
   load(paste(temp_meas,month, year_to_start,'.RData'))
 } else {
   combined_df <-data.frame()
@@ -59,9 +58,18 @@ provs <- unique(combined_df[, 'prov'])
 for (i in 1:length(provs)){
   index <- which(combined_df[, "prov"] == provs[i])
   output_df <- combined_df[index,]
-  make_hist(output_df)
+  hist(output_df$slope, freq = TRUE, main  = paste("Histogram of Slope - ",unique(output_df[,"prov"])), xlab = "Slope")
+  #histogram for CIs
 }
+
+hist(combined_df$slope, freq = TRUE, main  = paste("Histogram of Slope(Canada)"), xlab = "Slope")
+abline(h=0, col = 'red')
+boxplot(combined_df$r.squared~combined_df$prov, xlab = "Province", ylab= 'r.squared', main = 'Boxplot of R_2')
+boxplot(combined_df$slope~combined_df$prov, xlab = 'Province',ylab = 'Slope', main = 'Boxplot of slope')
+
+
   
+
 clean_data <- function(temp_meas, dir)
   for (i in 1:length(temp_meas)){
     title = read.table(temp_meas[i], nrow = 1, sep = ",",dec = ".", as.is = TRUE,quote = "\"", na.strings=c(" "), header = FALSE)
@@ -156,26 +164,3 @@ regression <- function(input_df){
 # 
 # city<- data.table(city_vector, stringsAsFactors = TRUE)
 # fit_2 <- lm(y_temp~ city-1 + city*x_year , data = input_df)
-
-make_hist<- function(output_df){
-  hist <-hist(output_df$slope, freq = TRUE, main  = paste("Histogram of Slope - ",unique(output_df[,"prov"])), xlab = "Slope")
-  save(hist, file = paste(temp_meas, month, year_to_start,'.RData'))
-}
-
-#
-# hist(r_2$slope, prob = TRUE, main  = "Histogram of Slope - NL", xlab = "Slope")
-# lines(density(r_2$slope), col = "red")
-#
-# # hist(x = CI_lower_slope, prob = TRUE=)
-# # lines(density(CI_lower_slope), col = "red")
-#
-# write.csv(r_2,'reg_results_NL.csv')
-
-# boxplot(reg_results_AB$slope~reg_results_AB$prov)
-  
-
-
-
-# boxplot(combined_reg_results$slope~combined_reg_results$prov)
-
-# missing - CI plots, r.squared?
