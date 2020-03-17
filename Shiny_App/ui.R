@@ -8,6 +8,7 @@
 #
 
 library(shiny)
+source("test.R")
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
@@ -18,17 +19,26 @@ shinyUI(fluidPage(
     # Sidebar with a slider input for number of bins
     sidebarLayout(
         sidebarPanel(
-        
-        # Input: Select a dataset ----
-        selectInput("dataset", "Choose a dataset:",
-                    choices = c("BC", "ON", "AB","SK","MB","QC","NB","NS","PE","NL","NU", "NT")
-        ),
 
-        # Show a plot of the generated distribution
-        mainPanel(
-            plotOutput("distPlot")
-        )
+            # Input: Select a dataset ----
+            selectInput("month", "Choose a month:",
+                choices = c("January", "February", "March","April","May","June","July","August","September","October","November", "December")
+            ),
+            
+            selectInput("temp_meas", "Choose a Measuremnent:",
+                choices = c("Minimum Temperature", "Mean Temperature", "Maximum Temperature")
+            ),
+            
+            textInput("start_year", "Start Year", NULL),
+            
+            actionButton("param_submit", "Submit"),
+            
+            # Show a plot of the generated distribution
+            mainPanel(
+                plotOutput("distPlot")
+            )
     ),
+    
     DT::dataTableOutput("table")
 )
     

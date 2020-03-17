@@ -1,23 +1,29 @@
 require(data.table)
-require(tidyr)
-library(plyr)
-library(dplyr)
-library(readr)
-library(stringr)
+
+
+require(tidyverse)
+# library(dplyr)
+# library(readr)
+# library(tidyr)
+# library(plyr)
+# library(stringr)
 library(gmodels)
 
-# comments
+# Comments/To-do 
 # still buggy when a file/folder already exists
-#reproduce code, -> software engineering
-
+# reproducable code, -> software engineering
+# Histograms of CIs
+# notebook for data  cleaning - next week - marchs 11
+# review shiny app - mid march 
+# main function later... 
+# handling user adding new data ? - clean function needs to be better...,
+# in terms of the folder, or how its saved ???
 
 # dir = "Homog_monthly_min_temp"
 # temp_meas = list.files(path=dir, pattern="*.txt", full.names=TRUE)
 # i = 1;
 
-# main function later... 
-# handling new data ?
-#
+
 minTempDir = "Homog_monthly_min_temp"
 maxTempDir = "Homog_monthly_max_temp"
 meanTempDir = "Homog_monthly_mean_temp"
@@ -35,11 +41,13 @@ all_provs <- data.frame("provs" = c("AB","BC","YT","NT","NU","SK", "MB", "ON", "
 # single_prov <- data.frame("provs" = c('AB'))
 # provs <-data.frame("provs" = c("AB", "BC")) #convert to preset regions...
 
+#params - decorator ???
 provs <- all_provs
 year_to_start <- 1980
 month <- 'Feb'
 temp_meas <- 'min_temp'
 
+#create function here 
 if(file.exists(paste(temp_meas,month, year_to_start,'.RData'))){
   load(paste(temp_meas,month, year_to_start,'.RData'))
 } else {
@@ -56,6 +64,7 @@ if(file.exists(paste(temp_meas,month, year_to_start,'.RData'))){
 }
 
 
+#create function here
 provs <- unique(output_df_all[, 'prov'])
 for (i in 1:length(provs)){
   index <- which(output_df_all[, "prov"] == provs[i])
@@ -69,6 +78,33 @@ abline(h=0, col = 'red')
 boxplot(output_df_all$r.squared~output_df_all$prov, xlab = "Province", ylab= 'r.squared', main = 'Boxplot of R_2')
 boxplot(output_df_all$slope~output_df_all$prov, xlab = 'Province',ylab = 'Slope', main = 'Boxplot of slope')
 
+add_data <- function(temp_meas, old_df, new_data){
+  for (i in 1:length(temp_meas)){
+    
+    # title = read.table(temp_meas[i], nrow = 1, sep = ",",dec = ".", as.is = TRUE,quote = "\"", na.strings=c(" "), header = FALSE)
+    # stationNum_city_prov = sprintf("%s_%s_%s", title[1],trimws(title[2]),strtrim(title[3],2))
+    # assign(stationNum_city_prov, read.delim(temp_meas[i],skip = 2, header = FALSE))
+    # (stationNum_city_prov)
+    # hdr = read.table(temp_meas[i], skip = 2, nrow = 1, sep = ",", as.is = TRUE, na.strings=c(" "), strip.white = TRUE)
+    # hdr <- hdr[, colSums(is.na(hdr)) == 0]
+    # (hdr)
+    dat = read.delim(temp_meas[i], skip = 4, header= FALSE, as.is=TRUE, dec = ",", sep = ",", na.strings=c(" "))
+    dat <- dat[ ,colSums(is.na(dat)) == 0]
+    
+    #clean random data... 
+    dat <- data.frame(lapply(dat, function(x){
+      gsub("[a-zA-Z]", NA, x)
+    }))
+    dat <- dat[,colSums(is.na(dat))==0 ]
+    
+    #filter out -9999.9 - default values
+    dat <- data.frame(lapply(dat, function(x){
+      gsub("-9999.9", "NA", x)
+    }))
+
+    total = rbind(old_df, new_df)
+  }
+} 
 
 clean_data <- function(temp_meas, dir)
   for (i in 1:length(temp_meas)){
@@ -81,7 +117,8 @@ clean_data <- function(temp_meas, dir)
     (hdr)
     dat = read.delim(temp_meas[i], skip = 4, header= FALSE, as.is=TRUE, dec = ",", sep = ",", na.strings=c(" "))
     dat <- dat[ ,colSums(is.na(dat)) == 0]
-
+    
+    #cleaning step ........
     #clean random data... 
     dat <- data.frame(lapply(dat, function(x){
       gsub("[a-zA-Z]", NA, x)
@@ -160,6 +197,8 @@ regression <- function(input_df){
     curr_results_df <- data.frame("city"=city_vector[i],'prov' = prov,  b,"r.squared"=R_2,CI_lower, CI_upper,variance,"n"=nrow(fit$model), row.names = NULL)
     output_df <- rbind(output_df,curr_results_df) 
   }
+  # plot(y_temp~x_year, data = input_df)
+  # abline(fit, col = 'red')
   return(output_df)
 }
 
