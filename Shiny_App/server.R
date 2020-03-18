@@ -15,6 +15,7 @@ meanTempDir = "Homog_monthly_mean_temp_cleaned"
 # tempMean = list.files(path=meanTempDir, pattern="*.txt", full.names=TRUE)
 library(shiny)
 library(tidyverse)
+source("helpers.R")
 
 
 # Define server logic required to draw a histogram
@@ -38,34 +39,66 @@ shinyServer(function(input, output) {
       params <- c(temp_val, month, start_year)
       
     }
+    
+
     value <- eventReactive(input$confirm, {
+
       validate(
         need(input$temp_val != '', 'Please choose a temperature value.'),
         need(input$month != '', 'Please choose a month.'),
-        need(input$start_year !='', 'Please choose a valid start year.')
+        need(input$start_year != '', 'Please choose a valid start year.')
+      )
+
+      
+      params <- extractParams(input)
+      debug(logger, paste('|check value------ ' , '|',params[1],"|"))
+      
+      temp_val <- params[1]
+      month<-  params[2]
+      year_to_start <-params[3] 
+      
+      output$test_1 <- renderText({params})
+      
+      # need atleast 2 values for regression... 
+      start_year_cutoff <- check_start_year_cuttoff(temp_val)
+      validate(
+        need(input$start_year < (start_year_cutoff-2), 
+             paste('Please choose a year prior to', start_year_cutoff)
+        )
       )
       
-      three_value_vector <- extractParams(input)
+      beginning <- Sys.time()
+      
+      output_df_all <- main(params[[1]], params[[2]], params[[3]])
+      
+      
+      end <- Sys.time()
+      output$test_2 <- renderText({end - beginning})
+      
+      output_df_all
     })
     
-    output$test_1 <- renderText({value()})
-    
+
     # Filter data based on selections
     output$table <- DT::renderDataTable(DT::datatable({
-      params <- value()
-      output_df_all <- main(params[[1]], params[[2]], params[[3]])
+      output_df_all <- value()
     }))
     
-    output$hist <- renderPlot({
-      
-      hist_slopes(output_df_all)
-      # bins <- seq(min(x), max(x), length.out = input$bins + 1)
-      
-      # hist(x, breaks = bins, col = "#75AADB", border = "white",
-      #   xlab = "Waiting time to next eruption (in mins)",
-      #   main = "Histogram of Slopes")
-      
-    })
+    # output$hist <- renderPlot({
+    #   # slopes <- 
+    #   
+    #   
+    # })
+    # output$hist <- renderPlot({
+    #   
+    #   hist_slopes(output_df_all)
+    #   # bins <- seq(min(x), max(x), length.out = input$bins + 1)
+    #   
+    #   # hist(x, breaks = bins, col = "#75AADB", border = "white",
+    #   #   xlab = "Waiting time to next eruption (in mins)",
+    #   #   main = "Histogram of Slopes")
+    #   
+    # })
      
 
 })

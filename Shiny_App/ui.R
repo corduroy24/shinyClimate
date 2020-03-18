@@ -48,18 +48,19 @@ shinyUI(fluidPage(
         
         
         mainPanel(
-
-
             tabsetPanel(
-                tabPanel("Table", DT::dataTableOutput("table")),
-                
-                tabPanel("Plot", 
-                         plotOutput("hist")
+                tabPanel("Story", 
+                    DT::dataTableOutput("table")
+                    # plotOutput("hist")
                 ),
+                
+
             #   tabPanel("Table", tableOutput("table")),
 
-                tabPanel("About", verbatimTextOutput("summary"))
-            
+                tabPanel("About", 
+                    HTML("Hello world")
+                    # plotOutput("hist")
+                )
             )
         )
     )
