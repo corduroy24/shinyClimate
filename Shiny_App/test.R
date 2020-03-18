@@ -20,7 +20,7 @@ library(gmodels)
 # in terms of the folder, or how its saved ???
 
 # dir = "Homog_monthly_min_temp"
-# temp_meas = list.files(path=dir, pattern="*.txt", full.names=TRUE)
+# temp_val = list.files(path=dir, pattern="*.txt", full.names=TRUE)
 # i = 1;
 
 
@@ -37,32 +37,37 @@ meanTempDir = "Homog_monthly_mean_temp"
 # clean_data(tempMean,meanTempDir)
 
 
-all_provs <- data.frame("provs" = c("AB","BC","YT","NT","NU","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL"))
 # single_prov <- data.frame("provs" = c('AB'))
 # provs <-data.frame("provs" = c("AB", "BC")) #convert to preset regions...
 
 #params - decorator ???
-provs <- all_provs
-year_to_start <- 1980
-month <- 'Feb'
-temp_meas <- 'min_temp'
+# provs <- all_provs
+# year_to_start <- 1980
+# month <- 'Feb'
+# temp_val <- 'min_temp'
 
 #create function here 
-if(file.exists(paste(temp_meas,month, year_to_start,'.RData'))){
-  load(paste(temp_meas,month, year_to_start,'.RData'))
-} else {
-  input_df_all <-data.frame()
-  output_df_all <-data.frame()
-  for(i in 1:nrow(provs)){
-    input_df <- load_cleaned_data(year_to_start, month, temp_meas, provs[i,]) #data matrix X
-    output_df <- regression(input_df) #reg results 
-    input_df_all <- rbind(input_df_all, input_df)
-    output_df_all <- rbind(output_df_all, output_df)
+main <- function(temp_val, month, year_to_start){
+  provs <- data.frame("provs" = c("AB","BC","YT","NT","NU","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL"))
+  if(file.exists(paste(temp_val,month, year_to_start,'.RData'))){
+    load(paste(temp_val,month, year_to_start,'.RData'))
+    p("Rdata exists")
+  } else {
+    p("RData does not exists")
+    input_df_all <-data.frame()
+    output_df_all <-data.frame()
+    for(i in 1:nrow(provs)){
+      input_df <- load_cleaned_data(year_to_start, month, temp_val, provs[i,]) #data matrix X
+      output_df <- regression(input_df) #reg results 
+      input_df_all <- rbind(input_df_all, input_df)
+      output_df_all <- rbind(output_df_all, output_df)
+    }
+    save(input_df_all, file = paste(temp_val, month, year_to_start,'.RData'))
+    save(output_df_all, file = paste(temp_val, month, year_to_start,'.RData'))
   }
-  save(input_df_all, file = paste(temp_meas, month, year_to_start,'.RData'))
-  save(output_df_all, file = paste(temp_meas, month, year_to_start,'.RData'))
+  
+  return(output_df_all)
 }
-
 
 #create function here
 provs <- unique(output_df_all[, 'prov'])
@@ -78,17 +83,17 @@ abline(h=0, col = 'red')
 boxplot(output_df_all$r.squared~output_df_all$prov, xlab = "Province", ylab= 'r.squared', main = 'Boxplot of R_2')
 boxplot(output_df_all$slope~output_df_all$prov, xlab = 'Province',ylab = 'Slope', main = 'Boxplot of slope')
 
-add_data <- function(temp_meas, old_df, new_data){
-  for (i in 1:length(temp_meas)){
+add_data <- function(temp_val, old_df, new_data){
+  for (i in 1:length(temp_val)){
     
-    # title = read.table(temp_meas[i], nrow = 1, sep = ",",dec = ".", as.is = TRUE,quote = "\"", na.strings=c(" "), header = FALSE)
+    # title = read.table(temp_val[i], nrow = 1, sep = ",",dec = ".", as.is = TRUE,quote = "\"", na.strings=c(" "), header = FALSE)
     # stationNum_city_prov = sprintf("%s_%s_%s", title[1],trimws(title[2]),strtrim(title[3],2))
-    # assign(stationNum_city_prov, read.delim(temp_meas[i],skip = 2, header = FALSE))
+    # assign(stationNum_city_prov, read.delim(temp_val[i],skip = 2, header = FALSE))
     # (stationNum_city_prov)
-    # hdr = read.table(temp_meas[i], skip = 2, nrow = 1, sep = ",", as.is = TRUE, na.strings=c(" "), strip.white = TRUE)
+    # hdr = read.table(temp_val[i], skip = 2, nrow = 1, sep = ",", as.is = TRUE, na.strings=c(" "), strip.white = TRUE)
     # hdr <- hdr[, colSums(is.na(hdr)) == 0]
     # (hdr)
-    dat = read.delim(temp_meas[i], skip = 4, header= FALSE, as.is=TRUE, dec = ",", sep = ",", na.strings=c(" "))
+    dat = read.delim(temp_val[i], skip = 4, header= FALSE, as.is=TRUE, dec = ",", sep = ",", na.strings=c(" "))
     dat <- dat[ ,colSums(is.na(dat)) == 0]
     
     #clean random data... 
@@ -106,16 +111,16 @@ add_data <- function(temp_meas, old_df, new_data){
   }
 } 
 
-clean_data <- function(temp_meas, dir)
-  for (i in 1:length(temp_meas)){
-    title = read.table(temp_meas[i], nrow = 1, sep = ",",dec = ".", as.is = TRUE,quote = "\"", na.strings=c(" "), header = FALSE)
+clean_data <- function(temp_val, dir)
+  for (i in 1:length(temp_val)){
+    title = read.table(temp_val[i], nrow = 1, sep = ",",dec = ".", as.is = TRUE,quote = "\"", na.strings=c(" "), header = FALSE)
     stationNum_city_prov = sprintf("%s_%s_%s", title[1],trimws(title[2]),strtrim(title[3],2))
-    assign(stationNum_city_prov, read.delim(temp_meas[i],skip = 2, header = FALSE))
+    assign(stationNum_city_prov, read.delim(temp_val[i],skip = 2, header = FALSE))
     (stationNum_city_prov)
-    hdr = read.table(temp_meas[i], skip = 2, nrow = 1, sep = ",", as.is = TRUE, na.strings=c(" "), strip.white = TRUE)
+    hdr = read.table(temp_val[i], skip = 2, nrow = 1, sep = ",", as.is = TRUE, na.strings=c(" "), strip.white = TRUE)
     hdr <- hdr[, colSums(is.na(hdr)) == 0]
     (hdr)
-    dat = read.delim(temp_meas[i], skip = 4, header= FALSE, as.is=TRUE, dec = ",", sep = ",", na.strings=c(" "))
+    dat = read.delim(temp_val[i], skip = 4, header= FALSE, as.is=TRUE, dec = ",", sep = ",", na.strings=c(" "))
     dat <- dat[ ,colSums(is.na(dat)) == 0]
     
     #cleaning step ........
@@ -141,16 +146,16 @@ clean_data <- function(temp_meas, dir)
 
 # Load data from cleaning step
 
-load_cleaned_data <- function(year, month, temp_meas, nom_prov){
-  if(temp_meas == 'min_temp'){
+load_cleaned_data <- function(year, month, temp_val, nom_prov){
+  if(temp_val == 'min_temp'){
     txt_files_ls = list.files(path="Homog_monthly_min_temp_cleaned", pattern="*.txt", full.names = TRUE)
     names = list.files(path="Homog_monthly_min_temp_cleaned", pattern="*.txt")
   }
-  else if(temp_meas == 'max_temp'){
+  else if(temp_val == 'max_temp'){
     txt_files_ls = list.files(path="Homog_monthly_max_temp_cleaned", pattern="*.txt", full.names = TRUE)
     names = list.files(path="Homog_monthly_max_temp_cleaned", pattern="*.txt")
   }
-  else if(temp_meas == 'mean_temp'){
+  else if(temp_val == 'mean_temp'){
     txt_files_ls = list.files(path="Homog_monthly_mean_temp_cleaned", pattern="*.txt", full.names = TRUE)
     names = list.files(path="Homog_monthly_mean_temp_cleaned", pattern="*.txt")
   }

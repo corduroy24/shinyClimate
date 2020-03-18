@@ -14,28 +14,81 @@ meanTempDir = "Homog_monthly_mean_temp_cleaned"
 # tempMin  = list.files(path=minTempDir, pattern="*.txt", full.names=TRUE)
 # tempMean = list.files(path=meanTempDir, pattern="*.txt", full.names=TRUE)
 library(shiny)
+library(tidyverse)
 
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
+    # x1 <- strtrim(input$month, 3)
+    # 
+    # 
+    extractParams <- function(sent_variable){
+      # the function that responds to this 
+      # function call returns a list "list(outL, numericsL)
+      month <- strtrim(input$month, 3)
+      temp_val <- unlist(strsplit(input$temp_val, " "))
+      
+      temp_val_1 <- strtrim(tolower(temp_val[1]),3)
+      temp_val_2 <- strtrim(tolower(temp_val[2]),4)
+      
+      temp_val <- paste(temp_val_1,temp_val_2, sep='_')
+      
+      start_year <- input$start_year
+      
+      params <- c(temp_val, month, start_year)
+      
+    }
+    value <- eventReactive(input$submit, {
+      validate(
+        need(input$temp_val != '', 'Please choose a temperature value.'),
+        need(input$month != '', 'Please choose a month.'),
+        need(input$start_year !='', 'Please choose a valid start year.')
+      )
+      
+      three_value_vector <- extractParams(input)
+    })
+    
+    output$test_1 <- renderText({value()})
+    # output$test_2 <- render
 
+    # check <- output$value
+    # p(check)
     
     # Filter data based on selections
-     output$table <- DT::renderDataTable(DT::datatable({
-         # Create list of text files
-         txt_files_ls = list.files(path="Homog_monthly_mean_temp_cleaned", pattern="*.txt", full.names = TRUE)
-         names = list.files(path="Homog_monthly_mean_temp_cleaned", pattern="*.txt")
-         ns = matrix(unlist(strsplit(names,'_')),ncol = 3,byrow = TRUE)
-         for (i in 1:length(txt_files_ls))
-             if(ns[i,3] == "BC.txt"){
-                 list = c(list, txt_files_ls[i])
-             }
-         
-         list = list[-1]
-         txt_files_df = lapply(list, function(x) {read.table(file = x, header = T, sep =" ")})
-         
-         # Combine them
-         combined_df <- do.call("rbind", lapply(txt_files_df, as.data.frame)) 
-     }))
+    output$table <- DT::renderDataTable(DT::datatable({
+      params <- value()
+      output$test_2 <- renderText({length(params[[1]])})
+      output$test_3 <- renderText({length(params[[2]])})
+      output$test_4 <- renderText({length(params[[3]])})
+      
+      param_1 <- params[[1]]
+      param_2 <- params[[2]]
+      param_3 <- params[[3]]
+      
+
+      output_df <- main(param_1, param_2, param_3)
+    }))
+     
+    
+     
+     # observe({
+     #   
+     #   x1 <- strtrim(input$month, 3)
+     #   
+     #   
+     #   x2 <- unlist(strsplit(input$temp_meas, " "))
+     #   
+     #   x3 <- strtrim(tolower(x2[1]),3)
+     #   x4 <- strtrim(tolower(x2[2]),4) 
+     # 
+     #   
+     #   # updateTextInput(session, "testing_1", value = paste(x1))
+     #   # updateTextInput(session, "testing_2", value = paste(x3,x4, sep="_"))
+     #   
+     # })
+     
+
+     
+     
 
 })

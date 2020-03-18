@@ -25,21 +25,32 @@ shinyUI(fluidPage(
                 choices = c("January", "February", "March","April","May","June","July","August","September","October","November", "December")
             ),
             
-            selectInput("temp_meas", "Choose a Measuremnent:",
-                choices = c("Minimum Temperature", "Mean Temperature", "Maximum Temperature")
+            selectInput("temp_val", "Choose a Measuremnent:",
+                choices = c("Minimum Temperature", "Maximum Temperature")
+                # choices = c("Minimum Temperature", "Mean Temperature", "Maximum Temperature")
+            
             ),
             
-            textInput("start_year", "Start Year", NULL),
+            numericInput("start_year", "Start Year", NULL),
             
-            actionButton("param_submit", "Submit"),
+            actionButton("submit", "Submit"),
             
-            # Show a plot of the generated distribution
-            mainPanel(
-                plotOutput("distPlot")
-            )
-    ),
-    
-    DT::dataTableOutput("table")
-)
+            # textInput("testing_1", "Testing Output"),
+            # textInput("value", "Testing Output"),
+            
+
+            verbatimTextOutput("test_1"),
+            verbatimTextOutput("test_2"),
+            verbatimTextOutput("test_3"),
+            verbatimTextOutput("test_4")
+            
+            
+            
+            
+            
+        ),
+        
+        DT::dataTableOutput("table")
+    )
     
 ))
