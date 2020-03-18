@@ -42,7 +42,7 @@ meanTempDir = "Homog_monthly_mean_temp"
 # year_to_start <- 1980
 # month <- 'Feb'
 # temp_val <- 'min_temp'
-
+# check <- data.frame()
 #create function here 
 main <- function(temp_val, month, year_to_start){
   provs <- data.frame("provs" = c("AB","BC","YT","NT","NU","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL"))
@@ -51,14 +51,14 @@ main <- function(temp_val, month, year_to_start){
     p("Rdata exists")
   } else {
     p("RData does not exists")
-    input_df_all <-data.frame()
-    output_df_all <-data.frame()
-    for(i in 1:nrow(provs)){
-      input_df <- load_cleaned_data(year_to_start, month, temp_val, provs[i,]) #data matrix X
-      output_df <- regression(input_df) #reg results 
-      input_df_all <- rbind(input_df_all, input_df)
-      output_df_all <- rbind(output_df_all, output_df)
-    }
+    # input_df_all <-data.frame()
+    # output_df_all <-data.frame()
+    # for(i in 1:nrow(provs)){
+      input_df_all <- load_cleaned_data(year_to_start, month, temp_val) #data matrix X
+      output_df_all <- regression(input_df_all) #reg results 
+      # input_df_all <- rbind(input_df_all, input_df)
+      # output_df_all <- rbind(output_df_all, output_df)
+    # }
     # save(input_df_all, file = paste(temp_val, month, year_to_start,'.RData'))
     # save(output_df_all, file = paste(temp_val, month, year_to_start,'.RData'))
   }
@@ -147,25 +147,25 @@ find_files <- function(temp_val){
 }
 # Load data from cleaning step
 # dont have to sort it by province... 
-load_cleaned_data <- function(year_to_start, month, temp_val, nom_prov){
+load_cleaned_data <- function(year_to_start, month, temp_val){
   temp_object <- find_files(temp_val)
   txt_files_ls <- temp_object[[1]]
   names <- temp_object[[2]]
   
   ns = matrix(unlist(strsplit(names,'_',)),ncol = 3,byrow = TRUE)
   
-  #build data frame. 
-  
-  input_df <- data.frame()
-  # for later... 
+  # if i wanted to do by province still... 
   # all <- unlist(strsplit(ns[,3],'.txt'))
   # index <- which(all == nom_prov)
   # debug(logger, paste('| index |',index,"|"))
   
+  # build input data frame. 
+  input_df <- data.frame()
   for (i in 1:length(txt_files_ls)){
-    if(unlist(strsplit(ns[i,3],'.txt')) == nom_prov){
       nom_city <- ns[i,2]
       nom_prov <- unlist(strsplit(ns[i,3],'.txt'))
+      # debug(logger, paste('| province name |',nom_prov,"|"))
+      
       # Non-breaking spaces...trim.white doesnt work... 
       txt_files_df <- read.table(file = txt_files_ls[i], header = TRUE, sep = " ",dec = ".", colClasses = "factor")
       years_greater<-txt_files_df[as.numeric(as.character(txt_files_df$Year))>=year_to_start,]
@@ -175,9 +175,8 @@ load_cleaned_data <- function(year_to_start, month, temp_val, nom_prov){
       temp_df <- data.frame(y_temp, x_year, "city" = nom_city, "prov" = nom_prov) 
 
       input_df <- rbind(input_df, temp_df) 
-    }
   }
-  
+
   return(input_df)
 }
 
@@ -199,12 +198,18 @@ check_start_year_cutoff <- function(temp_val){
 }
 
 regression <- function(input_df){
-  city_vector <- unique(input_df[,"city"])
-  prov <- unique(input_df[, 'prov'])
+  city_prov_vector <- unique(input_df[,c("city", 'prov')])
+  city_vector <- city_prov_vector[, 'city']
+  prov_vector <- city_prov_vector[, 'prov']
+  
+  # debug(logger, paste("-----city vector length--------", length(city_vector)))
+  # debug(logger, paste("-----prov vector length--------", length(prov_vector)))
+
   output_df <- data.frame()
   for (i in 1:length(city_vector)){
     index <- which(input_df[, "city"] == city_vector[i])
     fit <- lm(y_temp[index]~x_year[index], data = input_df)
+
     b <- data.frame("intercept" = fit$coefficients[1], "slope" = fit$coefficients[2])
     R_2 <- data.frame("r.squared" = as.numeric(unlist(summary(fit)$r.squared)))
     # CIs <- ci(fit, 0.95, alpha=1-0.95, na.rm = TRUE)
@@ -215,9 +220,9 @@ regression <- function(input_df){
     CI_lower <-  estimate - margin_error
     CI_upper <- estimate + margin_error
     variance <- (standard_error)^2
-    # prov <- unique(as.character(input_df[, 'prov'][index]))
-    curr_results_df <- data.frame("city"=city_vector[i],'prov' = prov,  b,"r.squared"=R_2,CI_lower, CI_upper,variance,"n"=nrow(fit$model), row.names = NULL)
-    output_df <- rbind(output_df,curr_results_df) 
+    
+    curr_results_df <- data.frame("city"=city_vector[i],'prov' = prov_vector[i],  b,"r.squared"=R_2,CI_lower, CI_upper,variance,"n"=nrow(fit$model), row.names = NULL)
+    output_df <- rbind(output_df,curr_results_df)
   }
   # plot(y_temp~x_year, data = input_df)
   # abline(fit, col = 'red')
