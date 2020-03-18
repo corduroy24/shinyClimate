@@ -70,12 +70,15 @@ main <- function(temp_val, month, year_to_start){
 }
 
 #create function here
-provs <- unique(output_df_all[, 'prov'])
-for (i in 1:length(provs)){
-  index <- which(output_df_all[, "prov"] == provs[i])
-  output_df <- output_df_all[index,]
-  hist(output_df$slope, freq = TRUE, main  = paste("Histogram of Slope - ",unique(output_df[,"prov"])), xlab = "Slope")
-  #histogram for CIs
+hist_slopes <- function(output_df_all){
+  provs <- unique(output_df_all[, 'prov'])
+  for (i in 1:length(provs)){
+    index <- which(output_df_all[, "prov"] == provs[i])
+    output_df <- output_df_all[index,]
+    hists <- hist(output_df$slope, freq = TRUE, main  = paste("Histogram of Slope - ",unique(output_df[,"prov"])), xlab = "Slope")
+    #histogram for CIs
+  }
+  return(hists)
 }
 
 hist(output_df_all$slope, freq = TRUE, main  = paste("Histogram of Slope(Canada)"), xlab = "Slope")
@@ -83,33 +86,33 @@ abline(h=0, col = 'red')
 boxplot(output_df_all$r.squared~output_df_all$prov, xlab = "Province", ylab= 'r.squared', main = 'Boxplot of R_2')
 boxplot(output_df_all$slope~output_df_all$prov, xlab = 'Province',ylab = 'Slope', main = 'Boxplot of slope')
 
-add_data <- function(temp_val, old_df, new_data){
-  for (i in 1:length(temp_val)){
-    
-    # title = read.table(temp_val[i], nrow = 1, sep = ",",dec = ".", as.is = TRUE,quote = "\"", na.strings=c(" "), header = FALSE)
-    # stationNum_city_prov = sprintf("%s_%s_%s", title[1],trimws(title[2]),strtrim(title[3],2))
-    # assign(stationNum_city_prov, read.delim(temp_val[i],skip = 2, header = FALSE))
-    # (stationNum_city_prov)
-    # hdr = read.table(temp_val[i], skip = 2, nrow = 1, sep = ",", as.is = TRUE, na.strings=c(" "), strip.white = TRUE)
-    # hdr <- hdr[, colSums(is.na(hdr)) == 0]
-    # (hdr)
-    dat = read.delim(temp_val[i], skip = 4, header= FALSE, as.is=TRUE, dec = ",", sep = ",", na.strings=c(" "))
-    dat <- dat[ ,colSums(is.na(dat)) == 0]
-    
-    #clean random data... 
-    dat <- data.frame(lapply(dat, function(x){
-      gsub("[a-zA-Z]", NA, x)
-    }))
-    dat <- dat[,colSums(is.na(dat))==0 ]
-    
-    #filter out -9999.9 - default values
-    dat <- data.frame(lapply(dat, function(x){
-      gsub("-9999.9", "NA", x)
-    }))
-
-    total = rbind(old_df, new_df)
-  }
-} 
+# add_data <- function(temp_val, old_df, new_data){
+#   for (i in 1:length(temp_val)){
+#     
+#     # title = read.table(temp_val[i], nrow = 1, sep = ",",dec = ".", as.is = TRUE,quote = "\"", na.strings=c(" "), header = FALSE)
+#     # stationNum_city_prov = sprintf("%s_%s_%s", title[1],trimws(title[2]),strtrim(title[3],2))
+#     # assign(stationNum_city_prov, read.delim(temp_val[i],skip = 2, header = FALSE))
+#     # (stationNum_city_prov)
+#     # hdr = read.table(temp_val[i], skip = 2, nrow = 1, sep = ",", as.is = TRUE, na.strings=c(" "), strip.white = TRUE)
+#     # hdr <- hdr[, colSums(is.na(hdr)) == 0]
+#     # (hdr)
+#     dat = read.delim(temp_val[i], skip = 4, header= FALSE, as.is=TRUE, dec = ",", sep = ",", na.strings=c(" "))
+#     dat <- dat[ ,colSums(is.na(dat)) == 0]
+#     
+#     #clean random data... 
+#     dat <- data.frame(lapply(dat, function(x){
+#       gsub("[a-zA-Z]", NA, x)
+#     }))
+#     dat <- dat[,colSums(is.na(dat))==0 ]
+#     
+#     #filter out -9999.9 - default values
+#     dat <- data.frame(lapply(dat, function(x){
+#       gsub("-9999.9", "NA", x)
+#     }))
+# 
+#     total = rbind(old_df, new_df)
+#   }
+# } 
 
 clean_data <- function(temp_val, dir)
   for (i in 1:length(temp_val)){

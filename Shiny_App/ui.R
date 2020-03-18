@@ -8,7 +8,7 @@
 #
 
 library(shiny)
-source("test.R")
+source("helpers.R")
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
@@ -33,7 +33,7 @@ shinyUI(fluidPage(
             
             numericInput("start_year", "Start Year", NULL),
             
-            actionButton("submit", "Submit"),
+            actionButton("confirm", "Confirm Selection"),
             
             # textInput("testing_1", "Testing Output"),
             # textInput("value", "Testing Output"),
@@ -44,13 +44,25 @@ shinyUI(fluidPage(
             verbatimTextOutput("test_3"),
             verbatimTextOutput("test_4")
             
-            
-            
-            
-            
         ),
         
-        DT::dataTableOutput("table")
+        
+        mainPanel(
+
+
+            tabsetPanel(
+                tabPanel("Table", DT::dataTableOutput("table")),
+                
+                tabPanel("Plot", 
+                         plotOutput("hist")
+                ),
+            #   tabPanel("Table", tableOutput("table")),
+
+                tabPanel("About", verbatimTextOutput("summary"))
+            
+            )
+        )
     )
+
     
 ))

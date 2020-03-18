@@ -38,7 +38,7 @@ shinyServer(function(input, output) {
       params <- c(temp_val, month, start_year)
       
     }
-    value <- eventReactive(input$submit, {
+    value <- eventReactive(input$confirm, {
       validate(
         need(input$temp_val != '', 'Please choose a temperature value.'),
         need(input$month != '', 'Please choose a month.'),
@@ -49,46 +49,23 @@ shinyServer(function(input, output) {
     })
     
     output$test_1 <- renderText({value()})
-    # output$test_2 <- render
-
-    # check <- output$value
-    # p(check)
     
     # Filter data based on selections
     output$table <- DT::renderDataTable(DT::datatable({
       params <- value()
-      output$test_2 <- renderText({length(params[[1]])})
-      output$test_3 <- renderText({length(params[[2]])})
-      output$test_4 <- renderText({length(params[[3]])})
-      
-      param_1 <- params[[1]]
-      param_2 <- params[[2]]
-      param_3 <- params[[3]]
-      
-
-      output_df <- main(param_1, param_2, param_3)
+      output_df_all <- main(params[[1]], params[[2]], params[[3]])
     }))
-     
     
-     
-     # observe({
-     #   
-     #   x1 <- strtrim(input$month, 3)
-     #   
-     #   
-     #   x2 <- unlist(strsplit(input$temp_meas, " "))
-     #   
-     #   x3 <- strtrim(tolower(x2[1]),3)
-     #   x4 <- strtrim(tolower(x2[2]),4) 
-     # 
-     #   
-     #   # updateTextInput(session, "testing_1", value = paste(x1))
-     #   # updateTextInput(session, "testing_2", value = paste(x3,x4, sep="_"))
-     #   
-     # })
-     
-
-     
+    output$hist <- renderPlot({
+      
+      hist_slopes(output_df_all)
+      # bins <- seq(min(x), max(x), length.out = input$bins + 1)
+      
+      # hist(x, breaks = bins, col = "#75AADB", border = "white",
+      #   xlab = "Waiting time to next eruption (in mins)",
+      #   main = "Histogram of Slopes")
+      
+    })
      
 
 })
