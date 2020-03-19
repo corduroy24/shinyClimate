@@ -59,8 +59,8 @@ main <- function(temp_val, month, year_to_start){
       # input_df_all <- rbind(input_df_all, input_df)
       # output_df_all <- rbind(output_df_all, output_df)
     # }
-    save(input_df_all, file = paste(temp_val, month, year_to_start,'.RData'))
-    save(output_df_all, file = paste(temp_val, month, year_to_start,'.RData'))
+    save(input_df_all, output_df_all, file = paste(temp_val, month, year_to_start,'.RData'))
+    # save(output_df_all, file = paste(temp_val, month, year_to_start,'.RData'))
   }
   
   return(output_df_all)
@@ -244,18 +244,20 @@ overlay_slopes <- function(city, prov){
 
 get_city_vector <- function(temp_val, month, year_to_start){
   if(file.exists(paste(temp_val,month, year_to_start,'.RData'))){
-    load(paste(temp_val,month, year_to_start,'.RData'))
-    city_prov_vector <- unique(input_all_df[,c("city", 'prov')])
+    check <-load(paste(temp_val,month, year_to_start,'.RData'), .GlobalEnv)
+    debug(logger, paste("load data", check[1]))
+    city_prov_vector <- unique(input_df_all[,c("city", 'prov')])
     city_vector <- city_prov_vector[, 'city']
     return(city_vector)
   }
 }
 
+#do unique again... 
 get_prov_vector <- function(temp_val, month, year_start){
   if(file.exists(paste(temp_val,month, year_to_start,'.RData'))){
     load(paste(temp_val,month, year_to_start,'.RData'))
-    city_prov_vector <- unique(input_all_df[,c("city", 'prov')])
-    prov_vector <- city_prov_vector[, 'prov']
+    city_prov_vector <- unique(input_df_all[,c("city", 'prov')])
+    prov_vector <- unique(city_prov_vector[, 'prov'])
     return(prov_vector)
   }
 }

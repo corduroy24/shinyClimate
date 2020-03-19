@@ -19,10 +19,11 @@ shinyUI(fluidPage(
     # Sidebar with a slider input for number of bins
     sidebarLayout(
         sidebarPanel(
-
+            
             # Input: Select a dataset ----
             selectInput("month", "Choose a month:",
-                choices = c("January", "February", "March","April","May","June","July","August","September","October","November", "December")
+                choices = c("January", "February", "March","April","May","June","July","August","September","October","November", "December"),
+                selected = NULL
             ),
             
             selectInput("temp_val", "Choose a Measuremnent:",

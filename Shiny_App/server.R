@@ -20,9 +20,7 @@ source("helpers.R")
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
-    # x1 <- strtrim(input$month, 3)
-    # 
-    # 
+    
     extractParams <- function(sent_variable){
       # the function that responds to this 
       # function call returns a list "list(outL, numericsL)
@@ -40,6 +38,7 @@ shinyServer(function(input, output, session) {
       
     }
     
+    # debug(logger, paste("temp_val", temp_val))
 
     value <- eventReactive(input$confirm, {
 
@@ -69,20 +68,46 @@ shinyServer(function(input, output, session) {
       
       beginning <- Sys.time()
       
-      output_df_all <- main(params[[1]], params[[2]], params[[3]])
+      output_df_all <- main(temp_val, month, year_to_start)
+      
+
+      # check <- load(paste(temp_val,month, year_to_start,'.RData'))
+      
+      # debug(logger, paste('|check value------ ' , '|', check,"|"))
+      
+      # city_vector<- input_df_all 
+      
+      city_vector<- get_city_vector(temp_val, month, year_to_start)
+      prov_vector<- get_prov_vector(temp_val, month, year_to_start)
+
+      debug(logger, paste('|check prov ------ ' , '|', prov_vector,"|"))
       
       end <- Sys.time()
       output$test_2 <- renderText({end - beginning})
+      # vars <- output_df_all
+      vars <- list(output_df_all, prov_vector, city_vector)
       
-      output_df_all
     })
     
 
     # Filter data based on selections
     output$table <- DT::renderDataTable(DT::datatable({
-      output_df_all <- value()
+      vars <- value()
+      output_df_all <- vars[[1]]
     }))
     
+    observe({
+      vars <- value()
+      debug(logger, paste('|check prov ------ ' , '|', vars[[2]],"|"))
+      
+      updateSelectInput(session,
+                        "prov",
+                        "Choose a province:",
+                        choices = vars[[2]]
+                        )
+
+
+    })
     # output$hist <- renderPlot({
     #   # slopes <- 
     #   
