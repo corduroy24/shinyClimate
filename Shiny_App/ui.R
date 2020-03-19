@@ -32,7 +32,7 @@ shinyUI(fluidPage(
             
             ),
             
-            numericInput("start_year", "Start Year", NULL),
+            numericInput("year_to_start", "Start Year", 1980),
             
             actionButton("confirm", "Confirm Selection"),
             
@@ -49,14 +49,18 @@ shinyUI(fluidPage(
             selectInput("prov", "Choose a province:",
                         choices = c()
             ),
+            
+            # placeholder  = 
+            textInput("city", "Enter City", value = 'Toronto')
+            
         ),
         
         
         mainPanel(
             tabsetPanel(
                 tabPanel("Story", 
-                    DT::dataTableOutput("table")
-                    # plotOutput("hist")
+                    DT::dataTableOutput("table"),
+                    plotOutput("hist")
                 ),
                 
 

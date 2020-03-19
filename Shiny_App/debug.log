@@ -1,83 +1,510 @@
-DEBUG [2020-03-18 17:45:20] -----city vector length-------- 337
-DEBUG [2020-03-18 17:46:54] -----city vector length-------- 12265
-DEBUG [2020-03-18 17:51:21] -----city vector length-------- 2
-DEBUG [2020-03-18 17:52:06] -----city vector length-------- 2
-DEBUG [2020-03-18 17:52:49] -----city vector length-------- 2
-DEBUG [2020-03-18 17:57:33] -----city vector length-------- 338
-DEBUG [2020-03-18 17:59:36] -----city vector length-------- 
-DEBUG [2020-03-18 17:59:36] -----prov vector length-------- 
-DEBUG [2020-03-18 18:02:56] |check value------  | min_temp |
-DEBUG [2020-03-18 20:58:25] |check value------  | min_temp |
-DEBUG [2020-03-18 21:41:20] temp_val 
-DEBUG [2020-03-18 21:41:30] |check value------  | min_temp |
-DEBUG [2020-03-18 21:41:33] RData does not exists
-DEBUG [2020-03-18 21:59:45] |check value------  | min_temp |
-DEBUG [2020-03-18 21:59:47] Rdata exists
-DEBUG [2020-03-18 22:02:26] |check value------  | min_temp |
-DEBUG [2020-03-18 22:02:28] RData does not exists
-DEBUG [2020-03-18 22:09:54] |check value------  | min_temp |
-DEBUG [2020-03-18 22:09:55] Rdata exists
-DEBUG [2020-03-18 22:09:55] load data input_df_allload data output_df_all
-DEBUG [2020-03-18 22:11:55] |check value------  | min_temp |
-DEBUG [2020-03-18 22:11:57] Rdata exists
-DEBUG [2020-03-18 22:11:57] load data input_df_all
-DEBUG [2020-03-18 22:18:27] |check value------  | min_temp |
-DEBUG [2020-03-18 22:18:29] Rdata exists
-DEBUG [2020-03-18 22:22:25] |check value------  | min_temp |
-DEBUG [2020-03-18 22:22:27] Rdata exists
-DEBUG [2020-03-18 22:33:39] |check value------  | min_temp |
-DEBUG [2020-03-18 22:33:41] Rdata exists
-DEBUG [2020-03-18 22:35:57] |check value------  | min_temp |
-DEBUG [2020-03-18 22:35:58] Rdata exists
-DEBUG [2020-03-18 22:37:12] |check value------  | min_temp |
-DEBUG [2020-03-18 22:37:13] Rdata exists
-DEBUG [2020-03-18 22:38:45] |check value------  | min_temp |
-DEBUG [2020-03-18 22:38:46] Rdata exists
-DEBUG [2020-03-18 22:38:46] |check value------  | input_df_all ||check value------  | output_df_all |
-DEBUG [2020-03-18 23:38:03] |check value------  | min_temp |
-DEBUG [2020-03-18 23:38:06] Rdata exists
-DEBUG [2020-03-18 23:38:06] load data input_df_all
-DEBUG [2020-03-18 23:38:34] |check value------  | min_temp |
-DEBUG [2020-03-18 23:38:35] Rdata exists
-DEBUG [2020-03-18 23:38:35] load data input_df_all
-DEBUG [2020-03-18 23:39:20] |check value------  | min_temp |
-DEBUG [2020-03-18 23:39:21] Rdata exists
-DEBUG [2020-03-18 23:39:21] load data input_df_all
-DEBUG [2020-03-18 23:41:32] |check value------  | min_temp |
-DEBUG [2020-03-18 23:41:33] Rdata exists
-DEBUG [2020-03-18 23:41:33] load data input_df_all
-DEBUG [2020-03-18 23:42:00] |check value------  | min_temp |
-DEBUG [2020-03-18 23:42:02] Rdata exists
-DEBUG [2020-03-18 23:42:02] load data input_df_all
-DEBUG [2020-03-18 23:42:41] |check value------  | min_temp |
-DEBUG [2020-03-18 23:42:42] Rdata exists
-DEBUG [2020-03-18 23:42:42] load data input_df_all
-DEBUG [2020-03-18 23:43:14] |check value------  | min_temp |
-DEBUG [2020-03-18 23:43:15] Rdata exists
-DEBUG [2020-03-18 23:43:15] load data input_df_all
-DEBUG [2020-03-18 23:45:49] |check value------  | min_temp |
-DEBUG [2020-03-18 23:45:51] Rdata exists
-DEBUG [2020-03-18 23:45:51] load data input_df_all
-DEBUG [2020-03-18 23:45:51] |check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | BC ||check prov ------  | YT ||check prov ------  | YT ||check prov ------  | YT ||check prov ------  | YT ||check prov ------  | YT ||check prov ------  | YT ||check prov ------  | YT ||check prov ------  | YT ||check prov ------  | YT ||check prov ------  | YT ||check prov ------  | YT ||check prov ------  | NT ||check prov ------  | NT ||check prov ------  | NT ||check prov ------  | NT ||check prov ------  | NT ||check prov ------  | NT ||check prov ------  | NT ||check prov ------  | NT ||check prov ------  | NT ||check prov ------  | NT ||check prov ------  | NT ||check prov ------  | NU ||check prov ------  | NU ||check prov ------  | NU ||check prov ------  | NU ||check prov ------  | NU ||check prov ------  | NU ||check prov ------  | NU ||check prov ------  | NU ||check prov ------  | NU ||check prov ------  | NU ||check prov ------  | NU ||check prov ------  | NU ||check prov ------  | NU ||check prov ------  | NU ||check prov ------  | NU ||check prov ------  | NU ||check prov ------  | NU ||check prov ------  | NU ||check prov ------  | NU ||check prov ------  | NU ||check prov ------  | NU ||check prov ------  | NU ||check prov ------  | NU ||check prov ------  | NT ||check prov ------  | NT ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | AB ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | SK ||check prov ------  | MB ||check prov ------  | MB ||check prov ------  | MB ||check prov ------  | MB ||check prov ------  | MB ||check prov ------  | MB ||check prov ------  | MB ||check prov ------  | MB ||check prov ------  | MB ||check prov ------  | MB ||check prov ------  | MB ||check prov ------  | MB ||check prov ------  | MB ||check prov ------  | MB ||check prov ------  | MB ||check prov ------  | MB ||check prov ------  | MB ||check prov ------  | MB ||check prov ------  | MB ||check prov ------  | MB ||check prov ------  | MB ||check prov ------  | MB ||check prov ------  | MB ||check prov ------  | MB ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | ON ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | QC ||check prov ------  | NB ||check prov ------  | NB ||check prov ------  | NB ||check prov ------  | NB ||check prov ------  | NB ||check prov ------  | NB ||check prov ------  | NB ||check prov ------  | NB ||check prov ------  | NB ||check prov ------  | NB ||check prov ------  | NB ||check prov ------  | NS ||check prov ------  | NS ||check prov ------  | NS ||check prov ------  | NS ||check prov ------  | NS ||check prov ------  | NS ||check prov ------  | NS ||check prov ------  | NS ||check prov ------  | NS ||check prov ------  | NS ||check prov ------  | NS ||check prov ------  | NS ||check prov ------  | NS ||check prov ------  | PE ||check prov ------  | PE ||check prov ------  | PE ||check prov ------  | NL ||check prov ------  | NL ||check prov ------  | NL ||check prov ------  | NL ||check prov ------  | NL ||check prov ------  | NL ||check prov ------  | NL ||check prov ------  | NL ||check prov ------  | NL ||check prov ------  | NL ||check prov ------  | NL ||check prov ------  | NL ||check prov ------  | NL ||check prov ------  | NL ||check prov ------  | NL ||check prov ------  | NL ||check prov ------  | NL ||check prov ------  | NL ||check prov ------  | NL |
-DEBUG [2020-03-19 02:05:16] |check value------  | min_temp |
-DEBUG [2020-03-19 02:05:19] Rdata exists
-DEBUG [2020-03-19 02:05:19] load data input_df_all
-DEBUG [2020-03-19 02:05:19] |check prov ------  | BC ||check prov ------  | YT ||check prov ------  | NT ||check prov ------  | NU ||check prov ------  | AB ||check prov ------  | SK ||check prov ------  | MB ||check prov ------  | ON ||check prov ------  | QC ||check prov ------  | NB ||check prov ------  | NS ||check prov ------  | PE ||check prov ------  | NL |
-DEBUG [2020-03-19 02:07:01] |check value------  | min_temp |
-DEBUG [2020-03-19 02:07:02] Rdata exists
-DEBUG [2020-03-19 02:07:02] load data input_df_all
-DEBUG [2020-03-19 02:07:03] |check prov ------  | character |
-DEBUG [2020-03-19 02:07:41] |check value------  | min_temp |
-DEBUG [2020-03-19 02:07:43] Rdata exists
-DEBUG [2020-03-19 02:07:43] load data input_df_all
-DEBUG [2020-03-19 02:07:43] |check prov ------  | character |
-DEBUG [2020-03-19 02:09:50] |check value------  | min_temp |
-DEBUG [2020-03-19 02:09:51] Rdata exists
-DEBUG [2020-03-19 02:09:51] load data input_df_all
-DEBUG [2020-03-19 02:09:51] |check prov ------  | BC ||check prov ------  | YT ||check prov ------  | NT ||check prov ------  | NU ||check prov ------  | AB ||check prov ------  | SK ||check prov ------  | MB ||check prov ------  | ON ||check prov ------  | QC ||check prov ------  | NB ||check prov ------  | NS ||check prov ------  | PE ||check prov ------  | NL |
-DEBUG [2020-03-19 02:09:51] |check prov ------  | BC ||check prov ------  | YT ||check prov ------  | NT ||check prov ------  | NU ||check prov ------  | AB ||check prov ------  | SK ||check prov ------  | MB ||check prov ------  | ON ||check prov ------  | QC ||check prov ------  | NB ||check prov ------  | NS ||check prov ------  | PE ||check prov ------  | NL |
-DEBUG [2020-03-19 02:11:51] |check value------  | min_temp |
-DEBUG [2020-03-19 02:11:52] Rdata exists
-DEBUG [2020-03-19 02:11:52] load data input_df_all
-DEBUG [2020-03-19 02:11:52] |check prov ------  | BC ||check prov ------  | YT ||check prov ------  | NT ||check prov ------  | NU ||check prov ------  | AB ||check prov ------  | SK ||check prov ------  | MB ||check prov ------  | ON ||check prov ------  | QC ||check prov ------  | NB ||check prov ------  | NS ||check prov ------  | PE ||check prov ------  | NL |
-DEBUG [2020-03-19 02:11:52] |check prov ------  | BC ||check prov ------  | YT ||check prov ------  | NT ||check prov ------  | NU ||check prov ------  | AB ||check prov ------  | SK ||check prov ------  | MB ||check prov ------  | ON ||check prov ------  | QC ||check prov ------  | NB ||check prov ------  | NS ||check prov ------  | PE ||check prov ------  | NL |
+DEBUG [2020-03-19 14:59:13] |TEMP_VAL| 1 |
+DEBUG [2020-03-19 14:59:13] |check city df ------  | 0 |
+DEBUG [2020-03-19 15:00:08] |TEMP_VAL| 1 |
+DEBUG [2020-03-19 15:00:08] |YEAR_TO_START| 1 |
+DEBUG [2020-03-19 15:00:08] |check city df ------  | 0 |
+DEBUG [2020-03-19 15:00:11] |check value------  | Minimum |
+DEBUG [2020-03-19 15:00:12] |TEMP_VAL| min_temp |
+DEBUG [2020-03-19 15:01:03] |TEMP_VAL| 1 |
+DEBUG [2020-03-19 15:01:03] |YEAR_TO_START| 1 |
+DEBUG [2020-03-19 15:01:03] |check city df ------  | 0 |
+DEBUG [2020-03-19 15:01:05] |check value------  | Minimum |
+DEBUG [2020-03-19 15:01:06] |TEMP_VAL| min_temp |
+DEBUG [2020-03-19 15:01:06] |MONTH| Jan |
+DEBUG [2020-03-19 15:01:06] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 15:01:56] |TEMP_VAL| 1 |
+DEBUG [2020-03-19 15:01:56] |YEAR_TO_START| 1 |
+DEBUG [2020-03-19 15:01:56] |check city df ------  | 0 |
+DEBUG [2020-03-19 15:01:58] |check value------  | Minimum |
+DEBUG [2020-03-19 15:01:59] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 15:01:59] |MONTH 1| Jan |
+DEBUG [2020-03-19 15:01:59] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 15:02:58] |TEMP_VAL| 1 |
+DEBUG [2020-03-19 15:02:58] |YEAR_TO_START| 1 |
+DEBUG [2020-03-19 15:02:58] |check city df ------  | 0 |
+DEBUG [2020-03-19 15:03:00] |check value------  | Minimum |
+DEBUG [2020-03-19 15:03:01] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 15:03:01] |MONTH 1| Jan |
+DEBUG [2020-03-19 15:03:01] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 15:03:44] |TEMP_VAL|  |
+DEBUG [2020-03-19 15:03:44] |YEAR_TO_START|  |
+DEBUG [2020-03-19 15:03:44] |check city df ------  | 0 |
+DEBUG [2020-03-19 15:11:35] |TEMP_VAL|  |
+DEBUG [2020-03-19 15:11:35] |YEAR_TO_START|  |
+DEBUG [2020-03-19 15:11:35] |check city df ------  | 0 |
+DEBUG [2020-03-19 15:13:22] |TEMP_VAL|  |
+DEBUG [2020-03-19 15:13:22] |YEAR_TO_START|  |
+DEBUG [2020-03-19 15:13:22] |check city df ------  | 0 |
+DEBUG [2020-03-19 15:13:24] |check value------  | Minimum |
+DEBUG [2020-03-19 15:13:28] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 15:14:21] |TEMP_VAL|  |
+DEBUG [2020-03-19 15:14:21] |YEAR_TO_START|  |
+DEBUG [2020-03-19 15:14:21] |check city df ------  | 0 |
+DEBUG [2020-03-19 15:14:22] |check value------  | Minimum |
+DEBUG [2020-03-19 15:14:24] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 15:14:24] |MONTH 1| Jan |
+DEBUG [2020-03-19 15:14:24] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 15:14:24] Rdata exists
+DEBUG [2020-03-19 15:14:24] load data output_df_all
+DEBUG [2020-03-19 15:19:02] |TEMP_VAL 2|  |
+DEBUG [2020-03-19 15:19:02] |YEAR_TO_START|  |
+DEBUG [2020-03-19 15:19:02] |check city df ------  | 0 |
+DEBUG [2020-03-19 15:19:08] |check value------  | Minimum |
+DEBUG [2020-03-19 15:19:11] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 15:19:11] |MONTH 1| Jan |
+DEBUG [2020-03-19 15:19:11] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 15:19:11] Rdata exists
+DEBUG [2020-03-19 15:19:11] load data output_df_all
+DEBUG [2020-03-19 15:21:14] |check city df ------  | 0 |
+DEBUG [2020-03-19 15:21:16] |check value------  | Minimum |
+DEBUG [2020-03-19 15:21:17] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 15:21:17] |MONTH 1| Jan |
+DEBUG [2020-03-19 15:21:17] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 15:21:17] Rdata exists
+DEBUG [2020-03-19 15:21:17] load data output_df_all
+DEBUG [2020-03-19 15:21:17] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 15:21:17] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 15:25:29] |TEMP_VAL |  |
+DEBUG [2020-03-19 15:25:29] |MONTH|  |
+DEBUG [2020-03-19 15:25:29] |YEAR_TO_START|  |
+DEBUG [2020-03-19 15:25:29] |check city df ------  | 0 |
+DEBUG [2020-03-19 15:25:31] |check value------  | Minimum |
+DEBUG [2020-03-19 15:25:32] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 15:25:32] |MONTH| Jan |
+DEBUG [2020-03-19 15:25:32] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 15:27:48] |TEMP_VAL |  |
+DEBUG [2020-03-19 15:27:48] |MONTH|  |
+DEBUG [2020-03-19 15:27:48] |YEAR_TO_START|  |
+DEBUG [2020-03-19 15:27:48] |check city df ------  | 0 |
+DEBUG [2020-03-19 15:27:50] |check value------  | Minimum |
+DEBUG [2020-03-19 15:27:51] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 15:27:51] |MONTH 1| Jan |
+DEBUG [2020-03-19 15:27:51] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 15:27:51] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 15:27:51] |MONTH| Jan |
+DEBUG [2020-03-19 15:27:51] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 15:29:11] |TEMP_VAL |  |
+DEBUG [2020-03-19 15:29:11] |MONTH|  |
+DEBUG [2020-03-19 15:29:11] |YEAR_TO_START|  |
+DEBUG [2020-03-19 15:29:11] |check city df ------  | 0 |
+DEBUG [2020-03-19 15:29:12] |check value------  | Minimum |
+DEBUG [2020-03-19 15:29:12] |TEMP_VAL 1| character |
+DEBUG [2020-03-19 15:29:13] |MONTH 1| Jan |
+DEBUG [2020-03-19 15:29:13] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 15:29:13] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 15:29:13] |MONTH| Jan |
+DEBUG [2020-03-19 15:29:13] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 15:30:11] |TEMP_VAL |  |
+DEBUG [2020-03-19 15:30:11] |MONTH|  |
+DEBUG [2020-03-19 15:30:11] |YEAR_TO_START|  |
+DEBUG [2020-03-19 15:30:11] |check city df ------  | 0 |
+DEBUG [2020-03-19 15:30:11] |check value------  | Minimum |
+DEBUG [2020-03-19 15:30:11] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 15:30:13] |MONTH 1| Jan |
+DEBUG [2020-03-19 15:30:13] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 15:30:13] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 15:30:13] |MONTH| Jan |
+DEBUG [2020-03-19 15:30:13] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 15:32:13] |TEMP_VAL |  |
+DEBUG [2020-03-19 15:32:13] |MONTH|  |
+DEBUG [2020-03-19 15:32:13] |YEAR_TO_START|  |
+DEBUG [2020-03-19 15:32:13] |check city df ------  | 0 |
+DEBUG [2020-03-19 15:32:15] |check value------  | Minimum |
+DEBUG [2020-03-19 15:32:15] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 15:32:16] |MONTH 1| Jan |
+DEBUG [2020-03-19 15:32:16] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 15:32:16] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 15:32:16] |MONTH| Jan |
+DEBUG [2020-03-19 15:32:16] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 15:37:28] |TEMP_VAL |  |
+DEBUG [2020-03-19 15:37:28] |MONTH|  |
+DEBUG [2020-03-19 15:37:28] |YEAR_TO_START|  |
+DEBUG [2020-03-19 15:37:28] |check city df ------  | 0 |
+DEBUG [2020-03-19 15:37:30] |check value------  | Minimum |
+DEBUG [2020-03-19 15:37:30] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 15:37:31] |MONTH 1| Jan |
+DEBUG [2020-03-19 15:37:31] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 15:37:31] Rdata exists
+DEBUG [2020-03-19 15:37:31] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 15:37:31] |MONTH| Jan |
+DEBUG [2020-03-19 15:37:31] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 15:37:55] |TEMP_VAL |  |
+DEBUG [2020-03-19 15:37:55] |MONTH|  |
+DEBUG [2020-03-19 15:37:55] |YEAR_TO_START|  |
+DEBUG [2020-03-19 15:37:55] |check city df ------  | 0 |
+DEBUG [2020-03-19 15:37:57] |check value------  | Minimum |
+DEBUG [2020-03-19 15:37:57] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 15:37:58] |MONTH 1| Jan |
+DEBUG [2020-03-19 15:37:58] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 15:37:58] Rdata exists
+DEBUG [2020-03-19 15:37:58] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 15:37:58] |MONTH| Jan |
+DEBUG [2020-03-19 15:37:58] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 15:38:06] |TEMP_VAL |  |
+DEBUG [2020-03-19 15:38:06] |MONTH|  |
+DEBUG [2020-03-19 15:38:06] |YEAR_TO_START|  |
+DEBUG [2020-03-19 15:38:06] |check city df ------  | 0 |
+DEBUG [2020-03-19 15:38:07] |check value------  | Minimum |
+DEBUG [2020-03-19 15:38:07] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 15:38:08] |MONTH 1| Jan |
+DEBUG [2020-03-19 15:38:08] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 15:38:08] Rdata exists
+DEBUG [2020-03-19 15:38:08] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 15:38:08] |MONTH| Jan |
+DEBUG [2020-03-19 15:38:08] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 15:38:40] |TEMP_VAL |  |
+DEBUG [2020-03-19 15:38:40] |MONTH|  |
+DEBUG [2020-03-19 15:38:40] |YEAR_TO_START|  |
+DEBUG [2020-03-19 15:38:40] |check city df ------  | 0 |
+DEBUG [2020-03-19 15:38:46] |check value------  | Minimum |
+DEBUG [2020-03-19 15:38:46] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 15:38:48] |MONTH 1| Jan |
+DEBUG [2020-03-19 15:38:48] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 15:38:48] Rdata exists
+DEBUG [2020-03-19 15:38:48] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 15:38:48] |MONTH| Jan |
+DEBUG [2020-03-19 15:38:48] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 15:39:11] |TEMP_VAL |  |
+DEBUG [2020-03-19 15:39:11] |MONTH|  |
+DEBUG [2020-03-19 15:39:11] |YEAR_TO_START|  |
+DEBUG [2020-03-19 15:39:11] |check city df ------  | 0 |
+DEBUG [2020-03-19 15:39:12] |check value------  | Minimum |
+DEBUG [2020-03-19 15:39:12] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 15:39:14] |MONTH 1| Jan |
+DEBUG [2020-03-19 15:39:14] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 15:39:14] Rdata exists
+DEBUG [2020-03-19 15:39:14] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 15:39:14] |MONTH| Jan |
+DEBUG [2020-03-19 15:39:14] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 15:40:28] |TEMP_VAL |  |
+DEBUG [2020-03-19 15:40:28] |MONTH|  |
+DEBUG [2020-03-19 15:40:28] |YEAR_TO_START|  |
+DEBUG [2020-03-19 15:40:28] |check city df ------  | 0 |
+DEBUG [2020-03-19 15:40:34] |check value------  | min_temp |
+DEBUG [2020-03-19 15:40:34] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 15:40:35] |MONTH 1| Jan |
+DEBUG [2020-03-19 15:40:35] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 15:40:35] Rdata exists
+DEBUG [2020-03-19 15:40:35] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 15:40:35] |MONTH| Jan |
+DEBUG [2020-03-19 15:40:35] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 15:45:14] |TEMP_VAL |  |
+DEBUG [2020-03-19 15:45:14] |MONTH|  |
+DEBUG [2020-03-19 15:45:14] |YEAR_TO_START|  |
+DEBUG [2020-03-19 15:45:14] |check city df ------  | 0 |
+DEBUG [2020-03-19 15:45:42] |TEMP_VAL |  |
+DEBUG [2020-03-19 15:45:42] |MONTH|  |
+DEBUG [2020-03-19 15:45:42] |YEAR_TO_START|  |
+DEBUG [2020-03-19 15:45:42] |check city df ------  | 0 |
+DEBUG [2020-03-19 15:45:44] |check value------  | min_temp |
+DEBUG [2020-03-19 15:45:44] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 15:45:46] |MONTH 1| Jan |
+DEBUG [2020-03-19 15:45:46] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 15:45:46] Rdata exists
+DEBUG [2020-03-19 15:45:46] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 15:45:46] |MONTH| Jan |
+DEBUG [2020-03-19 15:45:46] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 15:45:46] |check city df ------  | 0 |
+DEBUG [2020-03-19 15:45:55] |check city df ------  | 1 |
+DEBUG [2020-03-19 16:13:23] |TEMP_VAL |  |
+DEBUG [2020-03-19 16:13:23] |MONTH|  |
+DEBUG [2020-03-19 16:13:23] |YEAR_TO_START|  |
+DEBUG [2020-03-19 16:13:23] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:13:30] |check value------  | min_temp |
+DEBUG [2020-03-19 16:13:30] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 16:13:32] |MONTH 1| Jan |
+DEBUG [2020-03-19 16:13:32] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 16:13:32] Rdata exists
+DEBUG [2020-03-19 16:13:32] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 16:13:32] |MONTH| Jan |
+DEBUG [2020-03-19 16:13:32] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 16:13:33] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:13:40] |check city df ------  | 1 |
+DEBUG [2020-03-19 16:13:40] |PROV_DF | 11.566348530472 ||PROV_DF | -0.013376215073371 |
+DEBUG [2020-03-19 16:14:56] |TEMP_VAL |  |
+DEBUG [2020-03-19 16:14:56] |MONTH|  |
+DEBUG [2020-03-19 16:14:56] |YEAR_TO_START|  |
+DEBUG [2020-03-19 16:14:56] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:14:57] |check value------  | min_temp |
+DEBUG [2020-03-19 16:14:57] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 16:14:59] |MONTH 1| Jan |
+DEBUG [2020-03-19 16:14:59] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 16:14:59] Rdata exists
+DEBUG [2020-03-19 16:14:59] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 16:14:59] |MONTH| Jan |
+DEBUG [2020-03-19 16:14:59] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 16:15:00] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:15:04] |check city df ------  | 1 |
+DEBUG [2020-03-19 16:15:04] |OUTPUT_PROV_DF | 1:13 ||OUTPUT_PROV_DF | c(-39.6607641996575, -169.286838234511, -175.270651029032, -193.524822479651, -57.7909766842435, 63.5976537407073, 89.0970018126693, 11.566348530472, -58.974446019138, -26.631176306925, -30.1346789278345, -57.5064962414171, -107.636372492144) ||OUTPUT_PROV_DF | c(0.0173110095046679, 0.0725578582828269, 0.0735515417099137, 0.0802038306166601, 0.0216779364544438, -0.0411702349375152, -0.0550663475337793, -0.013376215073371, 0.0206300437729532, 0.00627401993513464, 0.0107732180633409, 0.0233276125838419, 0.0462396776063712) ||OUTPUT_PROV_DF | c(0.000788633264813841, 0.0165710901439862, 0.0232781212151937, 0.0315318711903871, 0.00214173454340889, 0.006453352944627, 0.0113896928077007, 0.000467357553650776, 0.00153300788147264, 0.000350574033107524, 0.00126786193856368, 0.00904803399568687, 0.00555582260324227) ||OUTPUT_PROV_DF | c(0.044733546379313, 0.129011806152373, 0.117640268124887, 0.111526384400907, 0.0471866487346861, -0.0125588527682673, -0.0203846471668732, 0.0165207752321916, 0.0471804254598209, 0.0400663364491089, 0.0388164808282603, 0.0790897529596306, 0.0941457312736472) ||OUTPUT_PROV_DF | c(-0.0101115273699772, 0.0161039104132808, 0.0294628152949406, 0.0488812768324134, -0.00383077582579854, -0.069781617106763, -0.0897480479006853, -0.0432732053789336, -0.00592033791391449, -0.0275182965788397, -0.0172700447015785, -0.0324345277919468, -0.00166637606090467) ||OUTPUT_PROV_DF | c(0.000195513989682461, 0.000824368884891148, 0.000503303568547636, 0.000254603336333857, 0.000169071080061977, 0.000212679177407882, 0.000312218110642056, 0.000232338190357792, 0.000183210641574763, 0.000295376654995353, 0.000203620556921831, 0.000784197359918205, 0.000595183195619231) ||OUTPUT_PROV_DF | c(1944, 381, 453, 778, 1297, 1229, 845, 1649, 1515, 382, 451, 78, 645) |
+DEBUG [2020-03-19 16:15:04] |PROV_DF | 11.566348530472 ||PROV_DF | -0.013376215073371 |
+DEBUG [2020-03-19 16:22:47] |TEMP_VAL |  |
+DEBUG [2020-03-19 16:22:47] |MONTH|  |
+DEBUG [2020-03-19 16:22:47] |YEAR_TO_START|  |
+DEBUG [2020-03-19 16:22:47] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:22:48] |check value------  | min_temp |
+DEBUG [2020-03-19 16:22:48] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 16:22:49] |MONTH 1| Jan |
+DEBUG [2020-03-19 16:22:49] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 16:22:49] Rdata exists
+DEBUG [2020-03-19 16:22:49] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 16:22:49] |MONTH| Jan |
+DEBUG [2020-03-19 16:22:49] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 16:22:50] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:22:55] |check city df ------  | 1 |
+DEBUG [2020-03-19 16:22:55] |OUTPUT_PROV_DF | 1:13 ||OUTPUT_PROV_DF | c(-39.6607641996575, -169.286838234511, -175.270651029032, -193.524822479651, -57.7909766842435, 63.5976537407073, 89.0970018126693, 11.566348530472, -58.974446019138, -26.631176306925, -30.1346789278345, -57.5064962414171, -107.636372492144) ||OUTPUT_PROV_DF | c(0.0173110095046679, 0.0725578582828269, 0.0735515417099137, 0.0802038306166601, 0.0216779364544438, -0.0411702349375152, -0.0550663475337793, -0.013376215073371, 0.0206300437729532, 0.00627401993513464, 0.0107732180633409, 0.0233276125838419, 0.0462396776063712) ||OUTPUT_PROV_DF | c(0.000788633264813841, 0.0165710901439862, 0.0232781212151937, 0.0315318711903871, 0.00214173454340889, 0.006453352944627, 0.0113896928077007, 0.000467357553650776, 0.00153300788147264, 0.000350574033107524, 0.00126786193856368, 0.00904803399568687, 0.00555582260324227) ||OUTPUT_PROV_DF | c(0.044733546379313, 0.129011806152373, 0.117640268124887, 0.111526384400907, 0.0471866487346861, -0.0125588527682673, -0.0203846471668732, 0.0165207752321916, 0.0471804254598209, 0.0400663364491089, 0.0388164808282603, 0.0790897529596306, 0.0941457312736472) ||OUTPUT_PROV_DF | c(-0.0101115273699772, 0.0161039104132808, 0.0294628152949406, 0.0488812768324134, -0.00383077582579854, -0.069781617106763, -0.0897480479006853, -0.0432732053789336, -0.00592033791391449, -0.0275182965788397, -0.0172700447015785, -0.0324345277919468, -0.00166637606090467) ||OUTPUT_PROV_DF | c(0.000195513989682461, 0.000824368884891148, 0.000503303568547636, 0.000254603336333857, 0.000169071080061977, 0.000212679177407882, 0.000312218110642056, 0.000232338190357792, 0.000183210641574763, 0.000295376654995353, 0.000203620556921831, 0.000784197359918205, 0.000595183195619231) ||OUTPUT_PROV_DF | c(1944, 381, 453, 778, 1297, 1229, 845, 1649, 1515, 382, 451, 78, 645) |
+DEBUG [2020-03-19 16:22:55] |PROV_DF | 11.566348530472 ||PROV_DF | -0.013376215073371 |
+DEBUG [2020-03-19 16:24:09] |TEMP_VAL |  |
+DEBUG [2020-03-19 16:24:09] |MONTH|  |
+DEBUG [2020-03-19 16:24:09] |YEAR_TO_START|  |
+DEBUG [2020-03-19 16:24:09] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:24:12] |check value------  | min_temp |
+DEBUG [2020-03-19 16:24:13] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 16:24:14] |MONTH 1| Jan |
+DEBUG [2020-03-19 16:24:14] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 16:24:14] Rdata exists
+DEBUG [2020-03-19 16:24:14] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 16:24:14] |MONTH| Jan |
+DEBUG [2020-03-19 16:24:14] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 16:24:15] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:24:19] |check city df ------  | 1 |
+DEBUG [2020-03-19 16:24:19] |OUTPUT_PROV_DF | 1:13 ||OUTPUT_PROV_DF | c(-39.6607641996575, -169.286838234511, -175.270651029032, -193.524822479651, -57.7909766842435, 63.5976537407073, 89.0970018126693, 11.566348530472, -58.974446019138, -26.631176306925, -30.1346789278345, -57.5064962414171, -107.636372492144) ||OUTPUT_PROV_DF | c(0.0173110095046679, 0.0725578582828269, 0.0735515417099137, 0.0802038306166601, 0.0216779364544438, -0.0411702349375152, -0.0550663475337793, -0.013376215073371, 0.0206300437729532, 0.00627401993513464, 0.0107732180633409, 0.0233276125838419, 0.0462396776063712) ||OUTPUT_PROV_DF | c(0.000788633264813841, 0.0165710901439862, 0.0232781212151937, 0.0315318711903871, 0.00214173454340889, 0.006453352944627, 0.0113896928077007, 0.000467357553650776, 0.00153300788147264, 0.000350574033107524, 0.00126786193856368, 0.00904803399568687, 0.00555582260324227) ||OUTPUT_PROV_DF | c(0.044733546379313, 0.129011806152373, 0.117640268124887, 0.111526384400907, 0.0471866487346861, -0.0125588527682673, -0.0203846471668732, 0.0165207752321916, 0.0471804254598209, 0.0400663364491089, 0.0388164808282603, 0.0790897529596306, 0.0941457312736472) ||OUTPUT_PROV_DF | c(-0.0101115273699772, 0.0161039104132808, 0.0294628152949406, 0.0488812768324134, -0.00383077582579854, -0.069781617106763, -0.0897480479006853, -0.0432732053789336, -0.00592033791391449, -0.0275182965788397, -0.0172700447015785, -0.0324345277919468, -0.00166637606090467) ||OUTPUT_PROV_DF | c(0.000195513989682461, 0.000824368884891148, 0.000503303568547636, 0.000254603336333857, 0.000169071080061977, 0.000212679177407882, 0.000312218110642056, 0.000232338190357792, 0.000183210641574763, 0.000295376654995353, 0.000203620556921831, 0.000784197359918205, 0.000595183195619231) ||OUTPUT_PROV_DF | c(1944, 381, 453, 778, 1297, 1229, 845, 1649, 1515, 382, 451, 78, 645) |
+DEBUG [2020-03-19 16:24:19] |PROV_DF | 11.566348530472 ||PROV_DF | -0.013376215073371 |
+DEBUG [2020-03-19 16:31:44] |TEMP_VAL |  |
+DEBUG [2020-03-19 16:31:44] |MONTH|  |
+DEBUG [2020-03-19 16:31:44] |YEAR_TO_START|  |
+DEBUG [2020-03-19 16:31:44] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:31:45] |check value------  | min_temp |
+DEBUG [2020-03-19 16:31:45] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 16:31:47] |MONTH 1| Jan |
+DEBUG [2020-03-19 16:31:47] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 16:31:47] Rdata exists
+DEBUG [2020-03-19 16:31:47] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 16:31:47] |MONTH| Jan |
+DEBUG [2020-03-19 16:31:47] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 16:31:47] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:32:52] |TEMP_VAL |  |
+DEBUG [2020-03-19 16:32:52] |MONTH|  |
+DEBUG [2020-03-19 16:32:52] |YEAR_TO_START|  |
+DEBUG [2020-03-19 16:32:52] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:32:53] |check value------  | min_temp |
+DEBUG [2020-03-19 16:32:53] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 16:32:55] |MONTH 1| Jan |
+DEBUG [2020-03-19 16:32:55] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 16:32:55] Rdata exists
+DEBUG [2020-03-19 16:32:55] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 16:32:55] |MONTH| Jan |
+DEBUG [2020-03-19 16:32:55] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 16:32:55] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:33:07] |check city df ------  | 1 |
+DEBUG [2020-03-19 16:33:07] |CHECK | BC ||CHECK | YT ||CHECK | NT ||CHECK | NU ||CHECK | AB ||CHECK | SK ||CHECK | MB ||CHECK | ON ||CHECK | QC ||CHECK | NB ||CHECK | NS ||CHECK | PE ||CHECK | NL |
+DEBUG [2020-03-19 16:33:07] |PROV_DF | 11.566348530472 ||PROV_DF | -0.013376215073371 |
+DEBUG [2020-03-19 16:34:27] |TEMP_VAL |  |
+DEBUG [2020-03-19 16:34:27] |MONTH|  |
+DEBUG [2020-03-19 16:34:27] |YEAR_TO_START|  |
+DEBUG [2020-03-19 16:34:27] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:34:29] |check value------  | min_temp |
+DEBUG [2020-03-19 16:34:29] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 16:34:30] |MONTH 1| Jan |
+DEBUG [2020-03-19 16:34:30] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 16:34:30] Rdata exists
+DEBUG [2020-03-19 16:34:30] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 16:34:30] |MONTH| Jan |
+DEBUG [2020-03-19 16:34:30] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 16:34:31] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:34:35] |check city df ------  | 1 |
+DEBUG [2020-03-19 16:34:35] |PROV_DF | 11.566348530472 ||PROV_DF | -0.013376215073371 |
+DEBUG [2020-03-19 16:35:28] |TEMP_VAL |  |
+DEBUG [2020-03-19 16:35:28] |MONTH|  |
+DEBUG [2020-03-19 16:35:28] |YEAR_TO_START|  |
+DEBUG [2020-03-19 16:35:28] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:35:32] |check value------  | min_temp |
+DEBUG [2020-03-19 16:35:32] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 16:35:33] |MONTH 1| Jan |
+DEBUG [2020-03-19 16:35:33] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 16:35:33] Rdata exists
+DEBUG [2020-03-19 16:35:33] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 16:35:33] |MONTH| Jan |
+DEBUG [2020-03-19 16:35:33] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 16:35:34] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:35:37] |check city df ------  | 1 |
+DEBUG [2020-03-19 16:35:37] |PROV_DF | 11.566348530472 ||PROV_DF | -0.013376215073371 |
+DEBUG [2020-03-19 16:39:32] |TEMP_VAL |  |
+DEBUG [2020-03-19 16:39:32] |MONTH|  |
+DEBUG [2020-03-19 16:39:32] |YEAR_TO_START|  |
+DEBUG [2020-03-19 16:39:32] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:39:33] |check value------  | min_temp |
+DEBUG [2020-03-19 16:39:33] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 16:39:35] |MONTH 1| Jan |
+DEBUG [2020-03-19 16:39:35] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 16:39:35] Rdata exists
+DEBUG [2020-03-19 16:39:35] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 16:39:35] |MONTH| Jan |
+DEBUG [2020-03-19 16:39:35] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 16:39:35] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:39:40] |check city df ------  | 1 |
+DEBUG [2020-03-19 16:39:40] |PROV_DF | 11.566348530472 ||PROV_DF | -0.013376215073371 |
+DEBUG [2020-03-19 16:41:06] |TEMP_VAL |  |
+DEBUG [2020-03-19 16:41:06] |MONTH|  |
+DEBUG [2020-03-19 16:41:06] |YEAR_TO_START|  |
+DEBUG [2020-03-19 16:41:06] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:41:07] |check value------  | min_temp |
+DEBUG [2020-03-19 16:41:07] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 16:41:09] |MONTH 1| Jan |
+DEBUG [2020-03-19 16:41:09] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 16:41:09] Rdata exists
+DEBUG [2020-03-19 16:41:09] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 16:41:09] |MONTH| Jan |
+DEBUG [2020-03-19 16:41:09] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 16:41:10] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:41:19] |check city df ------  | 1 |
+DEBUG [2020-03-19 16:41:20] |PROV_DF | 11.566348530472 ||PROV_DF | -0.013376215073371 |
+DEBUG [2020-03-19 16:45:37] |TEMP_VAL |  |
+DEBUG [2020-03-19 16:45:37] |MONTH|  |
+DEBUG [2020-03-19 16:45:37] |YEAR_TO_START|  |
+DEBUG [2020-03-19 16:45:37] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:45:39] |check value------  | min_temp |
+DEBUG [2020-03-19 16:45:39] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 16:45:41] |MONTH 1| Jan |
+DEBUG [2020-03-19 16:45:41] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 16:45:41] Rdata exists
+DEBUG [2020-03-19 16:45:41] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 16:45:41] |MONTH| Jan |
+DEBUG [2020-03-19 16:45:41] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 16:45:41] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:45:45] |check city df ------  | 1 |
+DEBUG [2020-03-19 16:45:45] |PROV_DF | 11.566348530472 ||PROV_DF | -0.013376215073371 |
+DEBUG [2020-03-19 16:46:12] |TEMP_VAL |  |
+DEBUG [2020-03-19 16:46:12] |MONTH|  |
+DEBUG [2020-03-19 16:46:12] |YEAR_TO_START|  |
+DEBUG [2020-03-19 16:46:12] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:46:14] |check value------  | min_temp |
+DEBUG [2020-03-19 16:46:14] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 16:46:15] |MONTH 1| Jan |
+DEBUG [2020-03-19 16:46:15] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 16:46:15] Rdata exists
+DEBUG [2020-03-19 16:46:16] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 16:46:16] |MONTH| Jan |
+DEBUG [2020-03-19 16:46:16] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 16:46:16] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:46:20] |check city df ------  | 1 |
+DEBUG [2020-03-19 16:46:20] |PROV_DF | 11.566348530472 ||PROV_DF | -0.013376215073371 |
+DEBUG [2020-03-19 16:46:46] |TEMP_VAL |  |
+DEBUG [2020-03-19 16:46:46] |MONTH|  |
+DEBUG [2020-03-19 16:46:46] |YEAR_TO_START|  |
+DEBUG [2020-03-19 16:46:46] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:46:48] |check value------  | min_temp |
+DEBUG [2020-03-19 16:46:48] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 16:46:50] |MONTH 1| Jan |
+DEBUG [2020-03-19 16:46:50] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 16:46:50] Rdata exists
+DEBUG [2020-03-19 16:46:50] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 16:46:50] |MONTH| Jan |
+DEBUG [2020-03-19 16:46:50] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 16:46:50] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:46:54] |check city df ------  | 1 |
+DEBUG [2020-03-19 16:46:54] |PROV_DF | 11.566348530472 ||PROV_DF | -0.013376215073371 |
+DEBUG [2020-03-19 16:47:19] |TEMP_VAL |  |
+DEBUG [2020-03-19 16:47:19] |MONTH|  |
+DEBUG [2020-03-19 16:47:19] |YEAR_TO_START|  |
+DEBUG [2020-03-19 16:47:19] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:47:20] |check value------  | min_temp |
+DEBUG [2020-03-19 16:47:20] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 16:47:21] |MONTH 1| Jan |
+DEBUG [2020-03-19 16:47:21] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 16:47:21] Rdata exists
+DEBUG [2020-03-19 16:47:21] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 16:47:21] |MONTH| Jan |
+DEBUG [2020-03-19 16:47:21] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 16:47:22] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:47:25] |check city df ------  | 1 |
+DEBUG [2020-03-19 16:47:25] |PROV_DF | 11.566348530472 ||PROV_DF | -0.013376215073371 |
+DEBUG [2020-03-19 16:47:55] |TEMP_VAL |  |
+DEBUG [2020-03-19 16:47:55] |MONTH|  |
+DEBUG [2020-03-19 16:47:55] |YEAR_TO_START|  |
+DEBUG [2020-03-19 16:47:55] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:47:57] |check value------  | min_temp |
+DEBUG [2020-03-19 16:47:57] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 16:47:58] |MONTH 1| Jan |
+DEBUG [2020-03-19 16:47:58] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 16:47:58] Rdata exists
+DEBUG [2020-03-19 16:47:58] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 16:47:58] |MONTH| Jan |
+DEBUG [2020-03-19 16:47:58] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 16:47:59] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:48:10] |check city df ------  | 1 |
+DEBUG [2020-03-19 16:48:10] |PROV_DF | 11.566348530472 ||PROV_DF | -0.013376215073371 |
+DEBUG [2020-03-19 16:48:35] |TEMP_VAL |  |
+DEBUG [2020-03-19 16:48:35] |MONTH|  |
+DEBUG [2020-03-19 16:48:35] |YEAR_TO_START|  |
+DEBUG [2020-03-19 16:48:35] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:48:38] |check value------  | min_temp |
+DEBUG [2020-03-19 16:48:38] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 16:48:40] |MONTH 1| Jan |
+DEBUG [2020-03-19 16:48:40] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 16:48:40] Rdata exists
+DEBUG [2020-03-19 16:48:40] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 16:48:40] |MONTH| Jan |
+DEBUG [2020-03-19 16:48:40] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 16:48:40] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:48:44] |check city df ------  | 1 |
+DEBUG [2020-03-19 16:48:44] |PROV_DF | 11.566348530472 ||PROV_DF | -0.013376215073371 |
+DEBUG [2020-03-19 16:49:26] |TEMP_VAL |  |
+DEBUG [2020-03-19 16:49:26] |MONTH|  |
+DEBUG [2020-03-19 16:49:26] |YEAR_TO_START|  |
+DEBUG [2020-03-19 16:49:26] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:49:28] |check value------  | min_temp |
+DEBUG [2020-03-19 16:49:28] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 16:49:29] |MONTH 1| Jan |
+DEBUG [2020-03-19 16:49:29] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 16:49:29] Rdata exists
+DEBUG [2020-03-19 16:49:29] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 16:49:29] |MONTH| Jan |
+DEBUG [2020-03-19 16:49:29] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 16:49:30] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:49:33] |check city df ------  | 1 |
+DEBUG [2020-03-19 16:49:33] |PROV_DF | 11.566348530472 ||PROV_DF | -0.013376215073371 |
+DEBUG [2020-03-19 16:58:31] |TEMP_VAL |  |
+DEBUG [2020-03-19 16:58:31] |MONTH|  |
+DEBUG [2020-03-19 16:58:31] |YEAR_TO_START|  |
+DEBUG [2020-03-19 16:58:31] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:58:33] |check value------  | min_temp |
+DEBUG [2020-03-19 16:58:33] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 16:58:35] |MONTH 1| Jan |
+DEBUG [2020-03-19 16:58:35] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 16:58:35] Rdata exists
+DEBUG [2020-03-19 16:58:35] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 16:58:35] |MONTH| Jan |
+DEBUG [2020-03-19 16:58:35] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 16:58:36] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:58:40] |check city df ------  | 1 |
+DEBUG [2020-03-19 16:58:40] |PROV_DF | 11.566348530472 ||PROV_DF | -0.013376215073371 |
+DEBUG [2020-03-19 16:58:51] |TEMP_VAL |  |
+DEBUG [2020-03-19 16:58:51] |MONTH|  |
+DEBUG [2020-03-19 16:58:51] |YEAR_TO_START|  |
+DEBUG [2020-03-19 16:58:51] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:58:52] |check value------  | min_temp |
+DEBUG [2020-03-19 16:58:52] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 16:58:54] |MONTH 1| Jan |
+DEBUG [2020-03-19 16:58:54] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 16:58:54] Rdata exists
+DEBUG [2020-03-19 16:58:54] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 16:58:54] |MONTH| Jan |
+DEBUG [2020-03-19 16:58:54] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 16:58:55] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:58:58] |check city df ------  | 1 |
+DEBUG [2020-03-19 16:58:58] |PROV_DF | 11.566348530472 ||PROV_DF | -0.013376215073371 |
+DEBUG [2020-03-19 16:59:22] |TEMP_VAL |  |
+DEBUG [2020-03-19 16:59:22] |MONTH|  |
+DEBUG [2020-03-19 16:59:22] |YEAR_TO_START|  |
+DEBUG [2020-03-19 16:59:22] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:59:23] |check value------  | min_temp |
+DEBUG [2020-03-19 16:59:23] |TEMP_VAL 1| min_temp |
+DEBUG [2020-03-19 16:59:25] |MONTH 1| Jan |
+DEBUG [2020-03-19 16:59:25] |YEAR_TO_START 1| 1980 |
+DEBUG [2020-03-19 16:59:25] Rdata exists
+DEBUG [2020-03-19 16:59:25] |TEMP_VAL | min_temp |
+DEBUG [2020-03-19 16:59:25] |MONTH| Jan |
+DEBUG [2020-03-19 16:59:25] |YEAR_TO_START| 1980 |
+DEBUG [2020-03-19 16:59:26] |check city df ------  | 0 |
+DEBUG [2020-03-19 16:59:29] |check city df ------  | 1 |
+DEBUG [2020-03-19 16:59:30] |PROV_DF | 11.566348530472 ||PROV_DF | -0.013376215073371 |
