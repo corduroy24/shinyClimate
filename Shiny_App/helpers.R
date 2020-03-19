@@ -48,9 +48,9 @@ main <- function(temp_val, month, year_to_start){
   provs <- data.frame("provs" = c("AB","BC","YT","NT","NU","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL"))
   if(file.exists(paste(temp_val,month, year_to_start,'.RData'))){
     load(paste(temp_val,month, year_to_start,'.RData'))
-    p("Rdata exists")
+    debug(logger, paste("Rdata exists"))
   } else {
-    p("RData does not exists")
+    debug(logger, paste("RData does not exists"))
     # input_df_all <-data.frame()
     # output_df_all <-data.frame()
     # for(i in 1:nrow(provs)){
@@ -59,8 +59,8 @@ main <- function(temp_val, month, year_to_start){
       # input_df_all <- rbind(input_df_all, input_df)
       # output_df_all <- rbind(output_df_all, output_df)
     # }
-    # save(input_df_all, file = paste(temp_val, month, year_to_start,'.RData'))
-    # save(output_df_all, file = paste(temp_val, month, year_to_start,'.RData'))
+    save(input_df_all, file = paste(temp_val, month, year_to_start,'.RData'))
+    save(output_df_all, file = paste(temp_val, month, year_to_start,'.RData'))
   }
   
   return(output_df_all)
@@ -237,7 +237,27 @@ regression <- function(input_df){
 
 overlay_slopes <- function(city, prov){
   
+  # plot(y_temp~x_year, data = input_df)
+  # abline(fit, col = 'red')
   
+}
+
+get_city_vector <- function(temp_val, month, year_to_start){
+  if(file.exists(paste(temp_val,month, year_to_start,'.RData'))){
+    load(paste(temp_val,month, year_to_start,'.RData'))
+    city_prov_vector <- unique(input_all_df[,c("city", 'prov')])
+    city_vector <- city_prov_vector[, 'city']
+    return(city_vector)
+  }
+}
+
+get_prov_vector <- function(temp_val, month, year_start){
+  if(file.exists(paste(temp_val,month, year_to_start,'.RData'))){
+    load(paste(temp_val,month, year_to_start,'.RData'))
+    city_prov_vector <- unique(input_all_df[,c("city", 'prov')])
+    prov_vector <- city_prov_vector[, 'prov']
+    return(prov_vector)
+  }
 }
 
 # hist(output_df_all$slope, freq = TRUE, main  = paste("Histogram of Slope(Canada)"), xlab = "Slope")

@@ -6,3 +6,5 @@ DEBUG [2020-03-18 17:52:49] -----city vector length-------- 2
 DEBUG [2020-03-18 17:57:33] -----city vector length-------- 338
 DEBUG [2020-03-18 17:59:36] -----city vector length-------- 
 DEBUG [2020-03-18 17:59:36] -----prov vector length-------- 
+DEBUG [2020-03-18 18:02:56] |check value------  | min_temp |
+DEBUG [2020-03-18 20:58:25] |check value------  | min_temp |

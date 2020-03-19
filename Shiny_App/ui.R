@@ -42,8 +42,12 @@ shinyUI(fluidPage(
             verbatimTextOutput("test_1"),
             verbatimTextOutput("test_2"),
             verbatimTextOutput("test_3"),
-            verbatimTextOutput("test_4")
+            verbatimTextOutput("test_4"),
             
+            # Input: Select a dataset ----
+            selectInput("prov", "Choose a province:",
+                        choices = c()
+            ),
         ),
         
         

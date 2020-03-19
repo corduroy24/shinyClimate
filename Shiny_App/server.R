@@ -19,7 +19,7 @@ source("helpers.R")
 
 
 # Define server logic required to draw a histogram
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
     # x1 <- strtrim(input$month, 3)
     # 
     # 
@@ -70,7 +70,6 @@ shinyServer(function(input, output) {
       beginning <- Sys.time()
       
       output_df_all <- main(params[[1]], params[[2]], params[[3]])
-      
       
       end <- Sys.time()
       output$test_2 <- renderText({end - beginning})
