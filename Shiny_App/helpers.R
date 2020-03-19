@@ -46,20 +46,14 @@ meanTempDir = "Homog_monthly_mean_temp"
 main <- function(temp_val, month, year_to_start){
   provs <- data.frame("provs" = c("AB","BC","YT","NT","NU","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL"))
   if(file.exists(paste(temp_val,month, year_to_start,'.RData'))){
-    load(paste(temp_val,month, year_to_start,'.RData'))
+    load(paste(temp_val,month, year_to_start,'.RData'), .GlobalEnv)
     debug(logger, paste("Rdata exists"))
   } else {
     debug(logger, paste("RData does not exists"))
-    # input_df_all <-data.frame()
-    # output_df_all <-data.frame()
-    # for(i in 1:nrow(provs)){
-      input_df_all <- load_cleaned_data(year_to_start, month, temp_val) #data matrix X
-      output_df_all <- regression(input_df_all) #reg results 
-      # input_df_all <- rbind(input_df_all, input_df)
-      # output_df_all <- rbind(output_df_all, output_df)
-    # }
+    input_df_all <- load_cleaned_data(year_to_start, month, temp_val) #data matrix X
+    output_df_all <- regression(input_df_all) #reg results 
     save(input_df_all, output_df_all, file = paste(temp_val, month, year_to_start,'.RData'))
-    # save(output_df_all, file = paste(temp_val, month, year_to_start,'.RData'))
+    load(paste(temp_val,month, year_to_start,'.RData'), .GlobalEnv)
   }
   
   return(output_df_all)
@@ -201,9 +195,6 @@ regression <- function(input_df){
   city_vector <- city_prov_vector[, 'city']
   prov_vector <- city_prov_vector[, 'prov']
   
-  # debug(logger, paste("-----city vector length--------", length(city_vector)))
-  # debug(logger, paste("-----prov vector length--------", length(prov_vector)))
-
   output_df <- data.frame()
   for (i in 1:length(city_vector)){
     index <- which(input_df[, "city"] == city_vector[i])
@@ -223,12 +214,8 @@ regression <- function(input_df){
     curr_results_df <- data.frame("city"=city_vector[i],'prov' = prov_vector[i],  b,"r.squared"=R_2,CI_lower, CI_upper,variance,"n"=nrow(fit$model), row.names = NULL)
     output_df <- rbind(output_df,curr_results_df)
   }
-  # plot(y_temp~x_year, data = input_df)
-  # abline(fit, col = 'red')
   return(output_df)
 }
-
-output_df_prov <- data.frame()
 
 reg_prov <- function(input_df){
   city_prov_vector <- unique(input_df[,c("city", 'prov')])
@@ -254,12 +241,29 @@ reg_prov <- function(input_df){
     curr_results_df <- data.frame('prov' = prov_vector[i],  b,"r.squared"=R_2,CI_lower, CI_upper,variance,"n"=nrow(fit$model), row.names = NULL)
     output_df <- rbind(output_df,curr_results_df)
   }
-  # plot(y_temp~x_year, data = input_df)
-  # abline(fit, col = 'red')
-  output_df_prov <- output_df
   return(output_df)
 }
 
+reg_country <- function(input_df){
+  for (i in 1:length(input_df)){
+    fit <- lm(y_temp[i]~x_year[i], data = input_df)
+    
+    b <- data.frame("intercept" = fit$coefficients[1], "slope" = fit$coefficients[2])
+    R_2 <- data.frame("r.squared" = as.numeric(unlist(summary(fit)$r.squared)))
+    # CIs <- ci(fit, 0.95, alpha=1-0.95, na.rm = TRUE)
+    critical_value <- qt((1-0.95)/2, (nrow(fit$model)-1))
+    standard_error <- summary(fit)$coef[,2][2]
+    margin_error <- critical_value*standard_error
+    estimate <- summary(fit)$coef[,1][2]
+    CI_lower <-  estimate - margin_error
+    CI_upper <- estimate + margin_error
+    variance <- (standard_error)^2
+    
+    curr_results_df <- data.frame(b,"r.squared"=R_2,CI_lower, CI_upper,variance,"n"=nrow(fit$model), row.names = NULL)
+    output_df <- rbind(output_df,curr_results_df)
+  }
+  return(output_df)
+}
 # Interaction Model - Confirm Regression Results
 # 
 # city<- data.table(city_vector, stringsAsFactors = TRUE)
@@ -286,7 +290,7 @@ get_city_vector <- function(temp_val, month, year_to_start){
 #do unique again... 
 get_prov_vector <- function(temp_val, month, year_to_start){
   if(file.exists(paste(temp_val,month, year_to_start,'.RData'))){
-    load(paste(temp_val,month, year_to_start,'.RData'))
+    load(paste(temp_val,month, year_to_start,'.RData'), .GlobalEnv)
     city_prov_vector <- unique(input_df_all[,c("city", 'prov')])
     prov_vector <- unique(city_prov_vector[, 'prov'])
     return(prov_vector)
@@ -295,7 +299,7 @@ get_prov_vector <- function(temp_val, month, year_to_start){
 
 get_input_df <-function(temp_val, month, year_to_start){
   if(file.exists(paste(temp_val,month, year_to_start,'.RData'))){
-    load(paste(temp_val,month, year_to_start,'.RData'))
+    load(paste(temp_val,month, year_to_start,'.RData'), .GlobalEnv)
     return(input_df_all)
   }
 }

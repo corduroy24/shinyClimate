@@ -35,6 +35,7 @@ shinyServer(function(input, output, session) {
   month <- reactiveVal()
   temp_val <- reactiveVal()
   year_to_start <- reactiveVal()
+  t1 <- character()
   
 
     extractParams <- function(sent_variable){
@@ -64,7 +65,6 @@ shinyServer(function(input, output, session) {
         need(input$year_to_start != '', 'Please choose a valid start year.')
       )
 
-      
       params <- extractParams(input)
       debug(logger, paste('|check value------ ' , '|',params[1],"|"))
       
@@ -85,103 +85,89 @@ shinyServer(function(input, output, session) {
       
       beginning <- Sys.time()
       
-      output_df_all <- main(temp_val(), month(), year_to_start())
-      
-
-      # check <- load(paste(temp_val,month, year_to_start,'.RData'))
-      
-      # debug(logger, paste('|check value------ ' , '|', check,"|"))
-      
-      # city_vector<- input_df_all 
-      
-      # city_vector<- get_city_vector(temp_val(), month(), year_to_start())
-      # prov_vector<- get_prov_vector(temp_val(), month(), year_to_start())
-
-      # debug(logger, paste('|check prov ------ ' , '|', prov_vector,"|"))
+      main(temp_val(), month(), year_to_start())
       
       end <- Sys.time()
       output$test_2 <- renderText({end - beginning})
-      # vars <- list(output_df_all)
+      
       
     })
     
     
-    # Filter data based on selections
     output$table <- DT::renderDataTable(DT::datatable({
       value()
       output_df_all
     }))
+
+
     
-    observe({
-      # value()
-
-      debug(logger, paste('|TEMP_VAL |', temp_val(),"|"))
-      debug(logger, paste('|MONTH|', month(),"|"))
-      debug(logger, paste('|YEAR_TO_START|', year_to_start(),"|"))
-      
-      prov_vector<<- get_prov_vector(temp_val(), month(), year_to_start())
-      
-      updateSelectInput(session,
-                        "prov",
-                        "Choose a province:",
-                        choices = prov_vector
-                        )
-    })
-    
-    output$hist <- renderPlot({
-      # vars <- value()
-      # output_df_all <- vars[[1]]
-      # params <- vars[[4]]
-      
-      validate(
-        need(input$city != '', 'Please enter a valid city')
-      )
-      city <- toupper(input$city)
-      prov <- input$prov
-      
-      city_df <- output_df_all[ which(output_df_all$prov==prov
-                    & output_df_all$city == city), ]
-      debug(logger, paste('|check city df ------ ' , '|', nrow(city_df), "|"))
-      validate(
-        need(nrow(city_df) !=0, 'Please enter a valid city')
-      )
-      # prov_df <- output_df_all[which(output_df_all$prov==prov), ]
-      # debug(logger, paste('|check prov df ------ ' , '|', prov_df,"|"))
-      
-
-      city_df <- select(city_df, intercept, slope)
-      # prov_df <- select(prov_df, intercept, slope)
-      
-      
-      output_df_prov <- reg_prov(input_df_all)
-      test <- output_df_prov$prov
-      # debug(logger, paste('|TEST |', test,"|"))
-      
-      # debug(logger, paste('|OUTPUT_PROV_DF |', output_df_prov,"|"))
-      
-      prov_df <- output_df_prov[which(output_df_prov$prov==prov), ]
-      prov_df <- select(prov_df, intercept, slope)
-      
-      debug(logger, paste('|PROV_DF |', prov_df,"|"))
-      
-      # allow xlim and ylim to be chosen ?
-      plot(1, type="l", xlab="", ylab="", xlim=c(1980, 2020), ylim=c(-20, 5))
-      abline(h=0, lty = 4)
-      abline(a = city_df$intercept, b = city_df$slope, col = 'red', lwd = 3)
-      horiz_1 <- city_df$intercept + as.numeric(city_df$slope)*1980
-      abline(h=horiz_1, lty = 3)
-      abline(a = prov_df$intercept, b = prov_df$slope, col = 'blue', lwd  = 3)
-      horiz_2 <- prov_df$intercept + as.numeric(prov_df$slope)*1980
-      abline(h=horiz_2, lty = 3)
-      
-      legend("topright", 
-             legend = c(city, prov, 'CANADA'), 
-             col = c('red', 'blue', 'green'),
-             cex = 1.2, 
-             lty=3:3)
-      # abline(a = $intercept, b = city_df$slope, col = 'green')
-
-    })
+    # observeEvent(input${
+    #   debug(logger, paste('|TEMP_VAL |', temp_val(),"|"))
+    #   debug(logger, paste('|MONTH|', month(),"|"))
+    #   debug(logger, paste('|YEAR_TO_START|', year_to_start(),"|"))
+    # 
+    #   prov_vector<- get_prov_vector(temp_val(), month(), year_to_start())
+    # 
+    #   updateSelectInput(session,
+    #                     "prov",
+    #                     "Choose a province:",
+    #                     choices = prov_vector
+    #                     )
+    # })
+    # 
+    # output$hist <- renderPlot({
+    #   
+    #   validate(
+    #     need(input$city != '', 'Please enter a valid city')
+    #   )
+    #   city <- toupper(input$city)
+    #   prov <- input$prov
+    #   
+    #   city_df <- output_df_all[ which(output_df_all$prov==prov
+    #                 & output_df_all$city == city), ]
+    #   debug(logger, paste('|check city df ------ ' , '|', nrow(city_df), "|"))
+    #   validate(
+    #     need(nrow(city_df) !=0, 'Please enter a valid city')
+    #   )
+    #   # prov_df <- output_df_all[which(output_df_all$prov==prov), ]
+    #   # debug(logger, paste('|check prov df ------ ' , '|', prov_df,"|"))
+    #   city_df <- select(city_df, intercept, slope)
+    #   
+    #   output_df_prov <- reg_prov(input_df_all)
+    #   # test <- output_df_prov$prov
+    #   # debug(logger, paste('|TEST |', test,"|"))
+    #   # debug(logger, paste('|OUTPUT_PROV_DF |', output_df_prov,"|"))
+    #   prov_df <- output_df_prov[which(output_df_prov$prov==prov), ]
+    #   prov_df <- select(prov_df, intercept, slope)
+    #   debug(logger, paste('|PROV_DF |', prov_df,"|"))
+    #   
+    #   output_df_country <- reg_country(input_df_all)
+    #   debug(logger, paste('|OUTPUT_PROV_DF |', output_df_country,"|"))
+    #   country_df <- output_df_prov[which(output_df_prov$prov==prov), ]
+    #   country_df <- select(prov_df, intercept, slope)
+    #   debug(logger, paste('|PROV_DF |', country_df,"|"))
+    #   
+    #   # allow xlim and ylim to be chosen ?
+    #   plot(1, type="l", xlab="", ylab="", xlim=c(1980, 2020), ylim=c(-20, 5))
+    #   abline(h=0, lty = 4)
+    #   abline(a = city_df$intercept, b = city_df$slope, col = 'red', lwd = 3)
+    #   horiz_1 <- city_df$intercept + city_df$slope*1980
+    #   abline(h=horiz_1, lty = 3)
+    #   abline(a = prov_df$intercept, b = prov_df$slope, col = 'blue', lwd  = 3)
+    #   horiz_2 <- prov_df$intercept + prov_df$slope*1980
+    #   abline(h=horiz_2, lty = 3)
+    #   abline(a = country_df$intercept, b = country_df$slope, col = 'green', lwd  = 3)
+    #   horiz_3 <- country_df$intercept + country_df$slope*1980
+    #   abline(h=horiz_3, lty = 3)
+    #   
+    #   legend("topright", 
+    #          legend = c(city, prov, 'CANADA'), 
+    #          col = c('red', 'blue', 'green'),
+    #          cex = 1.2, 
+    #          lty=3:3)
+    #   # abline(a = $intercept, b = city_df$slope, col = 'green')
+    # 
+    # })
     # output$hist <- renderPlot({
     #   
     #   hist_slopes(output_df_all)
