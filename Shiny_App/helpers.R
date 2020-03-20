@@ -328,13 +328,37 @@ get_prov_vector <- function(temp_val, month, year_to_start){
   }
 }
 
-get_input_df <-function(temp_val, month, year_to_start){
-  if(file.exists(paste(temp_val,month, year_to_start,'.RData'))){
-    load(paste(temp_val,month, year_to_start,'.RData'), .GlobalEnv)
-    return(input_df_all)
-  }
-}
+# unsed for now.. 
+# get_input_df <-function(temp_val, month, year_to_start){
+#   if(file.exists(paste(temp_val,month, year_to_start,'.RData'))){
+#     load(paste(temp_val,month, year_to_start,'.RData'), .GlobalEnv)
+#     return(input_df_all)
+#   }
+# }
+
+
+gg_overlay_slopes <- function(city, prov){
+  city_df <- input_df_all[ which(input_df_all$prov==prov
+                                  & input_df_all$city == city), ]
+  if(nrow(city_df) == 0)return(NULL)
   
+  debug(logger, paste('|GG_OVERLAY_SLOPES |'))
+  prov_df <- input_df_all[which(input_df_all$prov==prov), ]
+  # debug(logger, paste('|PROV_DF |', prov_df,"|"))
+  country_df <- input_df_all
+  # debug(logger, paste('|CANADA_DF |', country_df,"|"))
+  
+  plot <- ggplot() +
+    geom_line(country_df, mapping = aes(x = x_year, y = y_temp, colour = "Country")) +
+    geom_smooth(country_df, method = "lm", mapping = aes(x = x_year, y = y_temp, colour = "Country")) +
+    geom_line(prov_df, mapping = aes(x = x_year, y=y_temp, colour = 'Province')) +
+    geom_smooth(prov_df,mapping = aes(x = x_year, y=y_temp, colour = "Province"), method = "lm") +
+    geom_line(city_df, mapping = aes(x = x_year, y=y_temp, colour = "City")) +
+    geom_smooth(city_df,mapping = aes(x = x_year, y=y_temp, colour = "City"), method = "lm") +
+    labs(x = "Year", y = "Temperature") 
+  return(plot)
+}
+
 
 # hist(output_df_all$slope, freq = TRUE, main  = paste("Histogram of Slope(Canada)"), xlab = "Slope")
 # abline(h=0, col = 'red')

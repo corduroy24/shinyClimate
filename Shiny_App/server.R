@@ -52,7 +52,6 @@ shinyServer(function(input, output, session) {
                       selected = 'TORONTO')
   })
 
-
   update <- reactive({
     month <- (strtrim(input$month, 3))
     temp_val <- unlist(strsplit(input$temp_val, " "))
@@ -80,11 +79,12 @@ shinyServer(function(input, output, session) {
     
   })
   
-    output$hist <- renderPlot({
+    output$slope <- renderPlot({
       update()
-      validate(
-        need(input$city != '', 'Please enter a valid city')
-      )
+      # controlled for...no longer needed
+      # validate(
+      #   need(input$city != '', 'Please enter a valid city')
+      # )
       city <- toupper(input$city)
       prov <- input$prov
       
@@ -95,4 +95,11 @@ shinyServer(function(input, output, session) {
       plot
     })
     
+    output$ggslope <- renderPlot({
+      update()
+      city <- toupper(input$city)
+      prov <- input$prov
+      
+      gg_overlay_slopes(city, prov)
+    })
 })

@@ -32,7 +32,7 @@ shinyUI(fluidPage(
             ),
             
             selectInput("year_to_start", "Start Year", 
-                         choices = seq(1840, 1986)),
+                         choices = seq(1840, 1986), selected = 1980),
             
 
             verbatimTextOutput("test_1"),
@@ -47,29 +47,17 @@ shinyUI(fluidPage(
             selectInput("city", "Choose a city:",
                         choices = c()
             ),
-            # htmlOutput("prov"),
-            # htmlOutput("city"),
-
-            # actionButton("confirm", "Confirm Selection"),
-            
-            # placeholder  = 
-            # textInput("city", "Enter City", value = 'Toronto')
-            
-
-
         ),
         
         
         mainPanel(
             tabsetPanel(
                 tabPanel("Story", 
-                    # DT::dataTableOutput("table"),
-                    plotOutput("hist")
+                    h1("Temperature Trends"),
+                    plotOutput("slope"),
+                    plotOutput("ggslope")
                 ),
                 
-
-            #   tabPanel("Table", tableOutput("table")),
-
                 tabPanel("About", 
                     HTML("Hello world")
                     # plotOutput("hist")
@@ -77,6 +65,4 @@ shinyUI(fluidPage(
             )
         )
     )
-
-    
 ))
