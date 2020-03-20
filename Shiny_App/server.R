@@ -41,9 +41,14 @@ shinyServer(function(input, output, session) {
     selectInput("prov", "Choose a province:",choices = prov_vector)
   })
   
-  output$city <- renderUI({
-    textInput("city", "Enter city:",value = "TORONTO" )
+  observeEvent(input$prov,{
+    output$city <- renderUI({
+      city_vector<- get_city_vector(input$prov)
+      selectInput("city", "Enter city:", choices = city_vector)
+    })
+    
   })
+
   
   
   update <- reactive({

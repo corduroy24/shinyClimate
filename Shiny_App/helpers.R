@@ -318,14 +318,10 @@ overlay_slopes <- function(city, prov){
   return(plot)
 }
 
-get_city_vector <- function(temp_val, month, year_to_start){
-  if(file.exists(paste(temp_val,month, year_to_start,'.RData'))){
-    check <-load(paste(temp_val,month, year_to_start,'.RData'),.GlobalEnv)
-    debug(logger, paste("load data", check[1]))
-    city_prov_vector <- unique(input_df_all[,c("city", 'prov')])
-    city_vector <- city_prov_vector[, 'city']
-    return(city_vector)
-  }
+get_city_vector <- function(prov){
+  city_vector <- output_df_all[which(output_df_all$prov==prov), ]
+  city_vector <- select(city_vector, city)
+  return(city_vector)
 }
 
 get_prov_vector <- function(temp_val, month, year_to_start){
