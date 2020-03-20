@@ -14,7 +14,7 @@ source("helpers.R")
 shinyUI(fluidPage(
 
     # Application title
-    titlePanel("Canadian Climate Data - Temperature  "),
+    titlePanel("Canadian Climate History"),
 
     # Sidebar with a slider input for number of bins
     sidebarLayout(
@@ -53,9 +53,21 @@ shinyUI(fluidPage(
         mainPanel(
             tabsetPanel(
                 tabPanel("Story", 
-                    h1("Temperature Trends"),
+                    h1("Analyzing Temperature"),
+                    h5("Aim - Answer some of the following questions..."),
+                    h3("Local, Provincial and National Trends"),
+                    h5("Taking a glance at temperature trends for a city, province and the nation"),
+                    h5("Suggestions - Set Month to Feb, or July to withhold a strong analysis of the worst case/best case scenarios "),
                     plotOutput("slope"),
-                    plotOutput("ggslope")
+                    plotOutput("ggslope"),
+                    h5("The different lines indicate different trends for selected regions"),
+                    h5("Take a moment to play around with the trends of different cities "),
+                    h5("Thus, remain cautious about trends forecasting trends for one region to the other"),
+                    h5("Notice, the variation of temperature increases as the size of region does. Thus, stronger assumptions on a local regions can be deduced"),
+                    h2("Local Analysis"),
+                    h4("Histogram (s)"),
+                    h5("Graphically summarize the distribution of a data set"),
+                    plotOutput("gghist")
                 ),
                 
                 tabPanel("About", 
