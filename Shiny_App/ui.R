@@ -34,32 +34,35 @@ shinyUI(fluidPage(
             
             numericInput("year_to_start", "Start Year", 1980),
             
-            actionButton("confirm", "Confirm Selection"),
-            
-            # textInput("testing_1", "Testing Output"),
-            # textInput("value", "Testing Output"),
-            
 
             verbatimTextOutput("test_1"),
             verbatimTextOutput("test_2"),
             verbatimTextOutput("test_3"),
             verbatimTextOutput("test_4"),
             
+            # can try disabling the element...
             # Input: Select a dataset ----
-            selectInput("prov", "Choose a province:",
-                        choices = c()
-            ),
+            # selectInput("prov", "Choose a province:",
+            #             choices = c()
+            # ),
+            htmlOutput("prov"),
+            
+            htmlOutput("city"),
+
+            actionButton("confirm", "Confirm Selection"),
             
             # placeholder  = 
-            textInput("city", "Enter City", value = 'Toronto')
+            # textInput("city", "Enter City", value = 'Toronto')
             
+
+
         ),
         
         
         mainPanel(
             tabsetPanel(
                 tabPanel("Story", 
-                    DT::dataTableOutput("table"),
+                    # DT::dataTableOutput("table"),
                     plotOutput("hist")
                 ),
                 

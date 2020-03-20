@@ -245,25 +245,26 @@ reg_prov <- function(input_df){
 }
 
 reg_country <- function(input_df){
-  for (i in 1:length(input_df)){
-    fit <- lm(y_temp[i]~x_year[i], data = input_df)
-    
+  # output_df <- data.frame()
+  
+    fit <- lm(y_temp~x_year, data = input_df)
     b <- data.frame("intercept" = fit$coefficients[1], "slope" = fit$coefficients[2])
     R_2 <- data.frame("r.squared" = as.numeric(unlist(summary(fit)$r.squared)))
-    # CIs <- ci(fit, 0.95, alpha=1-0.95, na.rm = TRUE)
-    critical_value <- qt((1-0.95)/2, (nrow(fit$model)-1))
-    standard_error <- summary(fit)$coef[,2][2]
-    margin_error <- critical_value*standard_error
-    estimate <- summary(fit)$coef[,1][2]
-    CI_lower <-  estimate - margin_error
-    CI_upper <- estimate + margin_error
-    variance <- (standard_error)^2
     
-    curr_results_df <- data.frame(b,"r.squared"=R_2,CI_lower, CI_upper,variance,"n"=nrow(fit$model), row.names = NULL)
-    output_df <- rbind(output_df,curr_results_df)
-  }
-  return(output_df)
+    # CIs <- ci(fit, 0.95, alpha=1-0.95, na.rm = TRUE)
+    # critical_value <- qt((1-0.95)/2, (nrow(fit$model)-1))
+    # standard_error <- summary(fit)$coef[,2][2]
+    # margin_error <- critical_value*standard_error
+    # estimate <- summary(fit)$coef[,1][2]
+    # CI_lower <-  estimate - margin_error
+    # CI_upper <- estimate + margin_error
+    # variance <- (standard_error)^2
+    
+    # curr_results_df <- data.frame(b,"r.squared"=R_2,CI_lower, CI_upper,variance,"n"=nrow(fit$model), row.names = NULL)
+    # output_df <- b
+  return(b)
 }
+
 # Interaction Model - Confirm Regression Results
 # 
 # city<- data.table(city_vector, stringsAsFactors = TRUE)
