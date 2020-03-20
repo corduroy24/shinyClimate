@@ -274,19 +274,14 @@ reg_country <- function(input_df){
 overlay_slopes <- function(city, prov){
   city_df <- output_df_all[ which(output_df_all$prov==prov
                                   & output_df_all$city == city), ]
-  if(nrow(city_df) == 0)
-    return(NULL)
+  if(nrow(city_df) == 0)return(NULL)
   
-  # debug(logger, paste('|check city df ------ ' , '|', nrow(city_df), "|"))
   city_df <- select(city_df, intercept, slope)
+  debug(logger, paste('|CITY_DF |', city_df, "|"))
   output_df_prov <- reg_prov(input_df_all)
-  # test <- output_df_prov$prov
-  # debug(logger, paste('|TEST |', test,"|"))
-  # debug(logger, paste('|OUTPUT_PROV_DF |', output_df_prov,"|"))
   prov_df <- output_df_prov[which(output_df_prov$prov==prov), ]
   prov_df <- select(prov_df, intercept, slope)
-  # debug(logger, paste('|PROV_DF |', prov_df,"|"))
-  
+  debug(logger, paste('|PROV_DF |', prov_df,"|"))
   country_df <- reg_country(input_df_all)
   debug(logger, paste('|CANADA_DF |', country_df,"|"))
   
@@ -297,10 +292,10 @@ overlay_slopes <- function(city, prov){
   horiz_can_1 <- country_df$intercept + country_df$slope*1980
   horiz_can_2 <- country_df$intercept + country_df$slope*2020
   
-  ylim <- c(round(min(horiz_city_1, horiz_prov_1, horiz_can_1)),
-            round(max(horiz_city_2, horiz_prov_2, horiz_can_2)))
+  ylim <- c(round(min(horiz_city_1, horiz_prov_1, horiz_can_1, horiz_city_2, horiz_prov_2, horiz_can_2)),
+            round(max(horiz_city_1, horiz_prov_1, horiz_can_1, horiz_city_2, horiz_prov_2, horiz_can_2)))
   
-  plot <- plot(1, type="l", xlab="", ylab="", xlim=c(1980, 2020), ylim=ylim)
+  plot <- plot(1, type="l", xlab="Year", ylab="Temperature", xlim=c(1980, 2020), ylim=ylim)
   abline(h=0, lty = 4)
   abline(a = city_df$intercept, b = city_df$slope, col = 'red', lwd = 3)
   abline(h=horiz_city_1, lty = 3, col = 'red')

@@ -23,7 +23,6 @@ shinyUI(fluidPage(
             # Input: Select a dataset ----
             selectInput("month", "Choose a month:",
                 choices = c("January", "February", "March","April","May","June","July","August","September","October","November", "December"),
-                selected = NULL
             ),
             
             selectInput("temp_val", "Choose a Measuremnent:",
@@ -32,7 +31,8 @@ shinyUI(fluidPage(
             
             ),
             
-            numericInput("year_to_start", "Start Year", 1980),
+            selectInput("year_to_start", "Start Year", 
+                         choices = seq(1840, 1986)),
             
 
             verbatimTextOutput("test_1"),
@@ -40,16 +40,17 @@ shinyUI(fluidPage(
             verbatimTextOutput("test_3"),
             verbatimTextOutput("test_4"),
             
-            # can try disabling the element...
-            # Input: Select a dataset ----
-            # selectInput("prov", "Choose a province:",
-            #             choices = c()
-            # ),
-            htmlOutput("prov"),
-            
-            htmlOutput("city"),
 
-            actionButton("confirm", "Confirm Selection"),
+            selectInput("prov", "Choose a province:",
+                        choices = c()
+            ),
+            selectInput("city", "Choose a city:",
+                        choices = c()
+            ),
+            # htmlOutput("prov"),
+            # htmlOutput("city"),
+
+            # actionButton("confirm", "Confirm Selection"),
             
             # placeholder  = 
             # textInput("city", "Enter City", value = 'Toronto')

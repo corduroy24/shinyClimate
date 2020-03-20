@@ -16,7 +16,6 @@ source("helpers.R", local = TRUE)
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
   rv <- reactiveValues()
-  
   prov_vector <- c("ON","AB","BC","YT","NT","NU","SK", "MB", "QC", "NB", "NS", "PE", "NL")
   # observe({output_df_all})
   
@@ -37,20 +36,23 @@ shinyServer(function(input, output, session) {
       
     # })
 
-  output$prov <- renderUI({
-    selectInput("prov", "Choose a province:",choices = prov_vector)
-  })
+  observe({
+    # output$prov <- renderUI({
+    # selectInput("prov", "Choose a province:",choices = prov_vector)
+    updateSelectInput(session, "prov", "Choose a province", 
+                      choices = prov_vector, 
+                      selected = 'ON')
+    # })
+  }, priority = 200)
   
   observeEvent(input$prov,{
-    output$city <- renderUI({
-      city_vector<- get_city_vector(input$prov)
-      selectInput("city", "Enter city:", choices = city_vector)
-    })
-    
+    city_vector<- get_city_vector(input$prov)
+    updateSelectInput(session, "city", "Choose a city", 
+                      choices = city_vector, 
+                      selected = 'TORONTO')
   })
 
-  
-  
+
   update <- reactive({
     month <- (strtrim(input$month, 3))
     temp_val <- unlist(strsplit(input$temp_val, " "))
@@ -61,14 +63,14 @@ shinyServer(function(input, output, session) {
     })
     year_to_start<-(input$year_to_start)
     
-    # test again...
     isolate({
-      start_year_cutoff <- check_start_year_cutoff(temp_val)
-      validate(
-        need(input$year_to_start < (start_year_cutoff-2), 
-             paste('Please choose a year prior to', start_year_cutoff)
-        )
-      )
+      # controlled...no longer needed
+      # start_year_cutoff <- check_start_year_cutoff(temp_val)
+      # validate(
+      #   need(input$year_to_start < (start_year_cutoff-1), 
+      #        paste('Please choose a year prior to', start_year_cutoff)
+      #   )
+      # )
       main(temp_val, month, year_to_start)
     })
     
@@ -77,6 +79,7 @@ shinyServer(function(input, output, session) {
     # output$test_2 <- renderText({end - beginning})
     
   })
+  
     output$hist <- renderPlot({
       update()
       validate(
@@ -91,5 +94,5 @@ shinyServer(function(input, output, session) {
       )
       plot
     })
-      
+    
 })
