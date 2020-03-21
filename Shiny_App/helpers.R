@@ -6,7 +6,6 @@ library(gmodels)
 library(log4r)
 
 logger <- create.logger()
-city_vector <- data.frame()
 logfile(logger) <- 'debug.log'
 level(logger) <- 'DEBUG'
 
@@ -37,9 +36,9 @@ meanTempDir = "Homog_monthly_mean_temp"
 # tempMean = list.files(path=meanTempDir, pattern="*.txt", full.names=TRUE)
 # clean_data(tempMean,meanTempDir)
 
-year_to_start <- 1980
-month <- 'Feb'
-temp_val <- 'min_temp'
+# year_to_start <- 1980
+# month <- 'Feb'
+# temp_val <- 'min_temp'
 # check <- data.frame()
 #create function here 
 main <- function(temp_val, month, year_to_start){
@@ -293,8 +292,8 @@ multiple_reg_lines <- function(city, prov){
   horiz_can_1 <- country_df$intercept + country_df$slope*1980
   horiz_can_2 <- country_df$intercept + country_df$slope*2020
 
-  ylim <- c(round(min(horiz_city_1, horiz_prov_1, horiz_can_1, horiz_city_2, horiz_prov_2, horiz_can_2)),
-            round(max(horiz_city_1, horiz_prov_1, horiz_can_1, horiz_city_2, horiz_prov_2, horiz_can_2)))
+  ylim <- c(round(min(horiz_city_1, horiz_prov_1, horiz_can_1, horiz_city_2, horiz_prov_2, horiz_can_2))-5,
+            round(max(horiz_city_1, horiz_prov_1, horiz_can_1, horiz_city_2, horiz_prov_2, horiz_can_2))+5)
 
   
   # ylim <- c(round(min(horiz_city_1, horiz_city_2)), round(max(horiz_city_1, horiz_city_2)))
@@ -326,23 +325,29 @@ multiple_reg_lines <- function(city, prov){
   return(plot)
 }
 
+# save(city_prov_vector, file = paste('RData/','constant_values','.RData'))
 get_city_vector <- function(prov){
   if(file.exists(paste('RData/','constant_values','.RData'))){
     load(paste('RData/','constant_values','.RData'), .GlobalEnv)
     city_vector <- city_prov_vector[which(city_prov_vector$prov==prov), ]
     city_vector <- select(city_vector, city)
+    # city_vector <- city_vector[order(city_vector[,'city']) , ]
+    # cityt <- setorder(city_vector, city)
+    # cityt<-setDT(city_vector)[order(city)]
+    
     return(city_vector)
   }
 }
+# DF[order(DF[,'ID']), ]
 
 get_prov_vector <- function(temp_val, month, year_to_start){
-  if(file.exists(paste('RData/','constant_values','.RData'))){
-    load(paste('RData/','constant_values','.RData'), .GlobalEnv)
+  if(file.exists(paste('RData/','constant_values','.RData', sep=''))){
+    load(paste('RData/','constant_values','.RData', sep=''), .GlobalEnv)
     prov_vector <- unique(city_prov_vector[, 'prov'])
+    prov_vector <- prov_vector[ , order(names(prov_vector))]
     return(prov_vector)
   }
 }
-
 
 gg_multiple_reg_lines <- function(city, prov){
   city_df <- input_df_all[ which(input_df_all$prov==prov
