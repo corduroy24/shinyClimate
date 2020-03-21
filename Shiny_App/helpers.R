@@ -387,7 +387,7 @@ hist_slope_prov <- function(prov){
 # # boxplot(output_df_all$slope~output_df_all$prov, xlab = 'Province',ylab = 'Slope', main = 'Boxplot of slope')
 # boxplot(output_df_all$r.squared~output_df_all$prov, xlab = "Province", ylab= 'r.squared', main = 'Boxplot of R_2')
 boxplot_val <- function(value){
-  if(value == 'r2'){
+  if(value == 'r.squared'){
     p<- ggplot(output_df_all, aes(x=prov, y=r.squared)) 
   }
   else if(value == 'slope'){
