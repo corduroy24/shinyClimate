@@ -8,7 +8,6 @@
 #
 
 library(shiny)
-source("helpers.R")
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
@@ -58,21 +57,28 @@ shinyUI(fluidPage(
                     h3("Local, Provincial and National Trends"),
                     h5("Taking a glance at temperature trends for a city, province and the nation"),
                     h5("Suggestions - Set Month to Feb, or July to withhold a strong analysis of the worst case/best case scenarios "),
-                    plotOutput("slope"),
-                    plotOutput("ggslope"),
+                    plotOutput("regline"),
+                    plotOutput("ggregline"),
                     h5("The different lines indicate different trends for selected regions"),
                     h5("Take a moment to play around with the trends of different cities "),
                     h5("Thus, remain cautious about trends forecasting trends for one region to the other"),
-                    h5("Notice, the variation of temperature increases as the size of region does. Thus, stronger assumptions on a local regions can be deduced"),
-                    h2("Local Analysis"),
-                    h4("Histogram (s)"),
+                    h5("Notice, the variation of temperature increases as the size of region does. Thus, the strength of assumptions from the cities to provincices will be analyzed"),
+                    h2("Provincial Analysis"),
+                    h4("Histogram"),
                     h5("Graphically summarize the distribution of a data set"),
-                    plotOutput("gghist")
+                    plotOutput("gghist_slope_prov"),
+                    h5("[Insert Images - Names - implications of different distributions]"),
+                    h4("reg line with CI?"),
+                    h2("National Analysis"),
+                    h4("Boxplot"),
+                    h5("This suggests that a small percentage of the variance in Y is predictable by X. And thus, Year and temperature are slightly correlated"),
+                    plotOutput("boxplot_r2"),
+                    plotOutput("hist_slope"),
+                    plotOutput("boxplot_slope")
                 ),
                 
                 tabPanel("About", 
                     HTML("Hello world")
-                    # plotOutput("hist")
                 )
             )
         )

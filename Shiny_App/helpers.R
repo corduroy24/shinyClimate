@@ -6,6 +6,7 @@ library(gmodels)
 library(log4r)
 
 logger <- create.logger()
+city_vector <- data.frame()
 logfile(logger) <- 'debug.log'
 level(logger) <- 'DEBUG'
 
@@ -251,18 +252,18 @@ reg_country <- function(input_df){
     b <- data.frame("intercept" = fit$coefficients[1], "slope" = fit$coefficients[2])
     R_2 <- data.frame("r.squared" = as.numeric(unlist(summary(fit)$r.squared)))
     
-    # CIs <- ci(fit, 0.95, alpha=1-0.95, na.rm = TRUE)
-    # critical_value <- qt((1-0.95)/2, (nrow(fit$model)-1))
-    # standard_error <- summary(fit)$coef[,2][2]
-    # margin_error <- critical_value*standard_error
-    # estimate <- summary(fit)$coef[,1][2]
-    # CI_lower <-  estimate - margin_error
-    # CI_upper <- estimate + margin_error
-    # variance <- (standard_error)^2
+    CIs <- ci(fit, 0.95, alpha=1-0.95, na.rm = TRUE)
+    critical_value <- qt((1-0.95)/2, (nrow(fit$model)-1))
+    standard_error <- summary(fit)$coef[,2][2]
+    margin_error <- critical_value*standard_error
+    estimate <- summary(fit)$coef[,1][2]
+    CI_lower <-  estimate - margin_error
+    CI_upper <- estimate + margin_error
+    variance <- (standard_error)^2
     
-    # curr_results_df <- data.frame(b,"r.squared"=R_2,CI_lower, CI_upper,variance,"n"=nrow(fit$model), row.names = NULL)
+    output_df <- data.frame(b,"r.squared"=R_2,CI_lower, CI_upper,variance,"n"=nrow(fit$model), row.names = NULL)
     # output_df <- b
-  return(b)
+  return(output_df)
 }
 
 # Interaction Model - Confirm Regression Results
@@ -270,31 +271,36 @@ reg_country <- function(input_df){
 # city<- data.table(city_vector, stringsAsFactors = TRUE)
 # fit_2 <- lm(y_temp~ city-1 + city*x_year , data = input_df)
 
-
-overlay_slopes <- function(city, prov){
+#Overlay regression lines 
+multiple_reg_lines <- function(city, prov){
   city_df <- output_df_all[ which(output_df_all$prov==prov
                                   & output_df_all$city == city), ]
   if(nrow(city_df) == 0)return(NULL)
   
-  city_df <- select(city_df, intercept, slope)
+  # city_df <- select(city_df, intercept, slope)
   debug(logger, paste('|CITY_DF |', city_df, "|"))
   output_df_prov <- reg_prov(input_df_all)
   prov_df <- output_df_prov[which(output_df_prov$prov==prov), ]
-  prov_df <- select(prov_df, intercept, slope)
+  # prov_df <- select(prov_df, intercept, slope)
   debug(logger, paste('|PROV_DF |', prov_df,"|"))
   country_df <- reg_country(input_df_all)
   debug(logger, paste('|CANADA_DF |', country_df,"|"))
   
+  # horiz_city_1 <- city_df$intercept + city_df$CI_lower*1980
+  # horiz_city_2 <- city_df$intercept + city_df$CI_upper*2020
   horiz_city_1 <- city_df$intercept + city_df$slope*1980
   horiz_city_2 <- city_df$intercept + city_df$slope*2020
   horiz_prov_1 <- prov_df$intercept + prov_df$slope*1980
   horiz_prov_2 <- prov_df$intercept + prov_df$slope*2020
   horiz_can_1 <- country_df$intercept + country_df$slope*1980
   horiz_can_2 <- country_df$intercept + country_df$slope*2020
-  
+
   ylim <- c(round(min(horiz_city_1, horiz_prov_1, horiz_can_1, horiz_city_2, horiz_prov_2, horiz_can_2)),
             round(max(horiz_city_1, horiz_prov_1, horiz_can_1, horiz_city_2, horiz_prov_2, horiz_can_2)))
+
   
+  # ylim <- c(round(min(horiz_city_1, horiz_city_2)), round(max(horiz_city_1, horiz_city_2)))
+
   plot <- plot(1, type="l", xlab="Year", ylab="Temperature", xlim=c(1980, 2020), ylim=ylim)
   abline(h=0, lty = 4)
   abline(a = city_df$intercept, b = city_df$slope, col = 'red', lwd = 3)
@@ -303,7 +309,16 @@ overlay_slopes <- function(city, prov){
   abline(h=horiz_prov_1, lty = 3, col = 'blue')
   abline(a = country_df$intercept, b = country_df$slope, col = 'green', lwd  = 3)
   abline(h=horiz_can_1, lty = 3, col = 'green')
-  
+    # abline(a = city_df$intercept, b = city_df$slope, col = 'red', lwd = 2)
+    # abline(a = city_df$intercept, b=city_df$CI_lower, lty = 2,lwd = 2, col = 'red')
+    # abline(a = city_df$intercept, b=city_df$CI_upper,lty = 2, lwd = 2, col = 'red')
+    # abline(a = prov_df$intercept, b = prov_df$CI_lower, col = 'blue', lty = 2,lwd  = 2)
+    # abline(a = prov_df$intercept, b = prov_df$slope, col = 'blue', lwd  = 2)
+    # abline(a = prov_df$intercept, b = prov_df$CI_upper, col = 'blue', lty = 2, lwd  = 2)
+    # abline(a = country_df$intercept, b = country_df$CI_lower, col = 'green', lwd  = 2, lty = 2)
+    # abline(a = country_df$intercept, b = country_df$slope, col = 'green', lwd  = 2)
+    # abline(a = country_df$intercept, b = country_df$CI_upper, col = 'green', lwd  = 2, lty =2)
+
   legend("topright",
          legend = c(city, prov, 'CANADA'),
          col = c('red', 'blue', 'green'),
@@ -314,30 +329,24 @@ overlay_slopes <- function(city, prov){
 }
 
 get_city_vector <- function(prov){
-  city_vector <- output_df_all[which(output_df_all$prov==prov), ]
-  city_vector <- select(city_vector, city)
-  return(city_vector)
+  if(file.exists(paste('constant_values','.RData'))){
+    load(paste('constant_values','.RData'), .GlobalEnv)
+    city_vector <- city_prov_vector[which(city_prov_vector$prov==prov), ]
+    city_vector <- select(city_vector, city)
+    return(city_vector)
+  }
 }
 
 get_prov_vector <- function(temp_val, month, year_to_start){
-  if(file.exists(paste(temp_val,month, year_to_start,'.RData'))){
-    load(paste(temp_val,month, year_to_start,'.RData'), .GlobalEnv)
-    city_prov_vector <- unique(input_df_all[,c("city", 'prov')])
+  if(file.exists(paste('constant_values','.RData'))){
+    load(paste('constant_values','.RData'), .GlobalEnv)
     prov_vector <- unique(city_prov_vector[, 'prov'])
     return(prov_vector)
   }
 }
 
-# unsed for now.. 
-# get_input_df <-function(temp_val, month, year_to_start){
-#   if(file.exists(paste(temp_val,month, year_to_start,'.RData'))){
-#     load(paste(temp_val,month, year_to_start,'.RData'), .GlobalEnv)
-#     return(input_df_all)
-#   }
-# }
 
-
-gg_overlay_slopes <- function(city, prov){
+gg_multiple_reg_lines <- function(city, prov){
   city_df <- input_df_all[ which(input_df_all$prov==prov
                                   & input_df_all$city == city), ]
   if(nrow(city_df) == 0)return(NULL)
@@ -362,17 +371,40 @@ gg_overlay_slopes <- function(city, prov){
 
 # hist(output_df_all$slope, freq = TRUE, main  = paste("Histogram of Slope(Canada)"), xlab = "Slope")
 # abline(h=0, col = 'red')
+
+hist_slope_prov <- function(prov){
+    index <- which(output_df_all[, "prov"] == prov)
+    prov_df <- output_df_all[index,]
+    # Histogram with density plot and mean line 
+  p<-ggplot(prov_df, aes(x=slope)) + 
+    geom_histogram(aes(y=..density..), colour="black", fill="white")+
+    geom_density(alpha=.2, fill="#FF6666") +
+    geom_vline(aes(xintercept=mean(slope)),
+                color="blue", linetype="dashed", size=1)
+  return(p)
+}
+
+# # boxplot(output_df_all$slope~output_df_all$prov, xlab = 'Province',ylab = 'Slope', main = 'Boxplot of slope')
 # boxplot(output_df_all$r.squared~output_df_all$prov, xlab = "Province", ylab= 'r.squared', main = 'Boxplot of R_2')
-# boxplot(output_df_all$slope~output_df_all$prov, xlab = 'Province',ylab = 'Slope', main = 'Boxplot of slope')
+boxplot_val <- function(value){
+  if(value == 'r2'){
+    p<- ggplot(output_df_all, aes(x=prov, y=r.squared)) 
+  }
+  else if(value == 'slope'){
+    p<- ggplot(output_df_all, aes(x=prov, y=slope)) 
+  }
 
+  p+geom_boxplot() +
+    stat_summary(fun.y=mean, geom="point", shape=23, size=4)+
+    stat_boxplot(geom = 'errorbar')
+}
 
-# hist_slopes <- function(output_df_all){
-#   provs <- unique(output_df_all[, 'prov'])
-#   for (i in 1:length(provs)){
-#     index <- which(output_df_all[, "prov"] == provs[i])
-#     output_df <- output_df_all[index,]
-#     hists <- hist(output_df$slope, freq = TRUE, main  = paste("Histogram of Slope - ",unique(output_df[,"prov"])), xlab = "Slope")
-#     #histogram for CIs
-#   }
-#   return(hists)
-# }
+hist_slope <- function(){
+  # Histogram with density plot and mean line 
+  p<-ggplot(output_df_all, aes(x=slope)) + 
+    geom_histogram(aes(y=..density..), colour="black", fill="white")+
+    geom_density(alpha=.2, fill="#FF6666") +
+    geom_vline(aes(xintercept=mean(slope)),
+               color="blue", linetype="dashed", size=1)
+  return(p)
+}

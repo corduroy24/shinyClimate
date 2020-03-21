@@ -79,7 +79,8 @@ shinyServer(function(input, output, session) {
     
   })
   
-    output$slope <- renderPlot({
+    
+    output$regline <- renderPlot({
       update()
       # controlled for...no longer needed
       # validate(
@@ -88,18 +89,38 @@ shinyServer(function(input, output, session) {
       city <- toupper(input$city)
       prov <- input$prov
       
-      plot <- overlay_slopes(city, prov)
+      plot <- multiple_reg_lines(city, prov)
       validate(
         need(is.null(plot), 'Please enter a valid city')
       )
       plot
     })
     
-    output$ggslope <- renderPlot({
+    output$ggregline <- renderPlot({
       update()
       city <- toupper(input$city)
       prov <- input$prov
-      
-      gg_overlay_slopes(city, prov)
+      gg_multiple_reg_lines(city, prov)
+    })
+    
+    # Single province
+    output$gghist_slope_prov <- renderPlot({
+      update()
+      prov <- input$prov
+      hist_slope_prov(prov)
+    })
+    
+    # All provinces - CANADA 
+    output$boxplot_r2 <- renderPlot({
+      update()
+      boxplot_val('r.squared')
+    })
+    output$hist_slope <- renderPlot({
+      update()
+      hist_slope()
+    })
+    output$boxplot_slope <- renderPlot({
+      update()
+      boxplot_val('slope')
     })
 })
