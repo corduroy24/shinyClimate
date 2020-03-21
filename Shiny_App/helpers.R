@@ -37,24 +37,22 @@ meanTempDir = "Homog_monthly_mean_temp"
 # tempMean = list.files(path=meanTempDir, pattern="*.txt", full.names=TRUE)
 # clean_data(tempMean,meanTempDir)
 
-#params - decorator ???
-# provs <- all_provs
-# year_to_start <- 1980
-# month <- 'Feb'
-# temp_val <- 'min_temp'
+year_to_start <- 1980
+month <- 'Feb'
+temp_val <- 'min_temp'
 # check <- data.frame()
 #create function here 
 main <- function(temp_val, month, year_to_start){
   provs <- data.frame("provs" = c("AB","BC","YT","NT","NU","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL"))
-  if(file.exists(paste(temp_val,month, year_to_start,'.RData'))){
-    load(paste(temp_val,month, year_to_start,'.RData'), .GlobalEnv)
+  if(file.exists(paste('RData/',temp_val,month, year_to_start,'.RData'))){
+    load(paste('RData/',temp_val,month, year_to_start,'.RData'), .GlobalEnv)
     debug(logger, paste("Rdata exists"))
   } else {
     debug(logger, paste("RData does not exists"))
     input_df_all <- load_cleaned_data(year_to_start, month, temp_val) #data matrix X
     output_df_all <- regression(input_df_all) #reg results 
-    save(input_df_all, output_df_all, file = paste(temp_val, month, year_to_start,'.RData'))
-    load(paste(temp_val,month, year_to_start,'.RData'), .GlobalEnv)
+    save(input_df_all, output_df_all, file = paste('RData/',temp_val, month, year_to_start,'.RData'))
+    load(paste('RData/',temp_val,month, year_to_start,'.RData'), .GlobalEnv)
   }
   
   return(output_df_all)
@@ -329,8 +327,8 @@ multiple_reg_lines <- function(city, prov){
 }
 
 get_city_vector <- function(prov){
-  if(file.exists(paste('constant_values','.RData'))){
-    load(paste('constant_values','.RData'), .GlobalEnv)
+  if(file.exists(paste('RData/','constant_values','.RData'))){
+    load(paste('RData/','constant_values','.RData'), .GlobalEnv)
     city_vector <- city_prov_vector[which(city_prov_vector$prov==prov), ]
     city_vector <- select(city_vector, city)
     return(city_vector)
@@ -338,8 +336,8 @@ get_city_vector <- function(prov){
 }
 
 get_prov_vector <- function(temp_val, month, year_to_start){
-  if(file.exists(paste('constant_values','.RData'))){
-    load(paste('constant_values','.RData'), .GlobalEnv)
+  if(file.exists(paste('RData/','constant_values','.RData'))){
+    load(paste('RData/','constant_values','.RData'), .GlobalEnv)
     prov_vector <- unique(city_prov_vector[, 'prov'])
     return(prov_vector)
   }
