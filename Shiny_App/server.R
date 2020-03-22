@@ -37,10 +37,9 @@ shinyServer(function(input, output, session) {
     # })
 
   observe({
-    # output$prov <- renderUI({
-    # selectInput("prov", "Choose a province:",choices = prov_vector)
+    prov_vector_sorted <- sort(prov_vector)
     updateSelectInput(session, "prov", "Choose a province", 
-                      choices = prov_vector, 
+                      choices = prov_vector_sorted, 
                       selected = 'ON')
     # })
   }, priority = 200)
@@ -82,10 +81,6 @@ shinyServer(function(input, output, session) {
     
     output$regline <- renderPlot({
       update()
-      # controlled for...no longer needed
-      # validate(
-      #   need(input$city != '', 'Please enter a valid city')
-      # )
       city <- toupper(input$city)
       prov <- input$prov
       

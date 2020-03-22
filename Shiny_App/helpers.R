@@ -331,14 +331,11 @@ get_city_vector <- function(prov){
     load(paste('RData/','constant_values','.RData'), .GlobalEnv)
     city_vector <- city_prov_vector[which(city_prov_vector$prov==prov), ]
     city_vector <- select(city_vector, city)
-    # city_vector <- city_vector[order(city_vector[,'city']) , ]
-    # cityt <- setorder(city_vector, city)
-    # cityt<-setDT(city_vector)[order(city)]
-    
-    return(city_vector)
+    city_vector$city <- as.character(city_vector$city)
+    city_v <- sort(city_vector$city)
+    return(city_v)
   }
 }
-# DF[order(DF[,'ID']), ]
 
 get_prov_vector <- function(temp_val, month, year_to_start){
   if(file.exists(paste('RData/','constant_values','.RData', sep=''))){
