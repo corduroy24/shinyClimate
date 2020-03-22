@@ -71,31 +71,17 @@ shinyServer(function(input, output, session) {
       # )
       main(temp_val, month, year_to_start)
     })
-    
     # beginning <- Sys.time()
     # end <- Sys.time()
     # output$test_2 <- renderText({end - beginning})
-    
   })
   
     
-    output$regline <- renderPlot({
+    output$trends_reg <- renderPlot({
       update()
       city <- toupper(input$city)
       prov <- input$prov
-      
-      plot <- multiple_reg_lines(city, prov)
-      validate(
-        need(is.null(plot), 'Please enter a valid city')
-      )
-      plot
-    })
-    
-    output$ggregline <- renderPlot({
-      update()
-      city <- toupper(input$city)
-      prov <- input$prov
-      gg_multiple_reg_lines(city, prov)
+      trends_reg(city, prov)
     })
     
     # Single province

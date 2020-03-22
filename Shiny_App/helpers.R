@@ -346,7 +346,7 @@ get_prov_vector <- function(temp_val, month, year_to_start){
   }
 }
 
-gg_multiple_reg_lines <- function(city, prov){
+trends_reg <- function(city, prov){
   city_df <- input_df_all[ which(input_df_all$prov==prov
                                   & input_df_all$city == city), ]
   if(nrow(city_df) == 0)return(NULL)
@@ -358,13 +358,24 @@ gg_multiple_reg_lines <- function(city, prov){
   # debug(logger, paste('|CANADA_DF |', country_df,"|"))
   
   plot <- ggplot() +
+    labs(x = "Year", y = "Temperature") +
     geom_line(country_df, mapping = aes(x = x_year, y = y_temp, colour = "Country")) +
     geom_smooth(country_df, method = "lm", mapping = aes(x = x_year, y = y_temp, colour = "Country")) +
     geom_line(prov_df, mapping = aes(x = x_year, y=y_temp, colour = 'Province')) +
     geom_smooth(prov_df,mapping = aes(x = x_year, y=y_temp, colour = "Province"), method = "lm") +
     geom_line(city_df, mapping = aes(x = x_year, y=y_temp, colour = "City")) +
-    geom_smooth(city_df,mapping = aes(x = x_year, y=y_temp, colour = "City"), method = "lm") +
-    labs(x = "Year", y = "Temperature") 
+    geom_smooth(city_df,mapping = aes(x = x_year, y=y_temp, colour = "City"), method = "lm")+
+    scale_x_continuous(breaks  = seq(1980,2025, by = 5))+
+    theme(
+      panel.background = element_rect(fill = "white",
+                                    colour = "grey",
+                                    size = 0.5, linetype = "solid"),
+      panel.grid.major = element_line(size = 0.25, linetype = 'solid',
+                                  colour = "gray"),
+      panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                  colour = "gray"),
+      axis.ticks = element_line(colour = "grey20")
+    )
   return(plot)
 }
 

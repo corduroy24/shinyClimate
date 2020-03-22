@@ -18,7 +18,6 @@ shinyUI(fluidPage(
     # Sidebar with a slider input for number of bins
     sidebarLayout(
         sidebarPanel(
-            
             # Input: Select a dataset ----
             selectInput("month", "Choose a month:",
                 choices = c("January", "February", "March","April","May","June","July","August","September","October","November", "December"),
@@ -27,19 +26,16 @@ shinyUI(fluidPage(
             selectInput("temp_val", "Choose a Measuremnent:",
                 choices = c("Minimum Temperature", "Maximum Temperature")
                 # choices = c("Minimum Temperature", "Mean Temperature", "Maximum Temperature")
-            
             ),
             
             selectInput("year_to_start", "Start Year", 
                          choices = seq(1840, 1986), selected = 1980),
             
-
             verbatimTextOutput("test_1"),
             verbatimTextOutput("test_2"),
             verbatimTextOutput("test_3"),
             verbatimTextOutput("test_4"),
             
-
             selectInput("prov", "Choose a province:",
                         choices = c()
             ),
@@ -57,8 +53,7 @@ shinyUI(fluidPage(
                     h3("Local, Provincial and National Trends"),
                     h5("Taking a glance at temperature trends for a city, province and the nation"),
                     h5("Suggestions - Set Month to Feb, or July to withhold a strong analysis of the worst case/best case scenarios "),
-                    plotOutput("regline"),
-                    plotOutput("ggregline"),
+                    plotOutput("trends_reg"),
                     h5("The different lines indicate different trends for selected regions"),
                     h5("Take a moment to play around with the trends of different cities "),
                     h5("Thus, remain cautious about trends forecasting trends for one region to the other"),
