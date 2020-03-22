@@ -76,9 +76,11 @@ shinyUI(fluidPage(
                     plotOutput("hist_slope"),
                     plotOutput("boxplot_slope")
                 ),
-                
+                tabPanel("Quality Control", 
+                         HTML("[Show data cleaning]")),
                 tabPanel("About", 
                     HTML("Hello world")
+                    
                 )
             )
         )

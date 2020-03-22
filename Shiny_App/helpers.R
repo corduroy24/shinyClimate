@@ -268,62 +268,62 @@ reg_country <- function(input_df){
 # city<- data.table(city_vector, stringsAsFactors = TRUE)
 # fit_2 <- lm(y_temp~ city-1 + city*x_year , data = input_df)
 
-#Overlay regression lines 
-multiple_reg_lines <- function(city, prov){
-  city_df <- output_df_all[ which(output_df_all$prov==prov
-                                  & output_df_all$city == city), ]
-  if(nrow(city_df) == 0)return(NULL)
-  
-  # city_df <- select(city_df, intercept, slope)
-  debug(logger, paste('|CITY_DF |', city_df, "|"))
-  output_df_prov <- reg_prov(input_df_all)
-  prov_df <- output_df_prov[which(output_df_prov$prov==prov), ]
-  # prov_df <- select(prov_df, intercept, slope)
-  debug(logger, paste('|PROV_DF |', prov_df,"|"))
-  country_df <- reg_country(input_df_all)
-  debug(logger, paste('|CANADA_DF |', country_df,"|"))
-  
-  # horiz_city_1 <- city_df$intercept + city_df$CI_lower*1980
-  # horiz_city_2 <- city_df$intercept + city_df$CI_upper*2020
-  horiz_city_1 <- city_df$intercept + city_df$slope*1980
-  horiz_city_2 <- city_df$intercept + city_df$slope*2020
-  horiz_prov_1 <- prov_df$intercept + prov_df$slope*1980
-  horiz_prov_2 <- prov_df$intercept + prov_df$slope*2020
-  horiz_can_1 <- country_df$intercept + country_df$slope*1980
-  horiz_can_2 <- country_df$intercept + country_df$slope*2020
-
-  ylim <- c(round(min(horiz_city_1, horiz_prov_1, horiz_can_1, horiz_city_2, horiz_prov_2, horiz_can_2))-5,
-            round(max(horiz_city_1, horiz_prov_1, horiz_can_1, horiz_city_2, horiz_prov_2, horiz_can_2))+5)
-
-  
-  # ylim <- c(round(min(horiz_city_1, horiz_city_2)), round(max(horiz_city_1, horiz_city_2)))
-
-  plot <- plot(1, type="l", xlab="Year", ylab="Temperature", xlim=c(1980, 2020), ylim=ylim)
-  abline(h=0, lty = 4)
-  abline(a = city_df$intercept, b = city_df$slope, col = 'red', lwd = 3)
-  abline(h=horiz_city_1, lty = 3, col = 'red')
-  abline(a = prov_df$intercept, b = prov_df$slope, col = 'blue', lwd  = 3)
-  abline(h=horiz_prov_1, lty = 3, col = 'blue')
-  abline(a = country_df$intercept, b = country_df$slope, col = 'green', lwd  = 3)
-  abline(h=horiz_can_1, lty = 3, col = 'green')
-    # abline(a = city_df$intercept, b = city_df$slope, col = 'red', lwd = 2)
-    # abline(a = city_df$intercept, b=city_df$CI_lower, lty = 2,lwd = 2, col = 'red')
-    # abline(a = city_df$intercept, b=city_df$CI_upper,lty = 2, lwd = 2, col = 'red')
-    # abline(a = prov_df$intercept, b = prov_df$CI_lower, col = 'blue', lty = 2,lwd  = 2)
-    # abline(a = prov_df$intercept, b = prov_df$slope, col = 'blue', lwd  = 2)
-    # abline(a = prov_df$intercept, b = prov_df$CI_upper, col = 'blue', lty = 2, lwd  = 2)
-    # abline(a = country_df$intercept, b = country_df$CI_lower, col = 'green', lwd  = 2, lty = 2)
-    # abline(a = country_df$intercept, b = country_df$slope, col = 'green', lwd  = 2)
-    # abline(a = country_df$intercept, b = country_df$CI_upper, col = 'green', lwd  = 2, lty =2)
-
-  legend("topright",
-         legend = c(city, prov, 'CANADA'),
-         col = c('red', 'blue', 'green'),
-         cex = 1.2,
-         lty=3:3)
-  
-  return(plot)
-}
+# #Overlay regression lines 
+# multiple_reg_lines <- function(city, prov){
+#   city_df <- output_df_all[ which(output_df_all$prov==prov
+#                                   & output_df_all$city == city), ]
+#   if(nrow(city_df) == 0)return(NULL)
+#   
+#   # city_df <- select(city_df, intercept, slope)
+#   debug(logger, paste('|CITY_DF |', city_df, "|"))
+#   output_df_prov <- reg_prov(input_df_all)
+#   prov_df <- output_df_prov[which(output_df_prov$prov==prov), ]
+#   # prov_df <- select(prov_df, intercept, slope)
+#   debug(logger, paste('|PROV_DF |', prov_df,"|"))
+#   country_df <- reg_country(input_df_all)
+#   debug(logger, paste('|CANADA_DF |', country_df,"|"))
+#   
+#   # horiz_city_1 <- city_df$intercept + city_df$CI_lower*1980
+#   # horiz_city_2 <- city_df$intercept + city_df$CI_upper*2020
+#   horiz_city_1 <- city_df$intercept + city_df$slope*1980
+#   horiz_city_2 <- city_df$intercept + city_df$slope*2020
+#   horiz_prov_1 <- prov_df$intercept + prov_df$slope*1980
+#   horiz_prov_2 <- prov_df$intercept + prov_df$slope*2020
+#   horiz_can_1 <- country_df$intercept + country_df$slope*1980
+#   horiz_can_2 <- country_df$intercept + country_df$slope*2020
+# 
+#   ylim <- c(round(min(horiz_city_1, horiz_prov_1, horiz_can_1, horiz_city_2, horiz_prov_2, horiz_can_2))-5,
+#             round(max(horiz_city_1, horiz_prov_1, horiz_can_1, horiz_city_2, horiz_prov_2, horiz_can_2))+5)
+# 
+#   
+#   # ylim <- c(round(min(horiz_city_1, horiz_city_2)), round(max(horiz_city_1, horiz_city_2)))
+# 
+#   plot <- plot(1, type="l", xlab="Year", ylab="Temperature", xlim=c(1980, 2020), ylim=ylim)
+#   abline(h=0, lty = 4)
+#   abline(a = city_df$intercept, b = city_df$slope, col = 'red', lwd = 3)
+#   abline(h=horiz_city_1, lty = 3, col = 'red')
+#   abline(a = prov_df$intercept, b = prov_df$slope, col = 'blue', lwd  = 3)
+#   abline(h=horiz_prov_1, lty = 3, col = 'blue')
+#   abline(a = country_df$intercept, b = country_df$slope, col = 'green', lwd  = 3)
+#   abline(h=horiz_can_1, lty = 3, col = 'green')
+#     # abline(a = city_df$intercept, b = city_df$slope, col = 'red', lwd = 2)
+#     # abline(a = city_df$intercept, b=city_df$CI_lower, lty = 2,lwd = 2, col = 'red')
+#     # abline(a = city_df$intercept, b=city_df$CI_upper,lty = 2, lwd = 2, col = 'red')
+#     # abline(a = prov_df$intercept, b = prov_df$CI_lower, col = 'blue', lty = 2,lwd  = 2)
+#     # abline(a = prov_df$intercept, b = prov_df$slope, col = 'blue', lwd  = 2)
+#     # abline(a = prov_df$intercept, b = prov_df$CI_upper, col = 'blue', lty = 2, lwd  = 2)
+#     # abline(a = country_df$intercept, b = country_df$CI_lower, col = 'green', lwd  = 2, lty = 2)
+#     # abline(a = country_df$intercept, b = country_df$slope, col = 'green', lwd  = 2)
+#     # abline(a = country_df$intercept, b = country_df$CI_upper, col = 'green', lwd  = 2, lty =2)
+# 
+#   legend("topright",
+#          legend = c(city, prov, 'CANADA'),
+#          col = c('red', 'blue', 'green'),
+#          cex = 1.2,
+#          lty=3:3)
+#   
+#   return(plot)
+# }
 
 # save(city_prov_vector, file = paste('RData/','constant_values','.RData'))
 get_city_vector <- function(prov){
