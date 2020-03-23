@@ -453,26 +453,36 @@ map <- function(){
   temp <- munic_div$Municipality
   temp <- gsub(",.*", "", temp)
   munic_div$Municipality <- temp
-  prov_df_temp <- merge(munic_div, prov_df_city_slope, by.x ='Municipality', by.y = 'city' )
+  prov_df_temp <- merge(munic_div, prov_df_city_slope, by.x ='Municipality', by.y ="city")
  
   
   ca.cities@data$id <- rownames(ca.cities@data)
   
   prov_df <- merge(ca.cities@data,prov_df_temp , by.x = 'NAME_2', by.y = 'Geographic.area')
 
-
-  # base_sp <- SpatialPointsDataFrame(coords = xy, data = yy,
-  #                                     proj4string = CRS(proj4string(ca.cities)))
-  
+  # xy <- prov_df[,c('long', 'lat')]
   ca.cities.df <- fortify(ca.cities)
   final <- merge(ca.cities.df, prov_df, by= 'id')
+  
+  check<-st_as_sf(ca.cities)
+  check2 <-merge(check, prov_df, by ='NAME_2')
 
-
-    ggplot(data = ca.cities,aes(x=long,y=lat, group = group))+
-      geom_polygon(fill = 'grey')+
-      geom_path(colour = "grey20", aes(group = group)) +
+    gg<- ggplot(data = check2)+
+      # geom_polygon(fill = 'grey')+
+      # geom_path(colour = "grey20", aes(group = group)) +
       # geom_path(data= ca.cities,aes(group=group))+
-      geom_tile(data = final, aes(fill= slope, height = 0.2, width = 0.2))+
+      geom_sf(aes(fill= slope))+
       scale_fill_gradient(name = 'Trends',
                           low = "blue", high = "gold2")
+     gg+ geom_path(data= ca.cities, mapping = aes(x=long, y =lat, group = group))
+    # return(base_sp)
 }
+
+
+# ggplot(data = check2,aes(x=long,y=lat, group = group))+
+#   # geom_polygon(fill = 'grey')+
+#   # geom_path(colour = "grey20", aes(group = group)) +
+#   # geom_path(data= ca.cities,aes(group=group))+
+#   geom_sf(aes(fill= slope))+
+#   scale_fill_gradient(name = 'Trends',
+#                       low = "blue", high = "gold2")
