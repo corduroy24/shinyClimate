@@ -5,10 +5,11 @@ library(tidyr)
 library(gmodels)
 library(log4r)
 
+
 logger <- create.logger()
 logfile(logger) <- 'debug.log'
 level(logger) <- 'DEBUG'
-
+setwd("C:/Environment_Canada_Shiny_App/Shiny_App")
 # Comments/To-do 
 # still buggy when a file/folder already exists
 # reproducable code, -> software engineering
@@ -36,9 +37,9 @@ meanTempDir = "Homog_monthly_mean_temp"
 # tempMean = list.files(path=meanTempDir, pattern="*.txt", full.names=TRUE)
 # clean_data(tempMean,meanTempDir)
 
-# year_to_start <- 1980
-# month <- 'Feb'
-# temp_val <- 'min_temp'
+year_to_start <- 1980
+month <- 'Feb'
+temp_val <- 'min_temp'
 # check <- data.frame()
 #create function here 
 main <- function(temp_val, month, year_to_start){
@@ -215,6 +216,7 @@ regression <- function(input_df){
   return(output_df)
 }
 
+
 reg_prov <- function(input_df){
   city_prov_vector <- unique(input_df[,c("city", 'prov')])
   city_vector <- city_prov_vector[, 'city']
@@ -346,9 +348,10 @@ get_prov_vector <- function(temp_val, month, year_to_start){
   }
 }
 
-trends_reg <- function(city, prov){
+
+reg_temp <- function(city, prov){
   city_df <- input_df_all[ which(input_df_all$prov==prov
-                                  & input_df_all$city == city), ]
+                                 & input_df_all$city == city), ]
   if(nrow(city_df) == 0)return(NULL)
   
   debug(logger, paste('|GG_OVERLAY_SLOPES |'))
@@ -359,21 +362,21 @@ trends_reg <- function(city, prov){
   
   plot <- ggplot() +
     labs(x = "Year", y = "Temperature") +
-    geom_line(country_df, mapping = aes(x = x_year, y = y_temp, colour = "Country")) +
+    # geom_line(country_df, mapping = aes(x = x_year, y = y_temp, colour = "Country")) +
     geom_smooth(country_df, method = "lm", mapping = aes(x = x_year, y = y_temp, colour = "Country")) +
-    geom_line(prov_df, mapping = aes(x = x_year, y=y_temp, colour = 'Province')) +
+    # geom_line(prov_df, mapping = aes(x = x_year, y=y_temp, colour = 'Province')) +
     geom_smooth(prov_df,mapping = aes(x = x_year, y=y_temp, colour = "Province"), method = "lm") +
-    geom_line(city_df, mapping = aes(x = x_year, y=y_temp, colour = "City")) +
+    # geom_line(city_df, mapping = aes(x = x_year, y=y_temp, colour = "City")) +
     geom_smooth(city_df,mapping = aes(x = x_year, y=y_temp, colour = "City"), method = "lm")+
     scale_x_continuous(breaks  = seq(1980,2025, by = 5))+
     theme(
       panel.background = element_rect(fill = "white",
-                                    colour = "grey",
-                                    size = 0.5, linetype = "solid"),
+                                      colour = "grey",
+                                      size = 0.5, linetype = "solid"),
       panel.grid.major = element_line(size = 0.25, linetype = 'solid',
-                                  colour = "gray"),
+                                      colour = "gray"),
       panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
-                                  colour = "gray"),
+                                      colour = "gray"),
       axis.ticks = element_line(colour = "grey20")
     )
   return(plot)
@@ -418,4 +421,58 @@ hist_slope <- function(){
     geom_vline(aes(xintercept=mean(slope)),
                color="blue", linetype="dashed", size=1)
   return(p)
+}
+
+
+library("sf")
+library(ggplot2)
+library(maps)
+library(mapproj)
+library(mapdata)
+library(rgeos)
+library(maptools)
+library(sp)
+library(raster)
+library(rgdal)
+
+map <- function(){
+  can0 <- getData("GADM",country="CAN",level=0)
+  provinces <- c("Ontario")
+  can1 <- getData('GADM', country="CAN", level=1)
+  ca.provinces <- can1[can1$NAME_1 %in% provinces,]
+  can2<-getData('GADM', country="CAN", level=2) # counties
+
+  ca.cities <- can2[can2$NAME_1 %in% provinces,]
+  prov <- 'ON'
+  prov_df_city_slope <- output_df_all[ which(output_df_all$prov==prov),]
+  prov_df_city_slope <- prov_df_city_slope[,c('city', 'slope')]
+  prov_df_city_slope$city <- str_to_title(prov_df_city_slope$city)
+
+  munic_div<- read.csv('mmah-list-of-ontario-municipalities-en-utf8-2020-01-03_0.csv')
+  munic_div$Municipality <- gsub("<.*?>","",as.character(munic_div$Municipality))
+  temp <- munic_div$Municipality
+  temp <- gsub(",.*", "", temp)
+  munic_div$Municipality <- temp
+  prov_df_temp <- merge(munic_div, prov_df_city_slope, by.x ='Municipality', by.y = 'city' )
+ 
+  
+  ca.cities@data$id <- rownames(ca.cities@data)
+  
+  prov_df <- merge(ca.cities@data,prov_df_temp , by.x = 'NAME_2', by.y = 'Geographic.area')
+
+
+  # base_sp <- SpatialPointsDataFrame(coords = xy, data = yy,
+  #                                     proj4string = CRS(proj4string(ca.cities)))
+  
+  ca.cities.df <- fortify(ca.cities)
+  final <- merge(ca.cities.df, prov_df, by= 'id')
+
+
+    ggplot(data = ca.cities,aes(x=long,y=lat, group = group))+
+      geom_polygon(fill = 'grey')+
+      geom_path(colour = "grey20", aes(group = group)) +
+      # geom_path(data= ca.cities,aes(group=group))+
+      geom_tile(data = final, aes(fill= slope, height = 0.2, width = 0.2))+
+      scale_fill_gradient(name = 'Trends',
+                          low = "blue", high = "gold2")
 }

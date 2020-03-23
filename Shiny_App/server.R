@@ -81,7 +81,7 @@ shinyServer(function(input, output, session) {
       update()
       city <- toupper(input$city)
       prov <- input$prov
-      trends_reg(city, prov)
+      reg_temp(city, prov)
     })
     
     # Single province

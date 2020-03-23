@@ -53,7 +53,7 @@ shinyUI(fluidPage(
                     h3("Local, Provincial and National Trends"),
                     h5("Taking a glance at temperature trends for a city, province and the nation"),
                     h5("Suggestions - Set Month to Feb, or July to withhold a strong analysis of the worst case/best case scenarios "),
-                    plotOutput("trends_reg"),
+                    plotOutput("reg_temp"),
                     h5("The different lines indicate different trends for selected regions"),
                     h5("Take a moment to play around with the trends of different cities "),
                     h5("Thus, remain cautious about trends forecasting trends for one region to the other"),
