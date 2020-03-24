@@ -77,7 +77,7 @@ shinyServer(function(input, output, session) {
   })
   
     
-    output$trends_reg <- renderPlot({
+    output$reg_temp <- renderPlot({
       update()
       city <- toupper(input$city)
       prov <- input$prov
