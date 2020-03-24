@@ -104,4 +104,8 @@ shinyServer(function(input, output, session) {
       update()
       boxplot_val('slope')
     })
+    output$map_ON <- renderPlot({
+      update()
+      map()
+    })
 })

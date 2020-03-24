@@ -69,7 +69,9 @@ shinyUI(fluidPage(
                     h5("This suggests that a small percentage of the variance in Y is predictable by X. And thus, Year and temperature are slightly correlated"),
                     plotOutput("boxplot_r2"),
                     plotOutput("hist_slope"),
-                    plotOutput("boxplot_slope")
+                    plotOutput("boxplot_slope"),
+                    plotOutput("map_ON")
+                    
                 ),
                 tabPanel("Quality Control", 
                          HTML("[Show data cleaning]")),

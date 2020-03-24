@@ -463,9 +463,11 @@ map <- function(){
   check5 <- merge(check, munic_div, by.x = 'NAME_2', by.y = 'Geographic.area')
   check7 <- merge(check5, prov_df_city_slope, by.x = 'Municipality', by.y = 'city')
   
+  copy_check7 <- check7 
+  st_geometry(copy_check7) <- NULL
   unique_copy_check7_slope <- data.frame(unique(copy_check7$NAME_2))
   new_new <-data.frame()
-  for(i in 1: nrow(unique_copy_check_7)){
+  for(i in 1: nrow(unique_copy_check7_slope)){
     name <- unique_copy_check7_slope[i,]
     index <- copy_check7[which(copy_check7$NAME_2 == name),]
     mean_slope <- mean(index$slope)
