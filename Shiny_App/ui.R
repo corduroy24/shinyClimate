@@ -11,7 +11,16 @@ library(shiny)
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
-
+  tags$head(
+    tags$style(HTML("
+                  .btn {
+                    height: 100px;
+                    width: 100px;
+                    border-radius: 60%;
+                    border: 1px solid red;
+                    }
+                    "))
+  ),
     # Application title
     titlePanel("Canadian Climate History"),
 
@@ -44,40 +53,33 @@ shinyUI(fluidPage(
             ),
         ),
         
-        
         mainPanel(
             tabsetPanel(
-                tabPanel("Story", 
-                    h1("Analyzing Temperature"),
-                    h5("Aim - Answer some of the following questions..."),
-                    h3("Local, Provincial and National Trends"),
-                    h5("Taking a glance at temperature trends for a city, province and the nation"),
-                    h5("Suggestions - Set Month to Feb, or July to withhold a strong analysis of the worst case/best case scenarios "),
-                    plotOutput("reg_temp"),
-                    h5("The different lines indicate different trends for selected regions"),
-                    h5("Take a moment to play around with the trends of different cities "),
-                    h5("Thus, remain cautious about trends forecasting trends for one region to the other"),
-                    h5("Notice, the variation of temperature increases as the size of region does. Thus, the strength of assumptions from the cities to provincices will be analyzed"),
-                    h2("Provincial Analysis"),
-                    h4("Histogram"),
-                    h5("Graphically summarize the distribution of a data set"),
-                    plotOutput("gghist_slope_prov"),
-                    h5("[Insert Images - Names - implications of different distributions]"),
-                    h4("reg line with CI?"),
-                    h2("National Analysis"),
-                    h4("Boxplot"),
-                    h5("This suggests that a small percentage of the variance in Y is predictable by X. And thus, Year and temperature are slightly correlated"),
-                    plotOutput("boxplot_r2"),
-                    plotOutput("hist_slope"),
-                    plotOutput("boxplot_slope"),
-                    plotOutput("map_ON")
-                    
+                tabPanel("Historical Temperature", 
+                    h1("What would you like to know?"),
+                    selectInput("qbox", "Choose one of the following",
+                                choices = c("How has climate change affected my city?",
+                                            "How has climate chnage affected my province",
+                                            "How has climate changed affected Canada"),
+                                width = "50%"
+                                ),
+                    h2("Great! What is  your current viewpoint?"),
+                    actionButton("option1", "No effect!"),
+                    actionButton("option2", "Minor effect"), 
+                    actionButton("option3", "Major effect"), 
+                    # plotOutput("reg_temp"),
+                    # plotOutput("gghist_slope_prov"),
+                    # plotOutput("boxplot_r2"),
+                    # plotOutput("hist_slope"),
+                    # plotOutput("boxplot_slope"),
+                    # plotOutput("map_ON")
                 ),
+                tabPanel("Temperature Predictions", 
+                         HTML("")),
                 tabPanel("Quality Control", 
                          HTML("[Show data cleaning]")),
                 tabPanel("About", 
                     HTML("Hello world")
-                    
                 )
             )
         )
