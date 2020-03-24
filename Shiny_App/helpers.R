@@ -1,9 +1,18 @@
 library(data.table)
 library(plyr)
-library(tidyverse)
 library(tidyr)
 library(gmodels)
 library(log4r)
+library(tidyverse)
+
+# library(sf)
+library(ggplot2)
+# library(maps)
+# library(mapproj)
+# library(mapdata)
+# library(rgeos)
+# library(maptools)
+# library(rgdal)
 
 
 logger <- create.logger()
@@ -37,9 +46,9 @@ meanTempDir = "Homog_monthly_mean_temp"
 # tempMean = list.files(path=meanTempDir, pattern="*.txt", full.names=TRUE)
 # clean_data(tempMean,meanTempDir)
 
-year_to_start <- 1980
-month <- 'Feb'
-temp_val <- 'min_temp'
+# year_to_start <- 1980
+# month <- 'Feb'
+# temp_val <- 'min_temp'
 # check <- data.frame()
 #create function here 
 main <- function(temp_val, month, year_to_start){
@@ -332,7 +341,8 @@ get_city_vector <- function(prov){
   if(file.exists(paste('RData/','constant_values','.RData'))){
     load(paste('RData/','constant_values','.RData'), .GlobalEnv)
     city_vector <- city_prov_vector[which(city_prov_vector$prov==prov), ]
-    city_vector <- select(city_vector, city)
+    # city_vector <- select(city_vector, city) # not working?
+    city_vector <- data.frame(city_vector[, 'city'])
     city_vector$city <- as.character(city_vector$city)
     city_v <- sort(city_vector$city)
     return(city_v)
@@ -423,16 +433,6 @@ hist_slope <- function(){
   return(p)
 }
 
-
-library(sf)
-library(ggplot2)
-library(maps)
-library(mapproj)
-library(mapdata)
-library(rgeos)
-library(maptools)
-library(sp)
-library(rgdal)
 
 map <- function(){
   can0 <- getData("GADM",country="CAN",level=0)
