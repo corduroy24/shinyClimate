@@ -424,7 +424,7 @@ hist_slope <- function(){
 }
 
 
-library("sf")
+library(sf)
 library(ggplot2)
 library(maps)
 library(mapproj)
@@ -432,7 +432,6 @@ library(mapdata)
 library(rgeos)
 library(maptools)
 library(sp)
-library(raster)
 library(rgdal)
 
 map <- function(){
@@ -455,22 +454,27 @@ map <- function(){
   munic_div$Municipality <- temp
   prov_df_temp <- merge(munic_div, prov_df_city_slope, by.x ='Municipality', by.y ="city")
  
-  
   ca.cities@data$id <- rownames(ca.cities@data)
   
   prov_df <- merge(ca.cities@data,prov_df_temp , by.x = 'NAME_2', by.y = 'Geographic.area')
 
-  # xy <- prov_df[,c('long', 'lat')]
-  ca.cities.df <- fortify(ca.cities)
-  final <- merge(ca.cities.df, prov_df, by= 'id')
-  
   check<-st_as_sf(ca.cities)
-  check2 <-merge(check, prov_df, by ='NAME_2')
+  
+  check5 <- merge(check, munic_div, by.x = 'NAME_2', by.y = 'Geographic.area')
+  check7 <- merge(check5, prov_df_city_slope, by.x = 'Municipality', by.y = 'city')
+  
+  unique_copy_check7_slope <- data.frame(unique(copy_check7$NAME_2))
+  new_new <-data.frame()
+  for(i in 1: nrow(unique_copy_check_7)){
+    name <- unique_copy_check7_slope[i,]
+    index <- copy_check7[which(copy_check7$NAME_2 == name),]
+    mean_slope <- mean(index$slope)
+    index$slope <- mean_slope
+    new_new <- rbind(new_new, index)
+  }
+  check7$slope <-new_new$slope
 
-    gg<- ggplot(data = check2)+
-      # geom_polygon(fill = 'grey')+
-      # geom_path(colour = "grey20", aes(group = group)) +
-      # geom_path(data= ca.cities,aes(group=group))+
+    gg<- ggplot(data = check7)+
       geom_sf(aes(fill= slope))+
       scale_fill_gradient(name = 'Trends',
                           low = "blue", high = "gold2")
@@ -478,6 +482,76 @@ map <- function(){
     # return(base_sp)
 }
 
+
+# newregions<-function(){
+#   cd <- st_read("gcd_000b11a_e/gcd_000b11a_e.shp")
+#   cd_ON <- cd[cd$PRNAME =='Ontario',]
+#   cd_ON_available <- merge(ccs_ON, prov_df_city_slope, by.x = 'CDNAME', by.y = 'city')
+#   names(cd_ON_available)[1] <- "city"
+#   copy_cd_ON_available <-cd_ON_available
+#   st_geometry(copy_cd_ON_available ) <- NULL
+#   
+#   prov <- 'ON'
+#   prov_df_city_slope <- output_df_all[ which(output_df_all$prov==prov),]
+#   prov_df_city_slope <- prov_df_city_slope[,c('city', 'slope')]
+#   prov_df_city_slope$city <- str_to_title(prov_df_city_slope$city)
+#   
+#   ccs <- st_read("census_consolidated_subdivisions/gccs000b11a_e.shp")
+#   ccs_ON <- ccs[ccs$PRNAME =='Ontario',]
+#   ccs_ON_available <- merge(ccs_ON, prov_df_city_slope, by.x = 'CCSNAME', by.y = 'city')
+#   cd_ccs_ON_available <- merge(ccs_ON, prov_df_city_slope, by.x = 'CDNAME', by.y = 'city')
+#   names(cd_ccs_ON_available)[1] <- "city"
+#   names(ccs_ON_available)[1] <- "city"
+#   
+#   # st_geometry(ccs_ON_available) <- NULL
+#   # st_geometry(cd_ON_available) <- NULL
+#   # st_geometry(fed_ON_available) <- NULL
+#   # st_geometry(cma_ON_available) <- NULL
+#   # st_geometry(csd_ON_available) <- NULL
+#   
+#   copy_cd_ON_available <-cd_ON_available
+#   st_geometry(copy_cd_ON_available ) <- NULL
+#   
+#   fed <- st_read("gfed000b11a_e/gfed000b11a_e.shp")
+#   fed_ON <- fed[fed$PRNAME =='Ontario',]
+#   fed_ON_available <- merge(fed_ON, prov_df_city_slope, by.x = 'CDNAME', by.y = 'city')
+#   names(fed_ON_available)[1] <- "city"
+#   
+#   cma <- st_read("gcma000b11a_e/gcma000b11a_e.shp")
+#   cma_ON <- cma[cma$PRNAME =='Ontario',]
+#   cma_ON_available <- merge(cma_ON, prov_df_city_slope, by.x = 'CDNAME', by.y = 'city')
+#   names(cma_ON_available)[1] <- "city"
+# 
+#   csd <- st_read("gcsd000b11a_e/gcsd000b11a_e.shp")
+#   csd_ON <- csd[csd$PRNAME =='Ontario',]
+#   csd_ON_available <- merge(csd_ON, prov_df_city_slope, by.x = 'CSDNAME', by.y = 'city')
+#   csd_cd_ON_available <- merge(csd_ON, prov_df_city_slope, by.x = 'CDNAME', by.y = 'city')
+#   copy_csd_cd_ON_available <-csd_cd_ON_available
+#   st_geometry(copy_csd_cd_ON_available ) <- NULL
+#   
+#   er <- st_read("ger_000b11a_e/ger_000b11a_e.shp")
+#   er_ON <- er[er$PRNAME =='Ontario',]
+#   er_ON_available <- merge(er_ON, prov_df_city_slope, by.x = 'ERNAME', by.y = 'city')
+#   copy_er_ON_available <-er_ON_available
+#   st_geometry(er_ON) <- NULL
+#   
+#   names(csd_ON_available)[1] <- "city"
+#   copy_check7 <- check7
+#   st_geometry(copy_check7)<-NULL
+#   
+#   ggplot()+
+#     # geom_sf(data = cd_ON_available,aes(fill= slope))+
+#     # geom_sf(data = fed_ON_available,aes(fill= slope))+
+#     # geom_sf(data = cma_ON_available,aes(fill= slope))+
+#     geom_sf(data = csd_cd_ON_available,aes(fill= slope))+
+#     # geom_sf(data = check7,aes(fill= slope))+
+#     # geom_sf(data = ccs_ON_available,aes(fill= slope))+
+#     geom_path(data= ca.cities, mapping = aes(x=long, y =lat, group = group))+
+#     scale_fill_gradient(name = 'Trends',
+#                         low = "blue", high = "gold2")
+#     
+#   
+# }
 
 # ggplot(data = check2,aes(x=long,y=lat, group = group))+
 #   # geom_polygon(fill = 'grey')+
