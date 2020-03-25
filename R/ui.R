@@ -38,32 +38,7 @@ shinyUI<- dashboardPage(
     # First tab content
     tabItems(
       tabItem(tabName = "home",
-              fluidRow(
-                box(
-                  selectInput("prov", "Choose a province:",
-                              choices = c()
-                  ),
-                  selectInput("city", "Choose a city:",
-                              choices = c()
-                  ),
-                  selectInput("temp_val", "Choose a Measuremnent:",
-                              choices = c("Average Temperature","Minimum Temperature", "Maximum Temperature"),
-                              selected = 'Average Temperature'
-                  )
-                ),
-                box(
-                  h3("Minimum - [purpose]"),
-                  background = 'red',
-                  width = 3,
-                  height = 100
-                ),
-                box(
-                  h3("Maximum - [purpose]"),
-                  background = 'red',
-                  width = 3,
-                  height = 100
-                )
-              )
+              homeLayoutUI("home")
       ),
       
       # Second tab content

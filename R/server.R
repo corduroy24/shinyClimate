@@ -15,7 +15,8 @@ source("helpers.R", local = TRUE)
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
   rv <- reactiveValues()
-  prov_vector <- c("ON","AB","BC","YT","NT","NU","SK", "MB", "QC", "NB", "NS", "PE", "NL")
+  
+  callModule(homeLayout, 'home')
   # observe({output_df_all})
   
     # value <- eventReactive(input$confirm, {
@@ -35,13 +36,6 @@ shinyServer(function(input, output, session) {
       
     # })
 
-  observe({
-    prov_vector_sorted <- sort(prov_vector)
-    updateSelectInput(session, "prov", "Choose a province", 
-                      choices = prov_vector_sorted, 
-                      selected = 'ON')
-    # })
-  }, priority = 200)
   
   observeEvent(input$prov,{
     city_vector<- get_city_vector(input$prov)

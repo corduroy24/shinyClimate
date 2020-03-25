@@ -18,7 +18,6 @@ library(ggplot2)
 logger <- create.logger()
 logfile(logger) <- 'debug.log'
 level(logger) <- 'DEBUG'
-setwd("C:/Environment_Canada_Shiny_App/Shiny_App")
 # Comments/To-do 
 # still buggy when a file/folder already exists
 # reproducable code, -> software engineering
@@ -50,7 +49,6 @@ meanTempDir = "Homog_monthly_mean_temp"
 # month <- 'Feb'
 # temp_val <- 'min_temp'
 # check <- data.frame()
-#create function here 
 main <- function(temp_val, month, year_to_start){
   provs <- data.frame("provs" = c("AB","BC","YT","NT","NU","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL"))
   if(file.exists(paste('RData/',temp_val,month, year_to_start,'.RData'))){
