@@ -1,12 +1,11 @@
-library(data.table)
 library(plyr)
+library(data.table)
 library(tidyr)
 library(gmodels)
 library(log4r)
 library(tidyverse)
 
 # library(sf)
-library(ggplot2)
 # library(maps)
 # library(mapproj)
 # library(mapdata)
@@ -45,21 +44,22 @@ meanTempDir = "Homog_monthly_mean_temp"
 # tempMean = list.files(path=meanTempDir, pattern="*.txt", full.names=TRUE)
 # clean_data(tempMean,meanTempDir)
 
-# year_to_start <- 1980
-# month <- 'Feb'
-# temp_val <- 'min_temp'
-# check <- data.frame()
+year_to_start <- 1980
+month <- 'Feb'
+temp_val <- 'ave_temp'
+
+
 main <- function(temp_val, month, year_to_start){
   provs <- data.frame("provs" = c("AB","BC","YT","NT","NU","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL"))
-  if(file.exists(paste('RData/',temp_val,month, year_to_start,'.RData'))){
-    load(paste('RData/',temp_val,month, year_to_start,'.RData'), .GlobalEnv)
+  if(file.exists(paste('C:/Environment_Canada_Shiny_App/RData/',temp_val,month, year_to_start,'.RData'))){
+    load(paste('C:/Environment_Canada_Shiny_App/RData/',temp_val,month, year_to_start,'.RData'), .GlobalEnv)
     debug(logger, paste("Rdata exists"))
   } else {
     debug(logger, paste("RData does not exists"))
     input_df_all <- load_cleaned_data(year_to_start, month, temp_val) #data matrix X
     output_df_all <- regression(input_df_all) #reg results 
-    save(input_df_all, output_df_all, file = paste('RData/',temp_val, month, year_to_start,'.RData'))
-    load(paste('RData/',temp_val,month, year_to_start,'.RData'), .GlobalEnv)
+    save(input_df_all, output_df_all, file = paste('C:/Environment_Canada_Shiny_App/RData/',temp_val, month, year_to_start,'.RData'))
+    load(paste('C:/Environment_Canada_Shiny_App/RData/',temp_val,month, year_to_start,'.RData'), .GlobalEnv)
   }
   
   return(output_df_all)
@@ -120,62 +120,69 @@ clean_data <- function(temp_val, dir)
     # dat <- dat[rowSums(is.na(dat))==0, ]
 
     total = rbind(hdr, dat)
-    parentPath = "C:/Environment_Canada_Shiny_App/Shiny_App/"
+    parentPath = "C:/Environment_Canada_Shiny_App/Data/"
     filePath= sprintf("%s%s_cleaned/%s.txt", parentPath,dir,stationNum_city_prov)
     write.table(total, filePath, append = FALSE, sep = " ", dec = ".",
                 row.names = FALSE, col.names = FALSE)
-   }
-
-find_files <- function(temp_val){
+  }
+# Find temperature data files 
+find_temp_data <- function(temp_val){
   if(temp_val == 'min_temp'){
-    txt_files_ls = list.files(path="Homog_monthly_min_temp_cleaned", pattern="*.txt", full.names = TRUE)
-    names = list.files(path="Homog_monthly_min_temp_cleaned", pattern="*.txt")
+    txt_files_ls = list.files(path="C:/Environment_Canada_Shiny_App/Data/Homog_monthly_min_temp_cleaned", pattern="*.txt", full.names = TRUE)
+    names = list.files(path="C:/Environment_Canada_Shiny_App/Data/Homog_monthly_min_temp_cleaned", pattern="*.txt")
   }
   else if(temp_val == 'max_temp'){
-    txt_files_ls = list.files(path="Homog_monthly_max_temp_cleaned", pattern="*.txt", full.names = TRUE)
-    names = list.files(path="Homog_monthly_max_temp_cleaned", pattern="*.txt")
+    txt_files_ls = list.files(path="C:/Environment_Canada_Shiny_App/Data/Homog_monthly_max_temp_cleaned", pattern="*.txt", full.names = TRUE)
+    names = list.files(path="C:/Environment_Canada_Shiny_App/Data/Homog_monthly_max_temp_cleaned", pattern="*.txt")
   }
-  else if(temp_val == 'mean_temp'){
-    txt_files_ls = list.files(path="Homog_monthly_mean_temp_cleaned", pattern="*.txt", full.names = TRUE)
-    names = list.files(path="Homog_monthly_mean_temp_cleaned", pattern="*.txt")
+  else if(temp_val == 'ave_temp'){
+    txt_files_ls = list.files(path="C:/Environment_Canada_Shiny_App/Data/Homog_monthly_mean_temp_cleaned", pattern="*.txt", full.names = TRUE)
+    names = list.files(path="C:/Environment_Canada_Shiny_App/Data/Homog_monthly_mean_temp_cleaned", pattern="*.txt")
+
   }
   
   temp_object <- list(txt_files_ls, names) 
+  debug(logger, paste('|FIND TEMP DATA|'))
   
   return(temp_object)
 }
 # Load data from cleaning step
-# dont have to sort it by province... 
 load_cleaned_data <- function(year_to_start, month, temp_val){
-  temp_object <- find_files(temp_val)
+  temp_object <- find_temp_data(temp_val)
+
   txt_files_ls <- temp_object[[1]]
   names <- temp_object[[2]]
   
   ns = matrix(unlist(strsplit(names,'_',)),ncol = 3,byrow = TRUE)
-  
-  # if i wanted to do by province still... 
-  # all <- unlist(strsplit(ns[,3],'.txt'))
-  # index <- which(all == nom_prov)
-  # debug(logger, paste('| index |',index,"|"))
-  
+
   # build input data frame. 
   input_df <- data.frame()
+  debug(logger, paste('|BEFORE FOR LOOP|'))
+  
   for (i in 1:length(txt_files_ls)){
       nom_city <- ns[i,2]
       nom_prov <- unlist(strsplit(ns[i,3],'.txt'))
-      # debug(logger, paste('| province name |',nom_prov,"|"))
       
       # Non-breaking spaces...trim.white doesnt work... 
       txt_files_df <- read.table(file = txt_files_ls[i], header = TRUE, sep = " ",dec = ".", colClasses = "factor")
+
       years_greater<-txt_files_df[as.numeric(as.character(txt_files_df$Year))>=year_to_start,]
+
       y_temp <- suppressWarnings(as.numeric(as.character(unlist(years_greater[,month]))))
+
       x_year <- suppressWarnings(as.numeric(as.character(unlist(years_greater[,'Year']))))
-     
-      temp_df <- data.frame(y_temp, x_year, "city" = nom_city, "prov" = nom_prov) 
-
-      input_df <- rbind(input_df, temp_df) 
+      # debug(logger, paste('|START YEAR|', year_to_start, '|'))
+      # debug(logger, paste('|MONTH|', x_year, '|'))
+      # debug(logger, paste('|Y_TEMP|', y_temp, '|'))
+      # debug(logger, paste('|X_YEAR|', x_year, '|'))
+      
+      temp_df <- data.frame(y_temp, x_year, "city" = nom_city, "prov" = nom_prov)
+      # debug(logger, paste('|LOAD CLEANED DATA|', 6, '|'))
+      
+      input_df <- rbind(input_df, temp_df)
   }
-
+  debug(logger, paste('|RETURN|'))
+  
   return(input_df)
 }
 
@@ -336,11 +343,11 @@ reg_country <- function(input_df){
 
 # save(city_prov_vector, file = paste('RData/','constant_values','.RData'))
 get_city_vector <- function(prov){
-  if(file.exists(paste('RData/','constant_values','.RData'))){
-    load(paste('RData/','constant_values','.RData'), .GlobalEnv)
+  if(file.exists(paste('C:/Environment_Canada_Shiny_App/RData/','constant_values','.RData'))){
+    load(paste('C:/Environment_Canada_Shiny_App/RData/','constant_values','.RData'), .GlobalEnv)
     city_vector <- city_prov_vector[which(city_prov_vector$prov==prov), ]
-    # city_vector <- select(city_vector, city) # not working?
-    city_vector <- data.frame(city_vector[, 'city'])
+    city_vector <- select(city_vector, city) # not working?
+    # city_vector <- data.frame(city_vector[, 'city'])
     city_vector$city <- as.character(city_vector$city)
     city_v <- sort(city_vector$city)
     return(city_v)
@@ -348,8 +355,8 @@ get_city_vector <- function(prov){
 }
 
 get_prov_vector <- function(temp_val, month, year_to_start){
-  if(file.exists(paste('RData/','constant_values','.RData', sep=''))){
-    load(paste('RData/','constant_values','.RData', sep=''), .GlobalEnv)
+  if(file.exists(paste('C:/Environment_Canada_Shiny_App/RData/','constant_values','.RData', sep=''))){
+    load(paste('C:/Environment_Canada_Shiny_App/RData/','constant_values','.RData', sep=''), .GlobalEnv)
     prov_vector <- unique(city_prov_vector[, 'prov'])
     prov_vector <- prov_vector[ , order(names(prov_vector))]
     return(prov_vector)

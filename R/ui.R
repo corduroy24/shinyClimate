@@ -9,6 +9,11 @@
 
 library(shiny)
 library(shinydashboard)
+source("homeModule.R")
+source("helpers.R")
+source("prefModule.R")
+
+
 shinyUI<- dashboardPage(
   
   #   tags$head(
@@ -54,20 +59,7 @@ shinyUI<- dashboardPage(
       
       # Third tab content
       tabItem(tabName = "pref",
-              fluidRow(
-                box(
-                  title = "Temperature",
-                  selectInput("month", "Choose a month:",
-                              choices = c("January", "February", "March","April","May","June","July","August","September","October","November", "December"),
-                              selected = 'February'
-                              ),
-                  
-                  selectInput("year_to_start", "Start Year",
-                              choices = seq(1840, 1986), 
-                              selected = 1980
-                              )
-                )
-              )
+              prefLayoutUI("pref")
       ), 
       # Second tab content
       tabItem(tabName = "more",
@@ -90,9 +82,6 @@ shinyUI<- dashboardPage(
 # 
 #     # Sidebar with a slider input for number of bins
 #     sidebarLayout(
-#         sidebarPanel(
-#             # Input: Select a dataset ----
-
 #         ),
 # 
 #         mainPanel(
