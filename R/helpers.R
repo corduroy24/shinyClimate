@@ -11,30 +11,20 @@ library(tidyr)
 # library(rgdal)
 # library(raster)
 
-
+# number of estimated values importante ??
+# had to
 logger <- create.logger()
 logfile(logger) <- 'debug.log'
 level(logger) <- 'DEBUG'
 
-minTempDir = "Homog_monthly_min_temp"
-maxTempDir = "Homog_monthly_max_temp"
-meanTempDir = "Homog_monthly_mean_temp"
-
-
-# tempMax = list.files(path=maxTempDir, pattern="*.txt", full.names=TRUE)
-# clean_data(tempMax,maxTempDir)
-# tempMin  = list.files(path=minTempDir, pattern="*.txt", full.names=TRUE)
-# clean_data(tempMin,minTempDir)
-# tempMean = list.files(path=meanTempDir, pattern="*.txt", full.names=TRUE)
-# clean_data(tempMean,meanTempDir)
-# 
 # year_to_start <- 1980
 # month <- 'Feb'
 # temp_val <- 'ave_temp'
 
-dir = "C:/Environment_Canada_Shiny_App/Data/Homog_monthly_min_temp"
-temp_val = list.files(path=dir, pattern="*.txt", full.names=TRUE)
-i = 1;
+# dir = "C:/Environment_Canada_Shiny_App/Data/Adj_monthly_total_prec"
+# var = list.files(path=dir, pattern="*.txt", full.names=TRUE)
+# i = 1;
+# clean_data(var, dir)
 main <- function(temp_val, month, year_to_start){
   # provs <- data.frame("provs" = c("AB","BC","YT","NT","NU","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL"))
   if(file.exists(paste('C:/Environment_Canada_Shiny_App/RData/',temp_val,month, year_to_start,'.RData'))){
@@ -52,9 +42,11 @@ main <- function(temp_val, month, year_to_start){
 }
 
 clean_data <- function(var, dir)
-  for (i in 1:length(temp_val)){
-    df = read.delim(val[i], skip = 0, header = FALSE, as.is=TRUE, dec=".", sep = ",", na.strings=c(" ", "",'NA'), strip.white = TRUE)
+  for (i in 1:length(var)){
+    df = read.delim(var[i], skip = 0, header = FALSE, as.is=TRUE, dec=".", sep = ",", na.strings=c(" ", "",'NA'), strip.white = TRUE)
     stationNum_city_prov <- paste(select(df, V1)[1,1], trimws(select(df, V2)[1,1]), province <- select(df, V3)[1,1], sep="_")
+    #forward slash for precipatation files - "7025250_MONTREAL/PIERRE ELLIOTT T_QC"
+    stationNum_city_prov<- str_replace_all(stationNum_city_prov, "/",'-')
     seq(from = 3, to = 35, by = 2)
     
     df <- select(df, -seq(from = 3, to = 35, by = 2))
@@ -68,7 +60,8 @@ clean_data <- function(var, dir)
       gsub("-9999.9", "NA", x)
     }))
 
-    filePath= sprintf("%s_test/%s.txt",dir,stationNum_city_prov)
+
+    filePath= sprintf("%s_cleaned/%s.txt",dir,stationNum_city_prov)
     write.table(df, filePath, append = FALSE, sep = " ", dec = ".",
                 row.names = FALSE, col.names = TRUE)
   }
