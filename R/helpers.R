@@ -12,6 +12,7 @@ library(tidyverse)
 # library(rgeos)
 # library(maptools)
 # library(rgdal)
+# library(raster)
 
 
 logger <- create.logger()
@@ -43,14 +44,14 @@ meanTempDir = "Homog_monthly_mean_temp"
 # clean_data(tempMin,minTempDir)
 # tempMean = list.files(path=meanTempDir, pattern="*.txt", full.names=TRUE)
 # clean_data(tempMean,meanTempDir)
-
-year_to_start <- 1980
-month <- 'Feb'
-temp_val <- 'ave_temp'
+# 
+# year_to_start <- 1980
+# month <- 'Feb'
+# temp_val <- 'ave_temp'
 
 
 main <- function(temp_val, month, year_to_start){
-  provs <- data.frame("provs" = c("AB","BC","YT","NT","NU","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL"))
+  # provs <- data.frame("provs" = c("AB","BC","YT","NT","NU","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL"))
   if(file.exists(paste('C:/Environment_Canada_Shiny_App/RData/',temp_val,month, year_to_start,'.RData'))){
     load(paste('C:/Environment_Canada_Shiny_App/RData/',temp_val,month, year_to_start,'.RData'), .GlobalEnv)
     debug(logger, paste("Rdata exists"))
@@ -346,8 +347,8 @@ get_city_vector <- function(prov){
   if(file.exists(paste('C:/Environment_Canada_Shiny_App/RData/','constant_values','.RData'))){
     load(paste('C:/Environment_Canada_Shiny_App/RData/','constant_values','.RData'), .GlobalEnv)
     city_vector <- city_prov_vector[which(city_prov_vector$prov==prov), ]
-    city_vector <- select(city_vector, city) # not working?
-    # city_vector <- data.frame(city_vector[, 'city'])
+    # city_vector <- select(city_vector, city) # not working?
+    city_vector <- data.frame(city_vector[, 'city'])
     city_vector$city <- as.character(city_vector$city)
     city_v <- sort(city_vector$city)
     return(city_v)
@@ -416,12 +417,12 @@ hist_slope_prov <- function(prov){
 # # boxplot(output_df_all$slope~output_df_all$prov, xlab = 'Province',ylab = 'Slope', main = 'Boxplot of slope')
 # boxplot(output_df_all$r.squared~output_df_all$prov, xlab = "Province", ylab= 'r.squared', main = 'Boxplot of R_2')
 boxplot_val <- function(value){
-  if(value == 'r.squared'){
-    p<- ggplot(output_df_all, aes(x=prov, y=r.squared)) 
-  }
-  else if(value == 'slope'){
-    p<- ggplot(output_df_all, aes(x=prov, y=slope)) 
-  }
+    if(value == 'r.squared'){
+      p<- ggplot(output_df_all, aes(x=prov, y=r.squared)) 
+    }
+    else if(value == 'slope'){
+      p<- ggplot(output_df_all, aes(x=prov, y=slope)) 
+    }
 
   p+geom_boxplot() +
     stat_summary(fun.y=mean, geom="point", shape=23, size=4)+
@@ -430,6 +431,7 @@ boxplot_val <- function(value){
 
 hist_slope <- function(){
   # Histogram with density plot and mean line 
+  debug(logger, paste(output_df_all))
   p<-ggplot(output_df_all, aes(x=slope)) + 
     geom_histogram(aes(y=..density..), colour="black", fill="white")+
     geom_density(alpha=.2, fill="#FF6666") +
@@ -438,21 +440,23 @@ hist_slope <- function(){
   return(p)
 }
 
-
+# library(sp)
+# library(raster)
 map <- function(){
-  can0 <- getData("GADM",country="CAN",level=0)
+  # can0 <- getData("GADM",country="CAN",level=0)
   provinces <- c("Ontario")
-  can1 <- getData('GADM', country="CAN", level=1)
-  ca.provinces <- can1[can1$NAME_1 %in% provinces,]
-  can2<-getData('GADM', country="CAN", level=2) # counties
-
+  # can1 <- getData('GADM', country="CAN", level=1)
+  # can1 <- readRDS("gadm36_CAN_1_sp.rds")
+  # ca.provinces <- can1[can1$NAME_1 %in% provinces,]
+  # can2<-getData('GADM', country="CAN", level=2) # counties
+  can2 <- readRDS("C:/Environment_Canada_Shiny_App/gadm36_CAN_2_sp.rds")
   ca.cities <- can2[can2$NAME_1 %in% provinces,]
   prov <- 'ON'
   prov_df_city_slope <- output_df_all[ which(output_df_all$prov==prov),]
   prov_df_city_slope <- prov_df_city_slope[,c('city', 'slope')]
   prov_df_city_slope$city <- str_to_title(prov_df_city_slope$city)
 
-  munic_div<- read.csv('mmah-list-of-ontario-municipalities-en-utf8-2020-01-03_0.csv')
+  munic_div<- read.csv('C:/Environment_Canada_Shiny_App/Data/mmah-list-of-ontario-municipalities-en-utf8-2020-01-03_0.csv')
   munic_div$Municipality <- gsub("<.*?>","",as.character(munic_div$Municipality))
   temp <- munic_div$Municipality
   temp <- gsub(",.*", "", temp)
@@ -490,75 +494,76 @@ map <- function(){
 }
 
 
-# newregions<-function(){
-#   cd <- st_read("gcd_000b11a_e/gcd_000b11a_e.shp")
-#   cd_ON <- cd[cd$PRNAME =='Ontario',]
-#   cd_ON_available <- merge(ccs_ON, prov_df_city_slope, by.x = 'CDNAME', by.y = 'city')
-#   names(cd_ON_available)[1] <- "city"
-#   copy_cd_ON_available <-cd_ON_available
-#   st_geometry(copy_cd_ON_available ) <- NULL
-#   
-#   prov <- 'ON'
-#   prov_df_city_slope <- output_df_all[ which(output_df_all$prov==prov),]
-#   prov_df_city_slope <- prov_df_city_slope[,c('city', 'slope')]
-#   prov_df_city_slope$city <- str_to_title(prov_df_city_slope$city)
-#   
-#   ccs <- st_read("census_consolidated_subdivisions/gccs000b11a_e.shp")
-#   ccs_ON <- ccs[ccs$PRNAME =='Ontario',]
-#   ccs_ON_available <- merge(ccs_ON, prov_df_city_slope, by.x = 'CCSNAME', by.y = 'city')
-#   cd_ccs_ON_available <- merge(ccs_ON, prov_df_city_slope, by.x = 'CDNAME', by.y = 'city')
-#   names(cd_ccs_ON_available)[1] <- "city"
-#   names(ccs_ON_available)[1] <- "city"
-#   
-#   # st_geometry(ccs_ON_available) <- NULL
-#   # st_geometry(cd_ON_available) <- NULL
-#   # st_geometry(fed_ON_available) <- NULL
-#   # st_geometry(cma_ON_available) <- NULL
-#   # st_geometry(csd_ON_available) <- NULL
-#   
-#   copy_cd_ON_available <-cd_ON_available
-#   st_geometry(copy_cd_ON_available ) <- NULL
-#   
-#   fed <- st_read("gfed000b11a_e/gfed000b11a_e.shp")
-#   fed_ON <- fed[fed$PRNAME =='Ontario',]
-#   fed_ON_available <- merge(fed_ON, prov_df_city_slope, by.x = 'CDNAME', by.y = 'city')
-#   names(fed_ON_available)[1] <- "city"
-#   
-#   cma <- st_read("gcma000b11a_e/gcma000b11a_e.shp")
-#   cma_ON <- cma[cma$PRNAME =='Ontario',]
-#   cma_ON_available <- merge(cma_ON, prov_df_city_slope, by.x = 'CDNAME', by.y = 'city')
-#   names(cma_ON_available)[1] <- "city"
-# 
-#   csd <- st_read("gcsd000b11a_e/gcsd000b11a_e.shp")
-#   csd_ON <- csd[csd$PRNAME =='Ontario',]
-#   csd_ON_available <- merge(csd_ON, prov_df_city_slope, by.x = 'CSDNAME', by.y = 'city')
-#   csd_cd_ON_available <- merge(csd_ON, prov_df_city_slope, by.x = 'CDNAME', by.y = 'city')
-#   copy_csd_cd_ON_available <-csd_cd_ON_available
-#   st_geometry(copy_csd_cd_ON_available ) <- NULL
-#   
-#   er <- st_read("ger_000b11a_e/ger_000b11a_e.shp")
-#   er_ON <- er[er$PRNAME =='Ontario',]
-#   er_ON_available <- merge(er_ON, prov_df_city_slope, by.x = 'ERNAME', by.y = 'city')
-#   copy_er_ON_available <-er_ON_available
-#   st_geometry(er_ON) <- NULL
-#   
-#   names(csd_ON_available)[1] <- "city"
-#   copy_check7 <- check7
-#   st_geometry(copy_check7)<-NULL
-#   
-#   ggplot()+
-#     # geom_sf(data = cd_ON_available,aes(fill= slope))+
-#     # geom_sf(data = fed_ON_available,aes(fill= slope))+
-#     # geom_sf(data = cma_ON_available,aes(fill= slope))+
-#     geom_sf(data = csd_cd_ON_available,aes(fill= slope))+
-#     # geom_sf(data = check7,aes(fill= slope))+
-#     # geom_sf(data = ccs_ON_available,aes(fill= slope))+
-#     geom_path(data= ca.cities, mapping = aes(x=long, y =lat, group = group))+
-#     scale_fill_gradient(name = 'Trends',
-#                         low = "blue", high = "gold2")
-#     
-#   
-# }
+newregions<-function(){
+
+  prov <- 'ON'
+  prov_df_city_slope <- output_df_all[ which(output_df_all$prov==prov),]
+  prov_df_city_slope <- prov_df_city_slope[,c('city', 'slope')]
+  prov_df_city_slope$city <- str_to_title(prov_df_city_slope$city)
+  
+  cd <- st_read("C:/Environment_Canada_Shiny_App/Data/gcd_000b11a_e/gcd_000b11a_e.shp")
+  cd_ON <- cd[cd$PRNAME =='Ontario',]
+  cd_ON_available <- merge(cd_ON, prov_df_city_slope, by.x = 'CDNAME', by.y = 'city')
+  names(cd_ON_available)[1] <- "city"
+  
+  copy_cd_ON_available <-cd_ON_available
+  st_geometry(copy_cd_ON_available ) <- NULL
+  # ccs <- st_read("census_consolidated_subdivisions/gccs000b11a_e.shp")
+  # ccs_ON <- ccs[ccs$PRNAME =='Ontario',]
+  # ccs_ON_available <- merge(ccs_ON, prov_df_city_slope, by.x = 'CCSNAME', by.y = 'city')
+  # cd_ccs_ON_available <- merge(ccs_ON, prov_df_city_slope, by.x = 'CDNAME', by.y = 'city')
+  # names(cd_ccs_ON_available)[1] <- "city"
+  # names(ccs_ON_available)[1] <- "city"
+
+  # st_geometry(ccs_ON_available) <- NULL
+  # st_geometry(cd_ON_available) <- NULL
+  # st_geometry(fed_ON_available) <- NULL
+  # st_geometry(cma_ON_available) <- NULL
+  # st_geometry(csd_ON_available) <- NULL
+
+  # copy_cd_ON_available <-cd_ON_available
+  # st_geometry(copy_cd_ON_available ) <- NULL
+  # 
+  # fed <- st_read("Data/gfed000b11a_e/gfed000b11a_e.shp")
+  # fed_ON <- fed[fed$PRNAME =='Ontario',]
+  # fed_ON_available <- merge(fed_ON, prov_df_city_slope, by.x = 'CDNAME', by.y = 'city')
+  # names(fed_ON_available)[1] <- "city"
+
+  # cma <- st_read("gcma000b11a_e/gcma000b11a_e.shp")
+  # cma_ON <- cma[cma$PRNAME =='Ontario',]
+  # cma_ON_available <- merge(cma_ON, prov_df_city_slope, by.x = 'CDNAME', by.y = 'city')
+  # names(cma_ON_available)[1] <- "city"
+
+  # csd <- st_read("C:/Environment_Canada_Shiny_App/Data/gcsd000b11a_e/gcsd000b11a_e.shp")
+  # csd_ON <- csd[csd$PRNAME =='Ontario',]
+  # csd_ON_available <- merge(csd_ON, prov_df_city_slope, by.x = 'CSDNAME', by.y = 'city')
+  # csd_cd_ON_available <- merge(csd_ON, prov_df_city_slope, by.x = 'CDNAME', by.y = 'city')
+  # copy_csd_cd_ON_available <-csd_cd_ON_available
+  # st_geometry(copy_csd_cd_ON_available ) <- NULL
+
+  # er <- st_read("ger_000b11a_e/ger_000b11a_e.shp")
+  # er_ON <- er[er$PRNAME =='Ontario',]
+  # er_ON_available <- merge(er_ON, prov_df_city_slope, by.x = 'ERNAME', by.y = 'city')
+  # copy_er_ON_available <-er_ON_available
+  # st_geometry(er_ON) <- NULL
+
+  # names(csd_ON_available)[1] <- "city"
+  # copy_check7 <- check7
+  # st_geometry(copy_check7)<-NULL
+
+  ggplot()+
+    geom_sf(data = cd_ON_available,aes(fill= slope))+
+    # geom_sf(data = fed_ON_available,aes(fill= slope))+
+    # geom_sf(data = cma_ON_available,aes(fill= slope))+
+    # geom_sf(data = csd_cd_ON_available,aes(fill= slope))+
+    # geom_sf(data = check7,aes(fill= slope))+
+    # geom_sf(data = ccs_ON_available,aes(fill= slope))+
+    # geom_sf(data= cd_ON)+
+    scale_fill_gradient(name = 'Trends',
+                        low = "blue", high = "gold2")
+
+
+}
 
 # ggplot(data = check2,aes(x=long,y=lat, group = group))+
 #   # geom_polygon(fill = 'grey')+

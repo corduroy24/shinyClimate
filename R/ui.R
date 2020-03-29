@@ -9,12 +9,18 @@
 
 library(shiny)
 library(shinydashboard)
+library(shinyjs)
 source("homeModule.R")
+source("sidebarModule.R")
 source("helpers.R")
 source("prefModule.R")
+source("triviaModule.R")
+source("moreInfoModule.R")
 
 
 shinyUI<- dashboardPage(
+
+  skin = "yellow",
   
   #   tags$head(
   #     tags$style(HTML("
@@ -26,6 +32,7 @@ shinyUI<- dashboardPage(
   #                     }
   #                     "))
   #   ),
+  
   dashboardHeader(title = "Climate For You"),
   
   #SideBar content 
@@ -34,27 +41,24 @@ shinyUI<- dashboardPage(
       menuItem("Home", tabName = "home", icon = icon("dashboard")),
       menuItem("Trivia", tabName = "trivia", icon = icon("th")),
       menuItem("Preferences", tabName = "pref", icon = icon("th")),
-      menuItem("More Info", tabName = "more", icon = icon("th"))
+      menuItem("More Info", tabName = "more", icon = icon("th")),
+      useShinyjs(debug = TRUE),
+      sidebarLayoutUI("sidebar")
     )
   ),
-  
+
   # Body content 
   dashboardBody(
     # First tab content
     tabItems(
       tabItem(tabName = "home",
+              useShinyjs(debug = TRUE),
               homeLayoutUI("home")
       ),
       
       # Second tab content
       tabItem(tabName = "trivia",
-              fluidRow(
-                # box(plotOutput("plot1", height = 250)),
-                box(
-                  title = "Controls",
-                  sliderInput("slider", "Number of observations:", 1, 100, 50)
-                )
-              )
+              triviaLayoutUI('trivia')
       ),
       
       # Third tab content
@@ -63,56 +67,20 @@ shinyUI<- dashboardPage(
       ), 
       # Second tab content
       tabItem(tabName = "more",
-              fluidRow(
-                box(
-                  sliderInput("slider", "Number of observations:", 1, 100, 50)
-                )
-              )
+              moreInfoUI('more')
       )
-      
     )
-
-  )
+  ),
+  # dropdownMenu(type = "messages",
+  #              messageItem(
+  #                from = "Sales Dept",
+  #                message = "Sales are steady this month."
+  #              ),
+  #              messageItem(
+  #                from = "New User",
+  #                message = "How do I register?",
+  #                icon = icon("question"),
+  #                time = "13:45"
+  #              )
+  # )
 )
-# 
-# shinyUI(fluidPage(
-
-#     # Application title
-#     titlePanel("Canadian Climate History"),
-# 
-#     # Sidebar with a slider input for number of bins
-#     sidebarLayout(
-#         ),
-# 
-#         mainPanel(
-#             tabsetPanel(
-#                 tabPanel("Historical Temperature", 
-#                     h1("What would you like to know?"),
-#                     selectInput("qbox", "Choose one of the following",
-#                                 choices = c("How has climate change affected my city?",
-#                                             "How has climate chnage affected my province",
-#                                             "How has climate changed affected Canada"),
-#                                 width = "50%"
-#                                 ),
-#                     h2("Great! What is  your current viewpoint?"),
-#                     actionButton("option1", "No effect!"),
-#                     actionButton("option2", "Minor effect"), 
-#                     actionButton("option3", "Major effect"), 
-#                     # plotOutput("reg_temp"),
-#                     # plotOutput("gghist_slope_prov"),
-#                     # plotOutput("boxplot_r2"),
-#                     # plotOutput("hist_slope"),
-#                     # plotOutput("boxplot_slope"),
-#                     # plotOutput("map_ON")
-#                 ),
-#                 tabPanel("Temperature Predictions", 
-#                          HTML("")),
-#                 tabPanel("Quality Control", 
-#                          HTML("[Show data cleaning]")),
-#                 tabPanel("About", 
-#                     HTML("Hello world")
-#                 )
-#             )
-#         )
-#     )
-# ))

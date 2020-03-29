@@ -1,80 +1,84 @@
 # source("helpers.R", local = TRUE)
+# tags$style(HTML(".small_icon_test { font-size: 12px; }"))
+# library(shinyjs)
+# Status:
+#   primary Blue (sometimes dark blue)
+#   success Green
+#   info Blue
+#   warning Orange
+#   danger Red
 
 # Module UI function
 homeLayoutUI <- function(id) {
   # Create a namespace function using the provided id
   ns <- NS(id)
-  
+
   tagList(
+    # infoBoxes with fill=TRUE
+    fluidRow(
+      valueBox(value = tags$p("temp", style = "font-size:30px; font-weight: bold;"), 
+              icon(NULL), subtitle =tags$p("City", style = "font-size: 20px"),
+              color = 'aqua'),
+      valueBox(value = tags$p("temp", style = "font-size:30px; font-weight: bold;"),
+               icon(NULL), subtitle =tags$p("Province", style = "font-size: 20px"),
+               color = 'aqua'),
+      valueBox(value = tags$p("temp", style = "font-size:30px; font-weight: bold;"),
+               icon(NULL), subtitle =tags$p("Canada", style = "font-size: 20px"),
+               color = 'aqua'),
+    ),
+    fluidRow(
+      infoBox(
+        title = "Minimum - [purpose]",
+        icon = shiny::icon('info-circle', class = NULL, lib = "font-awesome"),
+        color = 'red',
+        fill = TRUE
+        ),
+      infoBox(
+          title = "Maximum - [purpose]",
+          icon = shiny::icon('info-circle', class = NULL, lib = "font-awesome"),
+          color = 'red',
+          fill = TRUE
+          ),
+    ),
+    verbatimTextOutput(NS(id, "txt1")),
+    
     fluidRow(
       box(
-        selectInput(ns("prov"), "Choose a province:",
-                    choices = c()
+        title = "Question of the day",
+        h3(textOutput(ns("qday")), align= 'center'),
+        h3(textOutput(ns("aday")), align= 'center'),
+        status = "primary", 
+        width  = '100%',
+        solidHeader = TRUE, 
+        # background = "green",
+        # actionButton(ns('btn'), 'btn'),
+        tabBox(
+          # The id lets us use input$tabset1 on the server to find the current tab
+          id = "tabset1", height = "100%", width = '100%',
+          tabPanel("Tab1", plotOutput(ns("plot"))),
+          tabPanel("Tab2", "Tab content 2")
         ),
-        selectInput(ns("city"), "Choose a city:",
-                    choices = c()
-        ),
-        selectInput(ns("temp_val"), "Choose a Measuremnent:",
-                    choices = c("Average Temperature","Minimum Temperature", "Maximum Temperature"),
-                    selected = 'Average Temperature'
-        ),
-        verbatimTextOutput(NS(id, "txt1"))
       ),
-      box(
-        h3("Minimum - [purpose]"),
-        background = 'red',
-        width = 3,
-        height = 100
-      ),
-      box(
-        h3("Maximum - [purpose]"),
-        background = 'red',
-        width = 3,
-        height = 100
-      )
-    ),
-  
-    plotOutput(ns("reg_temp")),
-    verbatimTextOutput(NS(id, "txt2"))
-
-    
+    )
   )
 }
 
 
-
 # Module server function
-homeLayout <- function(input, output, session, vars) {
-
-  prov_vector <- c("ON","AB","BC","YT","NT","NU","SK", "MB", "QC", "NB", "NS", "PE", "NL")
-  output$txt1 <- renderPrint({
-    paste(vars$month(), "&", vars$year_to_start())
-  })
-  observe({
-
-
-    prov_vector_sorted <- sort(prov_vector)
-    updateSelectInput(session, "prov", "Choose a province",
-                      choices = prov_vector_sorted,
-                      selected = 'ON')
-  }, priority = 200)
-
-  observeEvent(input$prov,{
-    city_vector<- get_city_vector(input$prov)
-    updateSelectInput(session, "city", "Choose a city",
-                      choices = city_vector,
-                      selected = 'TORONTO')
-  })
-
-  # observeEvent(input$,{
+homeLayout <- function(input, output, session, vars, sidebar_vars) {
+  # ns <- session$ns
+  
     update <- reactive({
+      debug(logger, paste("|TEMP_VAL|",sidebar_vars$temp_val(), '|' ))
+      
+      beginning <- Sys.time()
       year_to_start <- vars$year_to_start()
       month <- (strtrim(vars$month(), 3))
       
       validate(need(month!='', 'no month'),
                need(year_to_start!='', 'no year')
                )
-      temp_val <- unlist(strsplit(input$temp_val, " "))
+      temp_val <- unlist(strsplit(sidebar_vars$temp_val(), " "))
       isolate({
         temp_val_1 <- strtrim(tolower(temp_val[1]),3)
         temp_val_2 <- strtrim(tolower(temp_val[2]),4)
@@ -84,29 +88,50 @@ homeLayout <- function(input, output, session, vars) {
       isolate({
         main(temp_val, month, year_to_start)
       })
-      # beginning <- Sys.time()
-      # end <- Sys.time()
-      # output$test_2 <- renderText({end - beginning})
+      end <- Sys.time()
+      output$txt1 <- renderText({end - beginning})
     })
-  # })
-  #
-  #
-  output$reg_temp <- renderPlot({
-    update()
+    
+  output$qday <- renderText({
+    qday <- randomQuestion()
+    aday <- "yesyesyes"
+    switch(qday,
+           "Q1 ?" = {output$plot<-renderPlot({
+             update()
+             prov <- sidebar_vars$prov()
+             hist_slope_prov(prov)})
+             output$aday <-renderText({aday}) 
+           },
 
-    city <- toupper(input$city)
-    prov <- input$prov
-    reg_temp(city, prov)
+           "Q2 ?"= output$plot<-renderPlot({
+             update()
+             prov <- sidebar_vars$prov()
+             boxplot_val('r.squared')
+             }), 
+           "Q3 ?"= output$plot<-renderPlot({
+             update()
+             prov <- sidebar_vars$prov()
+             hist_slope()
+             }), 
+           "Q4 ?"= output$plot<-renderPlot({
+             update()
+             prov <- sidebar_vars$prov()
+             boxplot_val('slope')
+             }), 
+           print('default')
+    )
+    qday
   })
   
+
   # # Single province
   # output$gghist_slope_prov <- renderPlot({
   #   update()
-  #   prov <- input$prov
+  #   prov <- sidebar_vars$prov()
   #   hist_slope_prov(prov)
   # })
   # 
-  # # All provinces - CANADA 
+  # # All provinces - CANADA
   # output$boxplot_r2 <- renderPlot({
   #   update()
   #   boxplot_val('r.squared')
@@ -123,29 +148,31 @@ homeLayout <- function(input, output, session, vars) {
   #   update()
   #   map()
   # })
-  
-  
-  # # The selected file, if any
-  # userFile <- reactive({
-  #   # If no file is selected, don't do anything
-  #   validate(need(input$file, message = FALSE))
-  #   input$file
-  # })
   # 
-  # # The user's data, parsed into a data frame
-  # dataframe <- reactive({
-  #   read.csv(userFile()$datapath,
-  #            header = input$heading,
-  #            quote = input$quote,
-  #            stringsAsFactors = stringsAsFactors)
-  # })
-  # 
-  # # We can run observers in here if we want to
-  # observe({
-  #   msg <- sprintf("File %s was uploaded", userFile()$name)
-  #   cat(msg, "\n")
-  # })
-  # 
-  # # Return the reactive that yields the data frame
   return(update)
+}
+
+#filter questions by city, province and nation - for later 
+randomQuestion <- function(){
+  questions <- c("Q1 ?",
+    'Q2 ?',
+    'Q3 ?',
+    'Q4 ?'
+    # 'Q5 ?',
+    # 'Q6 ?',
+    # 'Q7 ?',
+    # 'Q8 ?',
+    # 'Q9 ?',
+    # 'Q10 ?',
+    # 'Q11 ?',
+    # 'Q12 ?',
+    # 'Q13 ?',
+    # 'Q14 ?',
+    # 'Q15 ?',
+    # 'Q16 ?',
+    # 'Q17 ?',
+    # 'Q18 ?'
+    )
+
+  return(sample(questions,1))
 }

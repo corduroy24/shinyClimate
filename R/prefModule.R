@@ -25,7 +25,6 @@ prefLayoutUI <- function(id) {
 }
 
 
-
 # Module server function
 prefLayout <- function(input, output, session) {
 
