@@ -1,9 +1,6 @@
 library(plyr)
 library(data.table)
 library(tidyr)
-library(gmodels)
-library(log4r)
-library(tidyverse)
 
 # library(sf)
 # library(maps)
@@ -18,20 +15,6 @@ library(tidyverse)
 logger <- create.logger()
 logfile(logger) <- 'debug.log'
 level(logger) <- 'DEBUG'
-# Comments/To-do 
-# still buggy when a file/folder already exists
-# reproducable code, -> software engineering
-# Histograms of CIs
-# notebook for data  cleaning - next week - marchs 11
-# review shiny app - mid march 
-# main function later... 
-# handling user adding new data ? - clean function needs to be better...,
-# in terms of the folder, or how its saved ???
-
-# dir = "Homog_monthly_min_temp"
-# temp_val = list.files(path=dir, pattern="*.txt", full.names=TRUE)
-# i = 1;
-
 
 minTempDir = "Homog_monthly_min_temp"
 maxTempDir = "Homog_monthly_max_temp"
@@ -49,7 +32,9 @@ meanTempDir = "Homog_monthly_mean_temp"
 # month <- 'Feb'
 # temp_val <- 'ave_temp'
 
-
+dir = "C:/Environment_Canada_Shiny_App/Data/Homog_monthly_min_temp"
+temp_val = list.files(path=dir, pattern="*.txt", full.names=TRUE)
+i = 1;
 main <- function(temp_val, month, year_to_start){
   # provs <- data.frame("provs" = c("AB","BC","YT","NT","NU","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL"))
   if(file.exists(paste('C:/Environment_Canada_Shiny_App/RData/',temp_val,month, year_to_start,'.RData'))){
@@ -66,65 +51,26 @@ main <- function(temp_val, month, year_to_start){
   return(output_df_all)
 }
 
-# add_data <- function(temp_val, old_df, new_data){
-#   for (i in 1:length(temp_val)){
-#     
-#     # title = read.table(temp_val[i], nrow = 1, sep = ",",dec = ".", as.is = TRUE,quote = "\"", na.strings=c(" "), header = FALSE)
-#     # stationNum_city_prov = sprintf("%s_%s_%s", title[1],trimws(title[2]),strtrim(title[3],2))
-#     # assign(stationNum_city_prov, read.delim(temp_val[i],skip = 2, header = FALSE))
-#     # (stationNum_city_prov)
-#     # hdr = read.table(temp_val[i], skip = 2, nrow = 1, sep = ",", as.is = TRUE, na.strings=c(" "), strip.white = TRUE)
-#     # hdr <- hdr[, colSums(is.na(hdr)) == 0]
-#     # (hdr)
-#     dat = read.delim(temp_val[i], skip = 4, header= FALSE, as.is=TRUE, dec = ",", sep = ",", na.strings=c(" "))
-#     dat <- dat[ ,colSums(is.na(dat)) == 0]
-#     
-#     #clean random data... 
-#     dat <- data.frame(lapply(dat, function(x){
-#       gsub("[a-zA-Z]", NA, x)
-#     }))
-#     dat <- dat[,colSums(is.na(dat))==0 ]
-#     
-#     #filter out -9999.9 - default values
-#     dat <- data.frame(lapply(dat, function(x){
-#       gsub("-9999.9", "NA", x)
-#     }))
-# 
-#     total = rbind(old_df, new_df)
-#   }
-# } 
-
-clean_data <- function(temp_val, dir)
+clean_data <- function(var, dir)
   for (i in 1:length(temp_val)){
-    title = read.table(temp_val[i], nrow = 1, sep = ",",dec = ".", as.is = TRUE,quote = "\"", na.strings=c(" "), header = FALSE)
-    stationNum_city_prov = sprintf("%s_%s_%s", title[1],trimws(title[2]),strtrim(title[3],2))
-    assign(stationNum_city_prov, read.delim(temp_val[i],skip = 2, header = FALSE))
-    (stationNum_city_prov)
-    hdr = read.table(temp_val[i], skip = 2, nrow = 1, sep = ",", as.is = TRUE, na.strings=c(" "), strip.white = TRUE)
-    hdr <- hdr[, colSums(is.na(hdr)) == 0]
-    (hdr)
-    dat = read.delim(temp_val[i], skip = 4, header= FALSE, as.is=TRUE, dec = ",", sep = ",", na.strings=c(" "))
-    dat <- dat[ ,colSums(is.na(dat)) == 0]
+    df = read.delim(val[i], skip = 0, header = FALSE, as.is=TRUE, dec=".", sep = ",", na.strings=c(" ", "",'NA'), strip.white = TRUE)
+    stationNum_city_prov <- paste(select(df, V1)[1,1], trimws(select(df, V2)[1,1]), province <- select(df, V3)[1,1], sep="_")
+    seq(from = 3, to = 35, by = 2)
     
-    #cleaning step ........
-    #clean random data... 
-    dat <- data.frame(lapply(dat, function(x){
-      gsub("[a-zA-Z]", NA, x)
-    }))
-    #tempDat = dat
-     dat <- dat[,colSums(is.na(dat))==0 ]
-
+    df <- select(df, -seq(from = 3, to = 35, by = 2))
+    data <- slice(df, 5:n()) 
+    (hdr <- slice(df, 3)) 
+    is.na(hdr)
+    
+    df <- plyr::rename(data, hdr)
     #filter out -9999.9 - default values
-    dat <- data.frame(lapply(dat, function(x){
+    df <- data.frame(lapply(df, function(x){
       gsub("-9999.9", "NA", x)
     }))
-    # dat <- dat[rowSums(is.na(dat))==0, ]
 
-    total = rbind(hdr, dat)
-    parentPath = "C:/Environment_Canada_Shiny_App/Data/"
-    filePath= sprintf("%s%s_cleaned/%s.txt", parentPath,dir,stationNum_city_prov)
-    write.table(total, filePath, append = FALSE, sep = " ", dec = ".",
-                row.names = FALSE, col.names = FALSE)
+    filePath= sprintf("%s_test/%s.txt",dir,stationNum_city_prov)
+    write.table(df, filePath, append = FALSE, sep = " ", dec = ".",
+                row.names = FALSE, col.names = TRUE)
   }
 # Find temperature data files 
 find_temp_data <- function(temp_val){

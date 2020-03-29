@@ -7,6 +7,7 @@
 #   info Blue
 #   warning Orange
 #   danger Red
+library(shinycssloaders)
 
 # Module UI function
 homeLayoutUI <- function(id) {
@@ -14,17 +15,10 @@ homeLayoutUI <- function(id) {
   ns <- NS(id)
 
   tagList(
-    # infoBoxes with fill=TRUE
     fluidRow(
-      valueBox(value = tags$p("temp", style = "font-size:30px; font-weight: bold;"), 
-              icon(NULL), subtitle =tags$p("City", style = "font-size: 20px"),
-              color = 'aqua'),
-      valueBox(value = tags$p("temp", style = "font-size:30px; font-weight: bold;"),
-               icon(NULL), subtitle =tags$p("Province", style = "font-size: 20px"),
-               color = 'aqua'),
-      valueBox(value = tags$p("temp", style = "font-size:30px; font-weight: bold;"),
-               icon(NULL), subtitle =tags$p("Canada", style = "font-size: 20px"),
-               color = 'aqua'),
+      valueBoxOutput(ns('vbox_city')),
+      valueBoxOutput(ns('vbox_prov')),
+      valueBoxOutput(ns('vbox_can'))
     ),
     fluidRow(
       infoBox(
@@ -32,31 +26,29 @@ homeLayoutUI <- function(id) {
         icon = shiny::icon('info-circle', class = NULL, lib = "font-awesome"),
         color = 'red',
         fill = TRUE
-        ),
+      ),
       infoBox(
-          title = "Maximum - [purpose]",
-          icon = shiny::icon('info-circle', class = NULL, lib = "font-awesome"),
-          color = 'red',
-          fill = TRUE
-          ),
+        title = "Maximum - [purpose]",
+        icon = shiny::icon('info-circle', class = NULL, lib = "font-awesome"),
+        color = 'red',
+        fill = TRUE
+      ),
     ),
-    verbatimTextOutput(NS(id, "txt1")),
-    
+      verbatimTextOutput(NS(id, "txt1")),
     fluidRow(
       box(
         title = "Question of the day",
         h3(textOutput(ns("qday")), align= 'center'),
         h3(textOutput(ns("aday")), align= 'center'),
-        status = "primary", 
+        status = "primary",
         width  = '100%',
-        solidHeader = TRUE, 
+        solidHeader = TRUE,
         # background = "green",
-        # actionButton(ns('btn'), 'btn'),
         tabBox(
           # The id lets us use input$tabset1 on the server to find the current tab
           id = "tabset1", height = "100%", width = '100%',
-          tabPanel("Tab1", plotOutput(ns("plot"))),
-          tabPanel("Tab2", "Tab content 2")
+          tabPanel("Tab1", withSpinner(plotOutput(ns("plot")))),
+          tabPanel("Tab2", textOutput(ns('text')))
         ),
       ),
     )
@@ -66,8 +58,33 @@ homeLayoutUI <- function(id) {
 
 # Module server function
 homeLayout <- function(input, output, session, vars, sidebar_vars) {
-  # ns <- session$ns
+  ns <- session$ns
   
+    output$vbox_city <- renderValueBox({
+      valueBox(
+        tags$p("temp", style = "font-size:30px; font-weight: bold;"),
+        icon = icon(NULL),
+        subtitle =tags$p(sidebar_vars$city(), style = "font-size: 20px"),
+        color = 'aqua'
+      )
+    })
+    output$vbox_prov <- renderValueBox({
+      valueBox(
+        tags$p("temp", style = "font-size:30px; font-weight: bold;"),
+        icon = icon(NULL),
+        subtitle =tags$p(sidebar_vars$prov(), style = "font-size: 20px"),
+        color = 'aqua'
+      )
+    })
+    output$vbox_can <- renderValueBox({
+      valueBox(
+        tags$p("temp", style = "font-size:30px; font-weight: bold;"),
+        icon = icon(NULL),
+        subtitle =tags$p("CANADA", style = "font-size: 20px"),
+        color = 'aqua'
+      )
+    })
+    
     update <- reactive({
       debug(logger, paste("|TEMP_VAL|",sidebar_vars$temp_val(), '|' ))
       
@@ -90,8 +107,9 @@ homeLayout <- function(input, output, session, vars, sidebar_vars) {
       })
       end <- Sys.time()
       output$txt1 <- renderText({end - beginning})
+      showElement('txt1')
     })
-    
+  
   output$qday <- renderText({
     qday <- randomQuestion()
     aday <- "yesyesyes"
@@ -105,50 +123,23 @@ homeLayout <- function(input, output, session, vars, sidebar_vars) {
 
            "Q2 ?"= output$plot<-renderPlot({
              update()
-             prov <- sidebar_vars$prov()
              boxplot_val('r.squared')
              }), 
            "Q3 ?"= output$plot<-renderPlot({
              update()
-             prov <- sidebar_vars$prov()
              hist_slope()
              }), 
            "Q4 ?"= output$plot<-renderPlot({
              update()
-             prov <- sidebar_vars$prov()
              boxplot_val('slope')
              }), 
            print('default')
     )
     qday
   })
-  
-
-  # # Single province
-  # output$gghist_slope_prov <- renderPlot({
-  #   update()
-  #   prov <- sidebar_vars$prov()
-  #   hist_slope_prov(prov)
-  # })
-  # 
-  # # All provinces - CANADA
-  # output$boxplot_r2 <- renderPlot({
-  #   update()
-  #   boxplot_val('r.squared')
-  # })
-  # output$hist_slope <- renderPlot({
-  #   update()
-  #   hist_slope()
-  # })
-  # output$boxplot_slope <- renderPlot({
-  #   update()
-  #   boxplot_val('slope')
-  # })
-  # output$map_ON <- renderPlot({
-  #   update()
-  #   map()
-  # })
-  # 
+  Sys.sleep(2)
+  hideElement('loading_page')
+  showElement("main_content")
   return(update)
 }
 
