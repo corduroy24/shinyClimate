@@ -4,14 +4,15 @@
 .Ruserdata
 debug.log
 R/debug.log
-Data/Adj_monthly_snow - Copy/
-Data/Adj_monthly_total_prec_cleaned - Copy/
-Adj_monthly_total_cleaned - Copy/
-Homog_monthly_sea_level_pressure/
-Homog_monthly_station_pressure/
-Homog_monthly_wind_speed/
-Surface CO2 from NOAA/
-Surface MH4 from NOAA/
+Data/Adj_monthly_snow/
+Data/Adj_monthly_total_prec_cleaned/
+Data/Adj_monthly_total_cleaned/
+Data/Homog_monthly_sea_level_pressure/
+Data/Homog_monthly_station_pressure/
+Data/Homog_monthly_wind_speed/
+Data/Surface CO2 from NOAA/
+Data/Surface MH4 from NOAA/
+Data/Surface N2O from NOAA/
 
 
 
