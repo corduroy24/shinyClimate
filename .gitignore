@@ -7,9 +7,9 @@ R/gadm36_CAN_1_sp.rds
 R/gadm36_CAN_2_sp.rds
 debug.log
 R/debug.log
-Data/Adj_monthly_snow
-Data/Adj_monthly_toal_precip
-Data/Adj_monthly_toal_cleaned
+Adj_monthly_snow
+Adj_monthly_toal_precip
+Adj_monthly_toal_cleaned
 Data/Homog_monthly_sea_level_pressure
 Data/Homog_monthly_station_pressure
 Data/Homog_monthly_wind_speed
