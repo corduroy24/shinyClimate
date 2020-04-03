@@ -39,9 +39,9 @@ shinyUI<- dashboardPage(
   dashboardSidebar(
     sidebarMenu(
       menuItem("Home", tabName = "home", icon = icon("dashboard")),
-      menuItem("Trivia", tabName = "trivia", icon = icon("th")),
+      # menuItem("Trivia", tabName = "trivia", icon = icon("th")),
       menuItem("Preferences", tabName = "pref", icon = icon("th")),
-      menuItem("More Info", tabName = "more", icon = icon("th")),
+      # menuItem("More Info", tabName = "more", icon = icon("th")),
       useShinyjs(debug = TRUE),
       sidebarLayoutUI("sidebar")
     )
@@ -57,30 +57,18 @@ shinyUI<- dashboardPage(
       ),
       
       # Second tab content
-      tabItem(tabName = "trivia",
-              triviaLayoutUI('trivia')
-      ),
+      # tabItem(tabName = "trivia",
+      #         triviaLayoutUI('trivia')
+      # ),
       
       # Third tab content
       tabItem(tabName = "pref",
               prefLayoutUI("pref")
-      ), 
-      # Second tab content
-      tabItem(tabName = "more",
-              moreInfoUI('more')
       )
+      # # Fourth tab content
+      # tabItem(tabName = "more",
+      #         moreInfoUI('more')
+      # )
     )
   ),
-  # dropdownMenu(type = "messages",
-  #              messageItem(
-  #                from = "Sales Dept",
-  #                message = "Sales are steady this month."
-  #              ),
-  #              messageItem(
-  #                from = "New User",
-  #                message = "How do I register?",
-  #                icon = icon("question"),
-  #                time = "13:45"
-  #              )
-  # )
 )

@@ -21,15 +21,15 @@ level(logger) <- 'DEBUG'
 
 main <- function(meas, month, year_to_start){
   # provs <- data.frame("provs" = c("AB","BC","YT","NT","NU","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL"))
-  if(file.exists(paste('/RData/',meas,month, year_to_start,'.RData'))){
-    load(paste('/RData/',meas,month, year_to_start,'.RData'), .GlobalEnv)
+  if(file.exists(paste('../RData/',meas,month, year_to_start,'.RData'))){
+    load(paste('../RData/',meas,month, year_to_start,'.RData'), .GlobalEnv)
     debug(logger, paste("Rdata exists"))
   } else {
     debug(logger, paste("RData does not exists"))
     input_df_all <- load_cleaned_data(year_to_start, month, meas) #data matrix X
     output_df_all <- regression(input_df_all) #reg results 
-    save(input_df_all, output_df_all, file = paste('/RData/',meas, month, year_to_start,'.RData'))
-    load(paste('/RData/',meas,month, year_to_start,'.RData'), .GlobalEnv)
+    save(input_df_all, output_df_all, file = paste('../RData/',meas, month, year_to_start,'.RData'))
+    load(paste('../RData/',meas,month, year_to_start,'.RData'), .GlobalEnv)
   }
   return(output_df_all)
 }
@@ -62,21 +62,21 @@ find_meas_data <- function(meas){
   # debug(logger, paste("|IM HERE 2|"))
   
   if(meas == 'min_temp'){
-    txt_files_ls = list.files(path="/Data/Homog_monthly_min_temp_cleaned", pattern="*.txt", full.names = TRUE)
-    names = list.files(path="/Data/Homog_monthly_min_temp_cleaned", pattern="*.txt")
+    txt_files_ls = list.files(path="../Data/Homog_monthly_min_temp_cleaned", pattern="*.txt", full.names = TRUE)
+    names = list.files(path="../Data/Homog_monthly_min_temp_cleaned", pattern="*.txt")
   }
   else if(meas == 'max_temp'){
-    txt_files_ls = list.files(path="/Data/Homog_monthly_max_temp_cleaned", pattern="*.txt", full.names = TRUE)
-    names = list.files(path="/Data/Homog_monthly_max_temp_cleaned", pattern="*.txt")
+    txt_files_ls = list.files(path="../Data/Homog_monthly_max_temp_cleaned", pattern="*.txt", full.names = TRUE)
+    names = list.files(path="../Data/Homog_monthly_max_temp_cleaned", pattern="*.txt")
   }
   else if(meas == 'ave_temp'){
-    txt_files_ls = list.files(path="/Data/Homog_monthly_mean_temp_cleaned", pattern="*.txt", full.names = TRUE)
-    names = list.files(path="/Data/Homog_monthly_mean_temp_cleaned", pattern="*.txt")
+    txt_files_ls = list.files(path="../Data/Homog_monthly_mean_temp_cleaned", pattern="*.txt", full.names = TRUE)
+    names = list.files(path="../Data/Homog_monthly_mean_temp_cleaned", pattern="*.txt")
   }
   # else if(meas == 'precip'){
   #   debug(logger, paste("|IM HERE 3|"))
-  #   txt_files_ls = list.files(path="/Data/Adj_monthly_total_prec_cleaned", pattern="*.txt", full.names = TRUE)
-  #   names = list.files(path="/Data/Adj_monthly_total_prec_cleaned", pattern="*.txt")
+  #   txt_files_ls = list.files(path="../Data/Adj_monthly_total_prec_cleaned", pattern="*.txt", full.names = TRUE)
+  #   names = list.files(path="../Data/Adj_monthly_total_prec_cleaned", pattern="*.txt")
   # }
   path_names <- list(txt_files_ls, names) 
   # debug(logger, paste('|FIND TEMP DATA|'))
@@ -86,7 +86,7 @@ find_meas_data <- function(meas){
 
 # Load data from cleaning step
 load_cleaned_data <- function(year_to_start = 1980, month = 'Feb', meas){
-  debug(logger, paste("|IM HERE 1|"))
+  # debug(logger, paste("|IM HERE 1|"))
   path_names <- find_meas_data(meas)
   txt_files_ls <- path_names[[1]]
   names <- path_names[[2]]
@@ -119,22 +119,7 @@ load_cleaned_data <- function(year_to_start = 1980, month = 'Feb', meas){
   return(input_df)
 }
 
-check_start_year_cutoff <- function(meas){
-  temp_object <- find_meas_data(meas)
-  txt_files_ls <- temp_object[[1]]
-  names <- temp_object[[2]]
-  most_recent_year <-c()
-  for (i in 1:length(txt_files_ls)){
-    txt_files_df <- read.table(file = txt_files_ls[i], header = TRUE, sep = " ",dec = ".", colClasses = "factor")
-    x_temp <- suppressWarnings(as.numeric(as.character(unlist(txt_files_df[,'Year']))))
-    most_recent_year[i] <- max(x_temp)
-  }
-  most_recent_year <- most_recent_year[!is.na(most_recent_year)]
-  # debug(logger, paste('|most_recent_year ' , '|', most_recent_year,"|"))
-  start_year_cutoff <- min(most_recent_year, na.rm = TRUE)
-  # debug(logger, paste('|min ' , '|',start_year_cutoff,"|"))
-  return(start_year_cutoff)
-}
+
 
 regression <- function(input_df, numVar){
   city_prov_vector <- unique(input_df[,c("city", 'prov')])
@@ -208,18 +193,35 @@ hist_slope <- function(){
   return(p)
 }
 
-# get_city_vector <- function(prov){
-#   if(file.exists(paste('/RData/','constant_values','.RData'))){
-#     load(paste('/RData/','constant_values','.RData'), .GlobalEnv)
-#     city_vector <- city_prov_vector[which(city_prov_vector$prov==prov), ]
-#     # city_vector <- select(city_vector, city) # not working?
-#     city_vector <- data.frame(city_vector[, 'city'])
-#     city_vector$city <- as.character(city_vector$city)
-#     city_v <- sort(city_vector$city)
-#     return(city_v)
+get_city_vector <- function(prov){
+  if(file.exists(paste('../RData/','constant_values','.RData'))){
+    load(paste('../RData/','constant_values','.RData'), .GlobalEnv)
+    city_vector <- city_prov_vector[which(city_prov_vector$prov==prov), ]
+    # city_vector <- select(city_vector, city) # not working?
+    city_vector <- data.frame(city_vector[, 'city'])
+    city_vector$city <- as.character(city_vector$city)
+    city_v <- sort(city_vector$city)
+    return(city_v)
+  }
+}
+
+# check_start_year_cutoff <- function(meas){
+#   temp_object <- find_meas_data(meas)
+#   txt_files_ls <- temp_object[[1]]
+#   names <- temp_object[[2]]
+#   most_recent_year <-c()
+#   for (i in 1:length(txt_files_ls)){
+#     txt_files_df <- read.table(file = txt_files_ls[i], header = TRUE, sep = " ",dec = ".", colClasses = "factor")
+#     x_temp <- suppressWarnings(as.numeric(as.character(unlist(txt_files_df[,'Year']))))
+#     most_recent_year[i] <- max(x_temp)
 #   }
+#   most_recent_year <- most_recent_year[!is.na(most_recent_year)]
+#   # debug(logger, paste('|most_recent_year ' , '|', most_recent_year,"|"))
+#   start_year_cutoff <- min(most_recent_year, na.rm = TRUE)
+#   # debug(logger, paste('|min ' , '|',start_year_cutoff,"|"))
+#   return(start_year_cutoff)
 # }
-# 
+
 # get_prov_vector <- function(meas, month, year_to_start){
 #   if(file.exists(paste('/RData/','constant_values','.RData', sep=''))){
 #     load(paste('/RData/','constant_values','.RData', sep=''), .GlobalEnv)

@@ -19,9 +19,9 @@ shinyServer(function(input, output, session) {
   
   callModule(homeLayout, 'home', vars = vars, sidebar_vars = sidebar_vars)
   
-  callModule(triviaLayout, 'trivia')
+  # callModule(triviaLayout, 'trivia')
 
-  callModule(moreInfo, 'more')
+  # callModule(moreInfo, 'more')
   
   
 })
