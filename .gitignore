@@ -18,3 +18,5 @@ Data/Surface MH4 from NOAA
 
 
 
+*.rds
+R/gadm36_CAN_0_sp.rds
