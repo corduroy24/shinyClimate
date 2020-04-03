@@ -4,9 +4,9 @@
 .Ruserdata
 debug.log
 R/debug.log
-**/Adj_monthly_snow/
-Adj_monthly_toal_precip/
-Adj_monthly_toal_cleaned/
+Data/Adj_monthly_snow - Copy/
+Data/Adj_monthly_total_prec_cleaned - Copy/
+Adj_monthly_total_cleaned - Copy/
 Homog_monthly_sea_level_pressure/
 Homog_monthly_station_pressure/
 Homog_monthly_wind_speed/
