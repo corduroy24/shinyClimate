@@ -14,30 +14,22 @@ library(tidyr)
 
 # number of estimated values importante ??
 # allow for different models to be used.
+
 logger <- create.logger()
 logfile(logger) <- 'debug.log'
 level(logger) <- 'DEBUG'
 
-year_to_start <- 1980
-month <- 'Feb'
-meas <- 'precip'
-
-# dir = "C:/Environment_Canada_Shiny_App/Data/Adj_monthly_total_prec"
-# var = list.files(path=dir, pattern="*.txt", full.names=TRUE)
-# i = 1;
-# clean_data(var, dir)
-
 main <- function(meas, month, year_to_start){
   # provs <- data.frame("provs" = c("AB","BC","YT","NT","NU","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL"))
-  if(file.exists(paste('C:/Environment_Canada_Shiny_App/RData/',meas,month, year_to_start,'.RData'))){
-    load(paste('C:/Environment_Canada_Shiny_App/RData/',meas,month, year_to_start,'.RData'), .GlobalEnv)
+  if(file.exists(paste('/RData/',meas,month, year_to_start,'.RData'))){
+    load(paste('/RData/',meas,month, year_to_start,'.RData'), .GlobalEnv)
     debug(logger, paste("Rdata exists"))
   } else {
     debug(logger, paste("RData does not exists"))
     input_df_all <- load_cleaned_data(year_to_start, month, meas) #data matrix X
     output_df_all <- regression(input_df_all) #reg results 
-    save(input_df_all, output_df_all, file = paste('C:/Environment_Canada_Shiny_App/RData/',meas, month, year_to_start,'.RData'))
-    load(paste('C:/Environment_Canada_Shiny_App/RData/',meas,month, year_to_start,'.RData'), .GlobalEnv)
+    save(input_df_all, output_df_all, file = paste('/RData/',meas, month, year_to_start,'.RData'))
+    load(paste('/RData/',meas,month, year_to_start,'.RData'), .GlobalEnv)
   }
   return(output_df_all)
 }
@@ -67,33 +59,33 @@ clean_data <- function(var, dir)
   }
 # Find data files 
 find_meas_data <- function(meas){
-  debug(logger, paste("|IM HERE 2|"))
+  # debug(logger, paste("|IM HERE 2|"))
   
   if(meas == 'min_temp'){
-    txt_files_ls = list.files(path="C:/Environment_Canada_Shiny_App/Data/Homog_monthly_min_temp_cleaned", pattern="*.txt", full.names = TRUE)
-    names = list.files(path="C:/Environment_Canada_Shiny_App/Data/Homog_monthly_min_temp_cleaned", pattern="*.txt")
+    txt_files_ls = list.files(path="/Data/Homog_monthly_min_temp_cleaned", pattern="*.txt", full.names = TRUE)
+    names = list.files(path="/Data/Homog_monthly_min_temp_cleaned", pattern="*.txt")
   }
   else if(meas == 'max_temp'){
-    txt_files_ls = list.files(path="C:/Environment_Canada_Shiny_App/Data/Homog_monthly_max_temp_cleaned", pattern="*.txt", full.names = TRUE)
-    names = list.files(path="C:/Environment_Canada_Shiny_App/Data/Homog_monthly_max_temp_cleaned", pattern="*.txt")
+    txt_files_ls = list.files(path="/Data/Homog_monthly_max_temp_cleaned", pattern="*.txt", full.names = TRUE)
+    names = list.files(path="/Data/Homog_monthly_max_temp_cleaned", pattern="*.txt")
   }
   else if(meas == 'ave_temp'){
-    txt_files_ls = list.files(path="C:/Environment_Canada_Shiny_App/Data/Homog_monthly_mean_temp_cleaned", pattern="*.txt", full.names = TRUE)
-    names = list.files(path="C:/Environment_Canada_Shiny_App/Data/Homog_monthly_mean_temp_cleaned", pattern="*.txt")
+    txt_files_ls = list.files(path="/Data/Homog_monthly_mean_temp_cleaned", pattern="*.txt", full.names = TRUE)
+    names = list.files(path="/Data/Homog_monthly_mean_temp_cleaned", pattern="*.txt")
   }
-  else if(meas == 'precip'){
-    debug(logger, paste("|IM HERE 3|"))
-    txt_files_ls = list.files(path="C:/Environment_Canada_Shiny_App/Data/Adj_monthly_total_prec_cleaned", pattern="*.txt", full.names = TRUE)
-    names = list.files(path="C:/Environment_Canada_Shiny_App/Data/Adj_monthly_total_prec_cleaned", pattern="*.txt")
-  }
+  # else if(meas == 'precip'){
+  #   debug(logger, paste("|IM HERE 3|"))
+  #   txt_files_ls = list.files(path="/Data/Adj_monthly_total_prec_cleaned", pattern="*.txt", full.names = TRUE)
+  #   names = list.files(path="/Data/Adj_monthly_total_prec_cleaned", pattern="*.txt")
+  # }
   path_names <- list(txt_files_ls, names) 
-  debug(logger, paste('|FIND TEMP DATA|'))
+  # debug(logger, paste('|FIND TEMP DATA|'))
   
   return(path_names)
 }
 
 # Load data from cleaning step
-load_cleaned_data <- function(year_to_start, month, meas){
+load_cleaned_data <- function(year_to_start = 1980, month = 'Feb', meas){
   debug(logger, paste("|IM HERE 1|"))
   path_names <- find_meas_data(meas)
   txt_files_ls <- path_names[[1]]
@@ -122,7 +114,7 @@ load_cleaned_data <- function(year_to_start, month, meas){
       # debug(logger, paste('|LOAD CLEANED DATA|', 6, '|'))
       input_df <- rbind(input_df, temp_df)
   }
-  debug(logger, paste('|RETURN|'))
+  # debug(logger, paste('|RETURN|'))
   
   return(input_df)
 }
@@ -144,7 +136,7 @@ check_start_year_cutoff <- function(meas){
   return(start_year_cutoff)
 }
 
-regression <- function(input_df){
+regression <- function(input_df, numVar){
   city_prov_vector <- unique(input_df[,c("city", 'prov')])
   city_vector <- city_prov_vector[, 'city']
   prov_vector <- city_prov_vector[, 'prov']
@@ -152,8 +144,11 @@ regression <- function(input_df){
   output_df <- data.frame()
   for (i in 1:length(city_vector)){
     index <- which(input_df[, "city"] == city_vector[i])
-    fit <- lm(y_meas[index]~x_year[index], data = input_df)
-
+    if(numVar == 1)
+      fit <- lm(y_meas[index]~x_year[index], data = input_df)
+    else if(numVar == 2)
+      fit <- lm(y_meas.x[index]~y_meas.y[index], data = input_df)
+    
     b <- data.frame("intercept" = fit$coefficients[1], "slope" = fit$coefficients[2])
     R_2 <- data.frame("r.squared" = as.numeric(unlist(summary(fit)$r.squared)))
     # CIs <- ci(fit, 0.95, alpha=1-0.95, na.rm = TRUE)
@@ -177,66 +172,6 @@ regression <- function(input_df){
 # fit_2 <- lm(y_temp~ city-1 + city*x_year , data = input_df)
 
 
-# save(city_prov_vector, file = paste('RData/','constant_values','.RData'))
-get_city_vector <- function(prov){
-  if(file.exists(paste('C:/Environment_Canada_Shiny_App/RData/','constant_values','.RData'))){
-    load(paste('C:/Environment_Canada_Shiny_App/RData/','constant_values','.RData'), .GlobalEnv)
-    city_vector <- city_prov_vector[which(city_prov_vector$prov==prov), ]
-    # city_vector <- select(city_vector, city) # not working?
-    city_vector <- data.frame(city_vector[, 'city'])
-    city_vector$city <- as.character(city_vector$city)
-    city_v <- sort(city_vector$city)
-    return(city_v)
-  }
-}
-
-get_prov_vector <- function(meas, month, year_to_start){
-  if(file.exists(paste('C:/Environment_Canada_Shiny_App/RData/','constant_values','.RData', sep=''))){
-    load(paste('C:/Environment_Canada_Shiny_App/RData/','constant_values','.RData', sep=''), .GlobalEnv)
-    prov_vector <- unique(city_prov_vector[, 'prov'])
-    prov_vector <- prov_vector[ , order(names(prov_vector))]
-    return(prov_vector)
-  }
-}
-
-# 
-# reg_temp <- function(city, prov){
-#   city_df <- input_df_all[ which(input_df_all$prov==prov
-#                                  & input_df_all$city == city), ]
-#   if(nrow(city_df) == 0)return(NULL)
-#   
-#   debug(logger, paste('|GG_OVERLAY_SLOPES |'))
-#   prov_df <- input_df_all[which(input_df_all$prov==prov), ]
-#   # debug(logger, paste('|PROV_DF |', prov_df,"|"))
-#   country_df <- input_df_all
-#   # debug(logger, paste('|CANADA_DF |', country_df,"|"))
-#   
-#   plot <- ggplot() +
-#     labs(x = "Year", y = "Temperature") +
-#     # geom_line(country_df, mapping = aes(x = x_year, y = y_temp, colour = "Country")) +
-#     geom_smooth(country_df, method = "lm", mapping = aes(x = x_year, y = y_temp, colour = "Country")) +
-#     # geom_line(prov_df, mapping = aes(x = x_year, y=y_temp, colour = 'Province')) +
-#     geom_smooth(prov_df,mapping = aes(x = x_year, y=y_temp, colour = "Province"), method = "lm") +
-#     # geom_line(city_df, mapping = aes(x = x_year, y=y_temp, colour = "City")) +
-#     geom_smooth(city_df,mapping = aes(x = x_year, y=y_temp, colour = "City"), method = "lm")+
-#     scale_x_continuous(breaks  = seq(1980,2025, by = 5))+
-#     theme(
-#       panel.background = element_rect(fill = "white",
-#                                       colour = "grey",
-#                                       size = 0.5, linetype = "solid"),
-#       panel.grid.major = element_line(size = 0.25, linetype = 'solid',
-#                                       colour = "gray"),
-#       panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
-#                                       colour = "gray"),
-#       axis.ticks = element_line(colour = "grey20")
-#     )
-#   return(plot)
-# }
-
-
-# hist(output_df_all$slope, freq = TRUE, main  = paste("Histogram of Slope(Canada)"), xlab = "Slope")
-# abline(h=0, col = 'red')
-
 hist_slope_prov <- function(prov){
     index <- which(output_df_all[, "prov"] == prov)
     prov_df <- output_df_all[index,]
@@ -249,13 +184,11 @@ hist_slope_prov <- function(prov){
   return(p)
 }
 
-# # boxplot(output_df_all$slope~output_df_all$prov, xlab = 'Province',ylab = 'Slope', main = 'Boxplot of slope')
-# boxplot(output_df_all$r.squared~output_df_all$prov, xlab = "Province", ylab= 'r.squared', main = 'Boxplot of R_2')
 boxplot_val <- function(value){
-    if(value == 'r.squared'){
-      p<- ggplot(output_df_all, aes(x=prov, y=r.squared)) 
-    }
-    else if(value == 'slope'){
+    # if(value == 'r.squared'){
+    #   p<- ggplot(output_df_all, aes(x=prov, y=r.squared)) 
+    # }
+    if(value == 'slope'){
       p<- ggplot(output_df_all, aes(x=prov, y=slope)) 
     }
 
@@ -274,6 +207,45 @@ hist_slope <- function(){
                color="blue", linetype="dashed", size=1)
   return(p)
 }
+
+# get_city_vector <- function(prov){
+#   if(file.exists(paste('/RData/','constant_values','.RData'))){
+#     load(paste('/RData/','constant_values','.RData'), .GlobalEnv)
+#     city_vector <- city_prov_vector[which(city_prov_vector$prov==prov), ]
+#     # city_vector <- select(city_vector, city) # not working?
+#     city_vector <- data.frame(city_vector[, 'city'])
+#     city_vector$city <- as.character(city_vector$city)
+#     city_v <- sort(city_vector$city)
+#     return(city_v)
+#   }
+# }
+# 
+# get_prov_vector <- function(meas, month, year_to_start){
+#   if(file.exists(paste('/RData/','constant_values','.RData', sep=''))){
+#     load(paste('/RData/','constant_values','.RData', sep=''), .GlobalEnv)
+#     prov_vector <- unique(city_prov_vector[, 'prov'])
+#     prov_vector <- prov_vector[ , order(names(prov_vector))]
+#     return(prov_vector)
+#   }
+# }
+
+# test<- function(){
+#   year_to_start <- 1980
+#   month <- 'Feb'
+#   # meas <- 'precip'
+#   meas <- 'max_temp'
+#   in_ave_temp<- load_cleaned_data(year_to_start, month, meas)
+#   out_ave_temp <- regression(in_ave_temp,1)
+# }
+# testInter<-function(){
+#   input_merge <- merge(in_ave_temp, prec_df, by = c('city', 'x_year','prov'))
+#   output_merge <- regression(input_merge,2)
+#   input_df <- input_merge
+#   output_df_all<-output_merge
+#   boxplot_val('r.squared')
+#   output_df_all <- out_prec
+#   boxplot_val('slope')
+# }
 
 # library(sp)
 # library(raster)
