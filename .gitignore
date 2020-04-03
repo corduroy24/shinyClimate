@@ -2,8 +2,19 @@
 .Rhistory
 .RData
 .Ruserdata
-Shiny_App/gcd_000b11a_e.dbf
-Shiny_App/gcd_000b11a_e.dbf
-*.zip
-Shiny_App/gcd_000b11a_e.shx
-Shiny_App/gcd_000b11a_e.shp
+R/gadm36_CAN_0_sp.rds
+R/gadm36_CAN_1_sp.rds
+R/gadm36_CAN_2_sp.rds
+debug.log
+R/debug.log
+Adj_monthly_snow
+Adj_monthly_toal_precip
+Adj_monthly_toal_cleaned
+Homog_monthly_sea_level_pressure
+Homog_monthly_station_pressure
+Homog_monthly_wind_speed
+Surface CO2 from NOAA
+Surface MH4 from NOAA
+
+
+

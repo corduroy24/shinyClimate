@@ -9,8 +9,6 @@ This app was designed for two reasons:
 - provide a family friendly illustration of Canadian climate change - slopes 
 - give users a trustworthy look at climate trends in their province, (or city)
 - 
-  
-
 
 
 ## Original Data
