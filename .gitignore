@@ -5,6 +5,7 @@
 debug.log
 R/debug.log
 Data/Adj_monthly_snow/
+Data/Adj_monthly_total_prec/
 Data/Adj_monthly_total_prec_cleaned/
 Data/Adj_monthly_total_cleaned/
 Data/Homog_monthly_sea_level_pressure/
