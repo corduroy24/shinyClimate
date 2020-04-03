@@ -7,14 +7,14 @@ R/gadm36_CAN_1_sp.rds
 R/gadm36_CAN_2_sp.rds
 debug.log
 R/debug.log
-Adj_monthly_snow
-Adj_monthly_toal_precip
-Adj_monthly_toal_cleaned
-Homog_monthly_sea_level_pressure
-Homog_monthly_station_pressure
-Homog_monthly_wind_speed
-Surface CO2 from NOAA
-Surface MH4 from NOAA
+Data/Adj_monthly_snow
+Data/Adj_monthly_toal_precip
+Data/Adj_monthly_toal_cleaned
+Data/Homog_monthly_sea_level_pressure
+Data/Homog_monthly_station_pressure
+Data/Homog_monthly_wind_speed
+Data/Surface CO2 from NOAA
+Data/Surface MH4 from NOAA
 
 
 
