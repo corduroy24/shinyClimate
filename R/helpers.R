@@ -28,9 +28,14 @@ getData <- function(meas, month, year_to_start){
     debug(logger, paste("Rdata exists"))
   } else {
     debug(logger, paste("RData does not exists"))
-    input_df_all <- load_cleaned_data(year_to_start, month, meas) #data matrix X
-    output_df_all <- regression(input_df_all) #reg results 
-    save(input_df_all, output_df_all, file = paste('../RData/',meas, month, year_to_start,'.RData'))
+    # ugly...
+    min_input_df_all <- load_cleaned_data(year_to_start, month, 'min_temp') #data matrix X
+    output_df_all <- regression(min_input_df_all) #reg results 
+    max_input_df_all <- load_cleaned_data(year_to_start, month, 'max_temp') #data matrix X
+    output_df_all <- rbind(output_df_all, regression(max_input_df_all)) #reg results 
+    mean_input_df_all <- load_cleaned_data(year_to_start, month, 'mean_temp') #data matrix X
+    output_df_all <- rbind(output_df_all,regression(mean_input_df_all)) #reg results 
+    save(output_df_all, file = paste('../RData/',meas,month, year_to_start,'.RData'))
     load(paste('../RData/',meas,month, year_to_start,'.RData'), .GlobalEnv)
   }
   return(output_df_all)
@@ -71,7 +76,7 @@ find_meas_data <- function(meas){
     txt_files_ls = list.files(path="../Data/Homog_monthly_max_temp_cleaned", pattern="*.txt", full.names = TRUE)
     names = list.files(path="../Data/Homog_monthly_max_temp_cleaned", pattern="*.txt")
   }
-  else if(meas == 'ave_temp'){
+  else if(meas == 'mean_temp'){
     txt_files_ls = list.files(path="../Data/Homog_monthly_mean_temp_cleaned", pattern="*.txt", full.names = TRUE)
     names = list.files(path="../Data/Homog_monthly_mean_temp_cleaned", pattern="*.txt")
   }
@@ -112,7 +117,7 @@ load_cleaned_data <- function(year_to_start = 1980, month = 'Feb', meas){
       # debug(logger, paste('|MONTH|', x_year, '|'))
       # debug(logger, paste('|Y_MEAS|', y_meas, '|'))
       # debug(logger, paste('|X_YEAR|', x_year, '|'))
-      temp_df <- data.frame(y_meas, x_year, "city" = nom_city, "prov" = nom_prov)
+      temp_df <- data.frame(y_meas, x_year, "city" = nom_city, "prov" = nom_prov, 'meas_name' = meas)
       # debug(logger, paste('|LOAD CLEANED DATA|', 6, '|'))
       input_df <- rbind(input_df, temp_df)
   }
@@ -123,18 +128,19 @@ load_cleaned_data <- function(year_to_start = 1980, month = 'Feb', meas){
 
 
 
-regression <- function(input_df, numVar){
+regression <- function(input_df){
   city_prov_vector <- unique(input_df[,c("city", 'prov')])
   city_vector <- city_prov_vector[, 'city']
   prov_vector <- city_prov_vector[, 'prov']
+  meas <- unique(input_df$meas_name)
   
   output_df <- data.frame()
   for (i in 1:length(city_vector)){
     index <- which(input_df[, "city"] == city_vector[i])
-    if(numVar == 1)
-      fit <- lm(y_meas[index]~x_year[index], data = input_df)
-    else if(numVar == 2)
-      fit <- lm(y_meas.x[index]~y_meas.y[index], data = input_df)
+    # if(numVar == 1)
+    fit <- lm(y_meas[index]~x_year[index], data = input_df)
+    # else if(numVar == 2)
+      # fit <- lm(y_meas.x[index]~y_meas.y[index], data = input_df)
     
     b <- data.frame("intercept" = fit$coefficients[1], "slope" = fit$coefficients[2])
     R_2 <- data.frame("r.squared" = as.numeric(unlist(summary(fit)$r.squared)))
@@ -147,7 +153,9 @@ regression <- function(input_df, numVar){
     CI_upper <- estimate + margin_error
     variance <- (standard_error)^2
     
-    curr_results_df <- data.frame("city"=city_vector[i],'prov' = prov_vector[i],  b,"r.squared"=R_2,CI_lower, CI_upper,variance,"n"=nrow(fit$model), row.names = NULL)
+    curr_results_df <- data.frame("city"=city_vector[i],'prov' = prov_vector[i],  
+                                  b,"r.squared"=R_2,CI_lower, CI_upper,variance,
+                                  "n"=nrow(fit$model), 'meas_name' = meas,  row.names = NULL)
     output_df <- rbind(output_df,curr_results_df)
   }
   return(output_df)
@@ -175,6 +183,7 @@ boxplot_val <- function(value){
     # if(value == 'r.squared'){
     #   p<- ggplot(output_df_all, aes(x=prov, y=r.squared)) 
     # }
+  
     if(value == 'slope'){
       p<- ggplot(output_df_all, aes(x=prov, y=slope)) 
     }
@@ -193,11 +202,14 @@ hist_slope_nation <- function(meas, month, year_to_start){
   xlab <-expression(paste('Slopes (', degree, 'C)', sep = ""))
 
   #maybe save these instead?
-
-
+  
+  output_df_all <- getData('temp', month, year_to_start)
+  
+  # city_vector <- city_prov_vector[which(output_df_all$meas=='min_temp'), ]
+  # index <- which(input_df[, "city"] == city_vector[i])
   if(meas == 'min_max_temp'){
-    min_output_df_all <- getData('min_temp', month, year_to_start)
-    max_output_df_all <- getData('max_temp', month, year_to_start)
+    min_output_df_all <- output_df_all[which(output_df_all$meas_name=='min_temp'),]
+    max_output_df_all <- output_df_all[which(output_df_all$meas_name=='max_temp'),]
     p1<-ggplot(min_output_df_all, aes(x=slope)) +
       geom_histogram(aes(y=..density..), colour="black", fill="white")+
       geom_density(alpha=.05, fill="#FF6666") +
@@ -241,8 +253,7 @@ hist_slope_nation <- function(meas, month, year_to_start){
 
   }
   else if(meas == 'mean_temp'){
-    mean_output_df_all <- getData('ave_temp', month, year_to_start)
-    
+    mean_output_df_all <- output_df_all[which(output_df_all$meas_name=='mean_temp'),]
     p<-ggplot(mean_output_df_all, aes(x=slope)) +
       geom_histogram(aes(y=..density..), colour="black", fill="white")+
       geom_density(alpha=.05, fill="#FF6666") +
@@ -256,8 +267,6 @@ hist_slope_nation <- function(meas, month, year_to_start){
   
   return(p)
 }
-
-# labs(y='Frequency', x = (atop(paste('Temperature Slopes','(', degree, 'C)' ), test))
 
 
 get_city_vector <- function(prov){
@@ -303,8 +312,8 @@ get_city_vector <- function(prov){
 #   month <- 'Feb'
 #   # meas <- 'precip'
 #   meas <- 'max_temp'
-#   in_ave_temp<- load_cleaned_data(year_to_start, month, meas)
-#   out_ave_temp <- regression(in_ave_temp,1)
+#   in_mean_temp<- load_cleaned_data(year_to_start, month, meas)
+#   out_mean_temp <- regression(in_ave_temp,1)
 # }
 # testInter<-function(){
 #   input_merge <- merge(in_ave_temp, prec_df, by = c('city', 'x_year','prov'))

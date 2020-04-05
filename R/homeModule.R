@@ -26,14 +26,11 @@ homeLayoutUI <- function(id) {
       # verbatimTextOutput(NS(id, "txt1")),
     fluidRow(
       tabBox(
-        # height = 400,
-        title = "hello",
         id = "tabset1", height = "100%",
         tabPanel(title = "Min-Max",withSpinner(plotOutput(ns("plot_1_min_max_temp"), height = 300))),
         tabPanel(title = 'Mean', withSpinner(plotOutput(ns("plot_1_mean_temp"), height = 300)))
       ),
       tabBox(
-        # height = 400,
         id = "tabset2", height = "100%",
         tabPanel(title = "Min-Max",plotOutput(ns("plot_2_min_max_temp"), height = 300)),
         tabPanel(title = 'Mean', plotOutput(ns("plot_2_mean_temp"), height = 300))

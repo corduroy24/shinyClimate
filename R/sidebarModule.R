@@ -11,10 +11,10 @@ sidebarLayoutUI <- function(id) {
     selectInput(ns("city"), "Choose a city:",
                 choices = c()
     ),
-    selectInput(ns("temp_val"), "Choose a Measuremnent:",
-                choices = c("Average Temperature","Minimum Temperature", "Maximum Temperature"),
-                selected = 'Average Temperature'
-    ),
+    # selectInput(ns("temp_val"), "Choose a Measuremnent:",
+    #             choices = c("Average Temperature","Minimum Temperature", "Maximum Temperature"),
+    #             selected = 'Average Temperature'
+    # ),
     # verbatimTextOutput(NS(id, "txt1"))
   )
 }
@@ -40,8 +40,8 @@ sidebarLayout <- function(input, output, session) {
   return(
     list(
       prov = reactive({input$prov}),
-      city = reactive({input$city}),
-      temp_val = reactive({input$temp_val})
+      city = reactive({input$city})
+      # temp_val = reactive({input$temp_val})
     )
   )
 }
