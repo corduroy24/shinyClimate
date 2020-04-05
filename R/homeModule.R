@@ -15,64 +15,61 @@ homeLayoutUI <- function(id) {
   ns <- NS(id)
 
   tagList(
+    # center later 
+    h2("Temperature Trends"),
+    
     # fluidRow(
-    #   valueBoxOutput(ns('vbox_city')),
-    #   valueBoxOutput(ns('vbox_prov')),
-    #   valueBoxOutput(ns('vbox_can'))
+    #   valueBoxOutput(ns('vbox_1'), width = 2),
+    #   valueBoxOutput(ns('vbox_2'), width = 2),
     # ),
 
       # verbatimTextOutput(NS(id, "txt1")),
     fluidRow(
       tabBox(
         # height = 400,
-        # textOutput(ns("month_1")),
+        title = "hello",
         id = "tabset1", height = "100%",
-        tabPanel(title = "Min",plotOutput(ns("plot_1_min_temp"), height = 300)),
-        tabPanel(title = 'Max',plotOutput(ns("plot_1_max_temp"), height = 300)),
-        tabPanel(title = 'Mean', plotOutput(ns("plot_1_mean_temp"), height = 300))
-        # background = 
+        tabPanel(title = "Min-Max",withSpinner(plotOutput(ns("plot_1_min_max_temp"), height = 300))),
+        tabPanel(title = 'Mean', withSpinner(plotOutput(ns("plot_1_mean_temp"), height = 300)))
       ),
       tabBox(
         # height = 400,
-        # textOutput(ns("month_1")),
         id = "tabset2", height = "100%",
-        tabPanel(title = "Min",plotOutput(ns("plot_2_min_temp"), height = 300)),
-        tabPanel(title = 'Max',plotOutput(ns("plot_2_max_temp"), height = 300)),
+        tabPanel(title = "Min-Max",plotOutput(ns("plot_2_min_max_temp"), height = 300)),
         tabPanel(title = 'Mean', plotOutput(ns("plot_2_mean_temp"), height = 300))
-        # background = 
       )
     ),
-    # fluidRow(
-    #   box(
-    #     title = "Main",
-    #     # h2("These 2 months showcase the strongest evidence for climate change"),
-    #     # h3("Refer to preferences to change"), 
-    #     status = "primary",
-    #     solidHeader = TRUE,
-    #     # background = "green",
-    #     selectInput(ns("plotOptions"), "Choose a Plot:",
-    #                 choices = c("Histogram of slopes - Provincial",
-    #                             "Boxplot of slopes - Provincial", 
-    #                             "Histogram of Confidence Intervals for slopes - National",
-    #                             "Histogram of slopes - National", 
-    #                             "Histogram of Confidence Intervals for slopes - National"),
-    #                 
-    #     ) 
-    #   ),
-    # ),
+    fluidRow(
+      box(
+        title = "Main",
+        # h2("These 2 months showcase the strongest evidence for climate change"),
+        # h3("Refer to preferences to change"),
+        status = "primary",
+        solidHeader = TRUE,
+        # background = "green",
+        selectInput(ns("plotOptions"), "Choose a Plot:",
+                    choices = c("Histogram of slopes - Provincial",
+                                "Boxplot of slopes - Provincial",
+                                "Histogram of Confidence Intervals for slopes - National",
+                                "Histogram of slopes - National",
+                                "Histogram of Confidence Intervals for slopes - National"),
+
+        )
+      ),
+    ),
     fluidRow(
       infoBox(
-        title = "Minimum - [purpose]",
+        title = "Extremes - [purpose]",
         icon = shiny::icon('info-circle', class = NULL, lib = "font-awesome"),
         color = 'red',
         fill = TRUE
-      ),
-      infoBox(
-        title = "Maximum - [purpose]",
-        icon = shiny::icon('info-circle', class = NULL, lib = "font-awesome"),
-        color = 'red',
-        fill = TRUE
-      ),
+      )
+      # infoBox(
+      #   title = "  - [purpose]",
+      #   icon = shiny::icon('info-circle', class = NULL, lib = "font-awesome"),
+      #   color = 'red',
+      #   fill = TRUE
+      # ),
     )
     
   )
@@ -83,27 +80,19 @@ homeLayoutUI <- function(id) {
 homeLayout <- function(input, output, session, vars, sidebar_vars) {
   ns <- session$ns
   
-    output$vbox_city <- renderValueBox({
+    output$vbox_1 <- renderValueBox({
       valueBox(
-        tags$p("temp", style = "font-size:30px; font-weight: bold;"),
+        tags$p("Location", style = "font-size:30px; font-weight: bold;"),
         icon = icon(NULL),
-        subtitle =tags$p(sidebar_vars$city(), style = "font-size: 20px"),
+        # subtitle =tags$p(sidebar_vars$city(), style = "font-size: 20px"),
         color = 'aqua'
       )
     })
-    output$vbox_prov <- renderValueBox({
+    output$vbox_2 <- renderValueBox({
       valueBox(
-        tags$p("temp", style = "font-size:30px; font-weight: bold;"),
+        tags$p("month", style = "font-size:30px; font-weight: bold;"),
         icon = icon(NULL),
         subtitle =tags$p(sidebar_vars$prov(), style = "font-size: 20px"),
-        color = 'aqua'
-      )
-    })
-    output$vbox_can <- renderValueBox({
-      valueBox(
-        tags$p("temp", style = "font-size:30px; font-weight: bold;"),
-        icon = icon(NULL),
-        subtitle =tags$p("CANADA", style = "font-size: 20px"),
         color = 'aqua'
       )
     })
@@ -137,46 +126,21 @@ homeLayout <- function(input, output, session, vars, sidebar_vars) {
     })
     
       
-    output$plot_1_min_temp<-renderPlot({
-      isolate({
-        main('min_temp',update()$month_1, update()$year_to_start)
-      })
-      hist_slope()
+    output$plot_1_min_max_temp<-renderPlot({
+      hist_slope_nation('min_max_temp',update()$month_1, update()$year_to_start)
     })
       
-    output$plot_1_max_temp<-renderPlot({
-      isolate({
-        main('max_temp',update()$month_1 , update()$year_to_start)
-      })
-      hist_slope()
-    })
     output$plot_1_mean_temp<-renderPlot({
-      update()
-      isolate({
-        main('ave_temp',update()$month_1 , update()$year_to_start)
-      })
-      hist_slope()
+      hist_slope_nation('mean_temp',update()$month_1, update()$year_to_start)
     })
     
       
-    output$plot_2_min_temp<-renderPlot({
-      isolate({
-        main('min_temp',update()$month_2 , update()$year_to_start)
-      })
-      hist_slope()
+    output$plot_2_min_max_temp<-renderPlot({
+      hist_slope_nation('min_max_temp',update()$month_2, update()$year_to_start)
     })
     
-    output$plot_2_max_temp<-renderPlot({
-      isolate({
-        main('max_temp',update()$month_2 , update()$year_to_start)
-      })
-      hist_slope()
-    })
     output$plot_2_mean_temp<-renderPlot({
-      isolate({
-        main('ave_temp',update()$month_2 , update()$year_to_start)
-      })
-      hist_slope()
+      hist_slope_nation('mean_temp',update()$month_2,update()$year_to_start)
     })
     
 

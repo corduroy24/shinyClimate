@@ -2,6 +2,8 @@ library(plyr)
 library(data.table)
 library(log4r)
 library(tidyr)
+library(gridExtra)
+library(grid)
 
 # library(sf)
 # library(maps)
@@ -19,8 +21,8 @@ logger <- create.logger()
 logfile(logger) <- 'debug.log'
 level(logger) <- 'DEBUG'
 
-main <- function(meas, month, year_to_start){
-  # provs <- data.frame("provs" = c("AB","BC","YT","NT","NU","SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL"))
+# do i need the input data frame ??...#load vs readrds
+getData <- function(meas, month, year_to_start){
   if(file.exists(paste('../RData/',meas,month, year_to_start,'.RData'))){
     load(paste('../RData/',meas,month, year_to_start,'.RData'), .GlobalEnv)
     debug(logger, paste("Rdata exists"))
@@ -182,16 +184,81 @@ boxplot_val <- function(value){
     stat_boxplot(geom = 'errorbar')
 }
 
-hist_slope <- function(){
-  # Histogram with density plot and mean line 
-  debug(logger, paste(output_df_all))
-  p<-ggplot(output_df_all, aes(x=slope)) + 
-    geom_histogram(aes(y=..density..), colour="black", fill="white")+
-    geom_density(alpha=.2, fill="#FF6666") +
-    geom_vline(aes(xintercept=mean(slope)),
-               color="blue", linetype="dashed", size=1)
+# Histogram with density plot and mean line 
+# just display 1980 -2017 ???
+hist_slope_nation <- function(meas, month, year_to_start){
+  year_to_start <- toString(year_to_start)
+  month <- toString(month)
+  subt<- bquote(italic('Canada -'~.(month) *' -' ~.(year_to_start)*' (Start Year)'))
+  xlab <-expression(paste('Slopes (', degree, 'C)', sep = ""))
+
+  #maybe save these instead?
+
+
+  if(meas == 'min_max_temp'){
+    min_output_df_all <- getData('min_temp', month, year_to_start)
+    max_output_df_all <- getData('max_temp', month, year_to_start)
+    p1<-ggplot(min_output_df_all, aes(x=slope)) +
+      geom_histogram(aes(y=..density..), colour="black", fill="white")+
+      geom_density(alpha=.05, fill="#FF6666") +
+      geom_vline(aes(xintercept=mean(slope)),
+                 color="blue", linetype="dashed", size=1)+
+      ggtitle('Minimum Temperature - Slopes')+
+      labs(y='Frequency', x = xlab)+
+      theme(plot.title = element_text(hjust = 0.5, size = 10),
+            axis.title.x = element_text(size = 9),
+            axis.title.y = element_text(size = 9))
+    
+    p2<-ggplot(max_output_df_all, aes(x=slope)) +
+      geom_histogram(aes(y=..density..), colour="black", fill="white")+
+      geom_density(alpha=.05, fill="#FF6666") +
+      geom_vline(aes(xintercept=mean(slope)),
+                 color="blue", linetype="dashed", size=1)+
+      ggtitle('Maximum Temperature - Slopes')+
+      labs(y='Frequency', x = xlab)+
+      theme(plot.title = element_text(hjust = 0.5, size = 10),
+            axis.title.x = element_text(size = 9),
+            axis.title.y = element_text(size = 9))
+
+
+    p<- grid.arrange(
+      top = textGrob('Histogram - Minumum vs Maximum Temperature - Slopes',
+                     gp=gpar(fontface="bold")),
+      sub = textGrob(subt, gp = gpar(col = 'red', fontface='italic',
+                     fontsize = 11 )),
+      p1,
+      p2,
+      bottom = textGrob(
+        "this footnote is right-justified",
+        gp = gpar(fontface = 3, fontsize = 9),
+        hjust = 1,
+        x = 1
+      ),
+      ncol = 1,
+      heights=c(0.05, 0.5, 0.55)
+      )
+
+
+  }
+  else if(meas == 'mean_temp'){
+    mean_output_df_all <- getData('ave_temp', month, year_to_start)
+    
+    p<-ggplot(mean_output_df_all, aes(x=slope)) +
+      geom_histogram(aes(y=..density..), colour="black", fill="white")+
+      geom_density(alpha=.05, fill="#FF6666") +
+      geom_vline(aes(xintercept=mean(slope)),
+                 color="blue", linetype="dashed", size=1)+
+      ggtitle('Mean Temperature - Slopes')+
+      labs(y='Frequency', x = xlab, subtitle = subt)+
+      theme(plot.title = element_text(hjust = 0.5),
+            plot.subtitle = element_text(hjust = 0.5, color = 'red' ))
+  }
+  
   return(p)
 }
+
+# labs(y='Frequency', x = (atop(paste('Temperature Slopes','(', degree, 'C)' ), test))
+
 
 get_city_vector <- function(prov){
   if(file.exists(paste('../RData/','constant_values','.RData'))){
