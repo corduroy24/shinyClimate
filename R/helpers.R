@@ -179,31 +179,42 @@ hist_slope_prov <- function(prov){
   return(p)
 }
 
-# plot_type <- function(type){
-#     # if(value == 'r.squared'){
-#     #   p<- ggplot(output_df_all, aes(x=prov, y=r.squared)) 
-#     # }
-#   
-#     # if(type == 'slope'){
-#     #   p<- ggplot(output_df_all, aes(x=prov, y=slope)) 
-#     # }
-#   
-#   if(type == 'box_plot'){
-#     p <- ggplot(output_df_all, aes(x=prov, y=slope))+
-#       geom_boxplot() +
-#       stat_summary(fun.y=mean, geom="point", shape=23, size=4)+
-#       stat_boxplot(geom = 'errorbar')
-#   }
-#   else if(type == 'histogram')
-#   
-#   return(p)
-# }
 
-add_plot_type<- function(curr_plots, type){
+# meas<- 'min_max_temp'
+# month<-'Feb'
+# year_to_start <- '1980'
+# plot_type <- 'boxplot'
+# location <- 'ON'
+# loc_type <- 'prov'
+# Histogram with density plot and mean line 
+# just display 1980 -2017 ???
+# df_consts <- data.frame(year_to_start, plot_type, location, loc_type, stringsAsFactors = FALSE)
+setup_plots <- function(meas, month, df_consts){
+  year_to_start <- df_consts$year_to_start
+  plot_type <- df_consts$plot_type
+  location <- df_consts$location
+  loc_type <- df_consts$loc_type
+  debug(logger, paste('-----------df_consts ----------',df_consts ))
+  
+  # if(!exists('output_df_all'))
+    output_df_all <- getData('temp', month, year_to_start)
+  if(loc_type == 'prov'){
+    index <- which(output_df_all[, "prov"] == location)
+    output_df_all <- output_df_all[index,]
+  }
+  
+  p<-add_plot_data(meas, output_df_all) # returns a list plot(s)
+  p<-add_plot_type(p, plot_type, loc_type) #constructs plot(s)
+  # print(p)
+  p<- add_plot_labels(p,month, year_to_start, location)
+  grid.draw(p)
+}
+
+add_plot_type<- function(curr_plots, plot_type, loc_type){
   slope_lab <-expression(paste('Slopes (', degree, 'C)', sep = ""))
   
   for(i in 1: length(curr_plots)){
-    if(type == 'histogram'){
+    if(plot_type == 'histogram'){
       curr_plots[[i]] <- curr_plots[[i]] + aes(x = slope)+
         geom_histogram(aes(y=..density..), colour="black", fill="white")+
         geom_density(alpha=.05, fill="#FF6666") +
@@ -212,8 +223,11 @@ add_plot_type<- function(curr_plots, type){
         labs(y='Frequency', x = slope_lab)
         
     }
-    else if(type == 'boxplot'){
-      curr_plots[[i]] <- curr_plots[[i]] + aes(x=prov, y=slope)+
+    else if(plot_type == 'boxplot'){
+      x<- 'prov'
+      # if(loc_type == 'prov') x<- 'city'
+
+      curr_plots[[i]] <- curr_plots[[i]] + aes_string(x=x, y='slope')+
         geom_boxplot() +
         stat_summary(fun.y=mean, geom="point", shape=23, size=4)+
         stat_boxplot(geom = 'errorbar')+
@@ -224,22 +238,7 @@ add_plot_type<- function(curr_plots, type){
   return(curr_plots)
     
 }
-meas<- 'min_max_temp'
-month<-'Feb'
-year_to_start <- '1980'
-type <- 'boxplot'
-location <- 'ON'
-setup_plots <- function(meas, month, year_to_start, type, location){
-  if(!exists('output_df_all'))
-    output_df_all <- getData('temp', month, year_to_start)
-  
-  p<-add_plot_data(meas, output_df_all) # returns a list plot(s)
-  p<-add_plot_type(p, type) #constructs plot(s)
-  # print(p)
-  p<- add_plot_labels(p,month, year_to_start, location)
 
-  # grid.draw(p)
-}
 add_plot_data <- function(meas, output_df_all){
 
   if(meas == 'min_max_temp'){
@@ -256,6 +255,7 @@ add_plot_data <- function(meas, output_df_all){
       return(list(p))
     }
 }
+
 
 add_plot_labels <-function(curr_plot, month, year_to_start, location){
   year_to_start <- toString(year_to_start)
@@ -302,82 +302,6 @@ add_plot_labels <-function(curr_plot, month, year_to_start, location){
       theme(plot.title = element_text(hjust = 0.5),
             plot.subtitle = element_text(hjust = 0.5, color = 'red' ))
   }
-  
-  return(p)
-  
-  
-}
-
-# Histogram with density plot and mean line 
-# just display 1980 -2017 ???
-hist_slope_nation <- function(meas, month, year_to_start){
-  year_to_start <- toString(year_to_start)
-  month <- toString(month)
-  subt<- bquote(italic('Canada -'~.(month) *' -' ~.(year_to_start)*' (Start Year)'))
-  
-  xlab <-expression(paste('Slopes (', degree, 'C)', sep = ""))
-
-  if(!exists('output_df_all'))
-    output_df_all <- getData('temp', month, year_to_start)
-  
-  if(meas == 'min_max_temp'){
-    min_output_df_all <- output_df_all[which(output_df_all$meas_name=='min_temp'),]
-    max_output_df_all <- output_df_all[which(output_df_all$meas_name=='max_temp'),]
-    p1<-ggplot(min_output_df_all, aes(x=slope)) +
-      geom_histogram(aes(y=..density..), colour="black", fill="white")+
-      geom_density(alpha=.05, fill="#FF6666") +
-      geom_vline(aes(xintercept=mean(slope)),
-                 color="blue", linetype="dashed", size=1)+
-      ggtitle('Minimum Temperature - Slopes')+
-      labs(y='Frequency', x = xlab)+
-      theme(plot.title = element_text(hjust = 0.5, size = 10),
-            axis.title.x = element_text(size = 9),
-            axis.title.y = element_text(size = 9))
-    
-    p2<-ggplot(max_output_df_all, aes(x=slope)) +
-      geom_histogram(aes(y=..density..), colour="black", fill="white")+
-      geom_density(alpha=.05, fill="#FF6666") +
-      geom_vline(aes(xintercept=mean(slope)),
-                 color="blue", linetype="dashed", size=1)+
-      ggtitle('Maximum Temperature - Slopes')+
-      labs(y='Frequency', x = xlab)+
-      theme(plot.title = element_text(hjust = 0.5, size = 10),
-            axis.title.x = element_text(size = 9),
-            axis.title.y = element_text(size = 9))
-
-
-    p<- grid.arrange(
-      top = textGrob('Minumum vs Maximum Temperature - Slopes',
-                     gp=gpar(fontface="bold")),
-      sub = textGrob(subt, gp = gpar(col = 'red', fontface='italic',
-                     fontsize = 11 )),
-      p1,
-      p2,
-      bottom = textGrob(
-        "this footnote is right-justified",
-        gp = gpar(fontface = 3, fontsize = 9),
-        hjust = 1,
-        x = 1
-      ),
-      ncol = 1,
-      heights=c(0.05, 0.5, 0.55)
-      )
-
-
-  }
-  else if(meas == 'mean_temp'){
-    mean_output_df_all <- output_df_all[which(output_df_all$meas_name=='mean_temp'),]
-    p<-ggplot(mean_output_df_all, aes(x=slope)) +
-      geom_histogram(aes(y=..density..), colour="black", fill="white")+
-      geom_density(alpha=.05, fill="#FF6666") +
-      geom_vline(aes(xintercept=mean(slope)),
-                 color="blue", linetype="dashed", size=1)+
-      ggtitle('Mean Temperature - Slopes')+
-      labs(y='Frequency', x = xlab, subtitle = subt)+
-      theme(plot.title = element_text(hjust = 0.5),
-            plot.subtitle = element_text(hjust = 0.5, color = 'red' ))
-  }
-  
   return(p)
 }
 
@@ -418,24 +342,6 @@ get_city_vector <- function(prov){
 #     prov_vector <- prov_vector[ , order(names(prov_vector))]
 #     return(prov_vector)
 #   }
-# }
-
-# test<- function(){
-#   year_to_start <- 1980
-#   month <- 'Feb'
-#   # meas <- 'precip'
-#   meas <- 'max_temp'
-#   in_mean_temp<- load_cleaned_data(year_to_start, month, meas)
-#   out_mean_temp <- regression(in_ave_temp,1)
-# }
-# testInter<-function(){
-#   input_merge <- merge(in_ave_temp, prec_df, by = c('city', 'x_year','prov'))
-#   output_merge <- regression(input_merge,2)
-#   input_df <- input_merge
-#   output_df_all<-output_merge
-#   boxplot_val('r.squared')
-#   output_df_all <- out_prec
-#   boxplot_val('slope')
 # }
 
 # library(sp)

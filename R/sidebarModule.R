@@ -5,17 +5,30 @@ sidebarLayoutUI <- function(id) {
   ns <- NS(id)
   
   tagList(
-    selectInput(ns("prov"), "Choose a province:",
-                choices = c()
-    ),
-    selectInput(ns("city"), "Choose a city:",
-                choices = c()
-    ),
-    # selectInput(ns("temp_val"), "Choose a Measuremnent:",
-    #             choices = c("Average Temperature","Minimum Temperature", "Maximum Temperature"),
-    #             selected = 'Average Temperature'
-    # ),
-    # verbatimTextOutput(NS(id, "txt1"))
+    menuItem("Preferences", tabName = "pref", icon = icon("th"),
+             startExpanded = TRUE,
+             selectInput(ns("prov"), "Choose a province:",
+                         choices = c()
+             ),
+             selectInput(ns("city"), "Choose a city:",
+                         choices = c()
+             ),
+             
+             menuItem("Other",
+               selectInput(ns("month_1"), "Choose a month (1) :",
+                           choices = c("January", "February", "March","April","May","June","July","August","September","October","November", "December"),
+                           selected = 'February'
+                           ),
+               selectInput(ns("month_2"), "Choose a month (2):",
+                           choices = c("January", "February", "March","April","May","June","July","August","September","October","November", "December"),
+                           selected = 'July'
+               ),
+               selectInput(ns("year_to_start"), "Start Year",
+                           choices = seq(1840, 1986), 
+                           selected = 1980
+               )
+             )
+    )
   )
 }
 
@@ -36,12 +49,15 @@ sidebarLayout <- function(input, output, session) {
                       choices = city_vector,
                       selected = 'TORONTO')
   })
+  # temp_val = reactive({input$temp_val})
   
   return(
     list(
       prov = reactive({input$prov}),
-      city = reactive({input$city})
-      # temp_val = reactive({input$temp_val})
+      city = reactive({input$city}),
+      month_1 = reactive({strtrim(input$month_1, 3)}),
+      month_2 = reactive({strtrim(input$month_2, 3)}),
+      year_to_start = reactive({input$year_to_start})
     )
   )
 }

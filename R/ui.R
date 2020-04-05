@@ -40,10 +40,10 @@ shinyUI<- dashboardPage(
     sidebarMenu(
       menuItem("Home", tabName = "home", icon = icon("dashboard")),
       # menuItem("Trivia", tabName = "trivia", icon = icon("th")),
-      menuItem("Preferences", tabName = "pref", icon = icon("th")),
-      # menuItem("More Info", tabName = "more", icon = icon("th")),
-      useShinyjs(debug = TRUE),
       sidebarLayoutUI("sidebar")
+      # menuItem("More Info", tabName = "more", icon = icon("th")),
+      # useShinyjs(debug = TRUE)
+      # sidebarLayoutUI("sidebar")
     )
   ),
 
@@ -54,7 +54,7 @@ shinyUI<- dashboardPage(
       tabItem(tabName = "home",
               useShinyjs(debug = TRUE),
               homeLayoutUI("home")
-      ),
+      )
       
       # Second tab content
       # tabItem(tabName = "trivia",
@@ -62,9 +62,9 @@ shinyUI<- dashboardPage(
       # ),
       
       # Third tab content
-      tabItem(tabName = "pref",
-              prefLayoutUI("pref")
-      )
+      # tabItem(tabName = "pref",
+      #         prefLayoutUI("pref")
+      # )
       # # Fourth tab content
       # tabItem(tabName = "more",
       #         moreInfoUI('more')

@@ -18,8 +18,26 @@ homeLayoutUI <- function(id) {
     # center later 
     h2("Temperature Trends"),
     
-
     # verbatimTextOutput(NS(id, "txt1")),
+
+    fluidRow(
+      box(
+        title = "Main",
+        # h2("These 2 months showcase the strongest evidence for climate change"),
+        # h3("Refer to preferences to change"),
+        status = "primary",
+        solidHeader = TRUE,
+        # background = "green",
+        selectInput(ns("plot_options"), "Choose a Plot:",
+                    choices = c("Histogram of slopes - Provincial",
+                                "Histogram of Confidence Intervals for slopes - National",
+                                "Histogram of slopes - National",
+                                "Boxplot of slopes - National/Provincial",
+                                "Histogram of Confidence Intervals for slopes - National"),
+                    selected = "Histogram of slopes - Provincial"
+        )
+      ),
+    ),
     fluidRow(
       tabBox(
         id = "tabset1", height = "100%",
@@ -31,25 +49,6 @@ homeLayoutUI <- function(id) {
         tabPanel(title = "Min-Max",plotOutput(ns("plot_2_min_max_temp"), height = 300)),
         tabPanel(title = 'Mean', plotOutput(ns("plot_2_mean_temp"), height = 300))
       )
-    ),
-    fluidRow(
-      box(
-        title = "Main",
-        # h2("These 2 months showcase the strongest evidence for climate change"),
-        # h3("Refer to preferences to change"),
-        status = "primary",
-        solidHeader = TRUE,
-        # background = "green",
-        selectInput(ns("plot_options"), "Choose a Plot:",
-                    choices = c("Histogram of slopes - Provincial",
-                                "Boxplot of slopes - Provincial",
-                                "Histogram of Confidence Intervals for slopes - National",
-                                "Histogram of slopes - National",
-                                "Boxplot of slopes - National",
-                                "Histogram of Confidence Intervals for slopes - National"),
-                    selected = "Histogram of slopes - Provincial"
-        )
-      ),
     ),
     fluidRow(
       infoBox(
@@ -65,186 +64,120 @@ homeLayoutUI <- function(id) {
       #   fill = TRUE
       # ),
     )
-    
   )
 }
 
 
 # Module server function
-homeLayout <- function(input, output, session, vars, sidebar_vars) {
+homeLayout <- function(input, output, session, sb_vars) {
   ns <- session$ns
 
-    # think about using reactiveValues instead of returning dataframe
-    update <- reactive({
-      # debug(logger, paste("|TEMP_VAL|",sidebar_vars$temp_val(), '|' ))
-      
-      # beginning <- Sys.time()
-      year_to_start <- vars$year_to_start()
-      month_1 <- (strtrim(vars$month_1(), 3))
-      month_2 <- (strtrim(vars$month_2(), 3))
-      # print(month_1)
-      # debug(logger, paste("|MONTH_1|", month_1, "|"))
-      
-      validate(need(month_1!='', 'missing month'),
-               need(month_2!='', 'missing month'),
-               need(year_to_start!='', 'missing year')
-               )
-      data.frame(year_to_start, month_1, month_2)
+  # beginning <- Sys.time()
+  # end <- Sys.time()
+  # output$txt1 <- renderText({end - beginning})
 
-      # end <- Sys.time()
-      # output$txt1 <- renderText({end - beginning})
-      # showElement('txt1')
-    })
-    
-    
-    observeEvent(input$plot_options,{
-      if(input$plot_options == "Histogram of slopes - National"){
-        output$plot_1_min_max_temp<-renderPlot({
-          hist_slope_nation('min_max_temp',update()$month_1, update()$year_to_start)
-        })
-        output$plot_1_mean_temp<-renderPlot({
-          hist_slope_nation('mean_temp',update()$month_1, update()$year_to_start)
-        })
-        output$plot_2_min_max_temp<-renderPlot({
-          hist_slope_nation('min_max_temp',update()$month_2, update()$year_to_start)
-        })
-        output$plot_2_mean_temp<-renderPlot({
-          hist_slope_nation('mean_temp',update()$month_2,update()$year_to_start)
-        })
-      }
-      else if(input$plot_options == "Boxplot of slopes - National"){
-        output$plot_1_min_max_temp<-renderPlot({
-          boxplot_slope_nation('min_max_temp',update()$month_1, update()$year_to_start)
-        })
-        output$plot_1_mean_temp<-renderPlot({
-          boxplot_slope_nation('mean_temp',update()$month_1, update()$year_to_start)
-        })
-        output$plot_2_min_max_temp<-renderPlot({
-          boxplot_slope_nation('min_max_temp',update()$month_2, update()$year_to_start)
-        })
-        output$plot_2_mean_temp<-renderPlot({
-          boxplot_slope_nation('mean_temp',update()$month_2,update()$year_to_start)
-        })
-      }    
-      else if(input$plot_options == "Hitsogram of slopes - Provincial"){
-        output$plot_1_min_max_temp<-renderPlot({
-          boxplot_slope_nation('min_max_temp',update()$month_1, update()$year_to_start)
-        })
-        output$plot_1_mean_temp<-renderPlot({
-          boxplot_slope_nation('mean_temp',update()$month_1, update()$year_to_start)
-        })
-        output$plot_2_min_max_temp<-renderPlot({
-          boxplot_slope_nation('min_max_temp',update()$month_2, update()$year_to_start)
-        })
-        output$plot_2_mean_temp<-renderPlot({
-          boxplot_slope_nation('mean_temp',update()$month_2,update()$year_to_start)
-        })
-      }  
+  observe({
+    validate(need(sb_vars$year_to_start() != '', 'missing start year'),
+             need(sb_vars$month_1() != '', 'missing month 1'),
+             need(sb_vars$month_2() != '', 'missing month 2')
+    )
+    year_to_start<- sb_vars$year_to_start()
+    if(input$plot_options == "Histogram of slopes - National"){
+      plot_type <- 'histogram';location <- 'Canada';loc_type <- 'nation'
+      df_consts <- data.frame(year_to_start, plot_type, location, loc_type, stringsAsFactors = FALSE)        
+      output$plot_1_min_max_temp<-renderPlot({
+        setup_plots('min_max_temp',vars$month_1(), df_consts)
+      })
+      output$plot_1_mean_temp<-renderPlot({
+        setup_plots('mean_temp',sb_vars$month_1(), df_consts)
+      })
+      output$plot_2_min_max_temp<-renderPlot({
+        setup_plots('min_max_temp',sb_vars$month_2(),df_consts)
+      })
+      output$plot_2_mean_temp<-renderPlot({
+        setup_plots('mean_temp',sb_vars$month_2(),df_consts)
+      })
+    }
+    else if(input$plot_options == "Boxplot of slopes - National/Provincial"){
+      plot_type <- 'boxplot';location <- 'Canada';loc_type <- 'nation'
+      df_consts <- data.frame(year_to_start, plot_type, location, loc_type, stringsAsFactors = FALSE)
+      output$plot_1_min_max_temp<-renderPlot({
+        setup_plots('min_max_temp',sb_vars$month_1(), df_consts)
+      })
+      output$plot_1_mean_temp<-renderPlot({
+        setup_plots('mean_temp',sb_vars$month_1(), df_consts)
+      })
+      output$plot_2_min_max_temp<-renderPlot({
+        setup_plots('min_max_temp',sb_vars$month_2(), df_consts)
+      })
+      output$plot_2_mean_temp<-renderPlot({
+        setup_plots('mean_temp',sb_vars$month_2(),df_consts)
+      })
+    }    
+    else if(input$plot_options == "Histogram of slopes - Provincial"){
+      plot_type <- 'histogram';location <- sb_vars$prov();loc_type <- 'prov'
+      validate(need(location != '', 'missing prov'))
+      df_consts <- data.frame(year_to_start, plot_type, location, loc_type, stringsAsFactors = FALSE)
+      output$plot_1_min_max_temp<-renderPlot({
+        setup_plots('min_max_temp',sb_vars$month_1(), df_consts)
+      })
+      output$plot_1_mean_temp<-renderPlot({
+        setup_plots('mean_temp',sb_vars$month_1(), df_consts)
+      })
+      output$plot_2_min_max_temp<-renderPlot({
+        setup_plots('min_max_temp',sb_vars$month_2(), df_consts)
+      })
+      output$plot_2_mean_temp<-renderPlot({
+        setup_plots('mean_temp',sb_vars$month_2(),df_consts)
+      })
+    }  
       # else if(input$plot_options == "Boxplot of slopes - Provincial"){
       #   output$plot_1_min_max_temp<-renderPlot({
-      #     boxplot_slope_nation('min_max_temp',update()$month_1, update()$year_to_start)
+      #     setup_plots('min_max_temp',sb_vars$month_1, sb_vars$year_to_start, plot_type, location, loc_type)
       #   })
       #   output$plot_1_mean_temp<-renderPlot({
-      #     boxplot_slope_nation('mean_temp',update()$month_1, update()$year_to_start)
+      #     setup_plots('mean_temp',sb_vars$month_1, sb_vars$year_to_start, plot_type, location, loc_type)
       #   })
       #   output$plot_2_min_max_temp<-renderPlot({
-      #     boxplot_slope_nation('min_max_temp',update()$month_2, update()$year_to_start)
+      #     setup_plots('min_max_temp',sb_vars$month_2, sb_vars$year_to_start, plot_type, location, loc_type)
       #   })
       #   output$plot_2_mean_temp<-renderPlot({
-      #     boxplot_slope_nation('mean_temp',update()$month_2,update()$year_to_start)
+      #     setup_plots('mean_temp',sb_vars$month_2,sb_vars$year_to_start, plot_type, location, loc_type)
       #   })
       # } 
       # 
       # else if(input$plot_options == "Boxplot of slopes - National"){
       #   output$plot_1_min_max_temp<-renderPlot({
-      #     boxplot_slope_nation('min_max_temp',update()$month_1, update()$year_to_start)
+      #     setup_plots('min_max_temp',sb_vars$month_1, sb_vars$year_to_start, plot_type, location, loc_type)
       #   })
       #   output$plot_1_mean_temp<-renderPlot({
-      #     boxplot_slope_nation('mean_temp',update()$month_1, update()$year_to_start)
+      #     setup_plots('mean_temp',sb_vars$month_1, sb_vars$year_to_start, plot_type, location, loc_type)
       #   })
       #   output$plot_2_min_max_temp<-renderPlot({
-      #     boxplot_slope_nation('min_max_temp',update()$month_2, update()$year_to_start)
+      #     setup_plots('min_max_temp',sb_vars$month_2, sb_vars$year_to_start, plot_type, location, loc_type)
       #   })
       #   output$plot_2_mean_temp<-renderPlot({
-      #     boxplot_slope_nation('mean_temp',update()$month_2,update()$year_to_start)
+      #     setup_plots('mean_temp',sb_vars$month_2,sb_vars$year_to_start, plot_type, location, loc_type)
       #   })
       # } 
       # 
       # else if(input$plot_options == "Boxplot of slopes - National"){
       #   output$plot_1_min_max_temp<-renderPlot({
-      #     boxplot_slope_nation('min_max_temp',update()$month_1, update()$year_to_start)
+      #     setup_plots('min_max_temp',sb_vars$month_1, sb_vars$year_to_start, plot_type, location, loc_type)
       #   })
       #   output$plot_1_mean_temp<-renderPlot({
-      #     boxplot_slope_nation('mean_temp',update()$month_1, update()$year_to_start)
+      #     setup_plots('mean_temp',sb_vars$month_1, sb_vars$year_to_start, plot_type, location, loc_type)
       #   })
       #   output$plot_2_min_max_temp<-renderPlot({
-      #     boxplot_slope_nation('min_max_temp',update()$month_2, update()$year_to_start)
+      #     setup_plots('min_max_temp',sb_vars$month_2, sb_vars$year_to_start, plot_type, location, loc_type)
       #   })
       #   output$plot_2_mean_temp<-renderPlot({
-      #     boxplot_slope_nation('mean_temp',update()$month_2,update()$year_to_start)
+      #     setup_plots('mean_temp',sb_vars$month_2,sb_vars$year_to_start, plot_type, location, loc_type)
       #   })
       # } 
-      
-    })
 
+})
 
-
-    
-    # Sys.sleep(2)
-    # hideElement('loading_page')
-    # showElement("main_content")
     
     return(update)
-  # output$qday <- renderText({
-  #   qday <- randomQuestion()
-  #   aday <- "yesyesyes"
-  #   switch(qday,
-  #          "Q1 ?" = {output$plot<-renderPlot({
-  #            update()
-  #            prov <- sidebar_vars$prov()
-  #            hist_slope_prov(prov)})
-  #            output$aday <-renderText({aday})
-  #          },
-  # 
-  #          "Q2 ?"= output$plot<-renderPlot({
-  #            update()
-  #            boxplot_val('r.squared')
-  #            }),
-  #          "Q3 ?"= output$plot<-renderPlot({
-  #            update()
-  #            hist_slope()
-  #            }),
-  #          "Q4 ?"= output$plot<-renderPlot({
-  #            update()
-  #            boxplot_val('slope')
-  #            }),
-  #          print('default')
-  #   )
-  #   qday
-  # })
 }
-
-# #filter questions by city, province and nation - for later 
-# randomQuestion <- function(){
-#   questions <- c("Q1 ?",
-#     'Q2 ?',
-#     # 'Q3 ?',
-#     'Q4 ?'
-#     # 'Q5 ?',
-#     # 'Q6 ?',
-#     # 'Q7 ?',
-#     # 'Q8 ?',
-#     # 'Q9 ?',
-#     # 'Q10 ?',
-#     # 'Q11 ?',
-#     # 'Q12 ?',
-#     # 'Q13 ?',
-#     # 'Q14 ?',
-#     # 'Q15 ?',
-#     # 'Q16 ?',
-#     # 'Q17 ?',
-#     # 'Q18 ?'
-#     )
-# 
-#   return(sample(questions,1))
-# }
