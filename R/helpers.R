@@ -199,47 +199,91 @@ hist_slope_prov <- function(prov){
 #   return(p)
 # }
 
-boxplot_slope_nation <-function(meas, month, year_to_start){
-  year_to_start <- toString(year_to_start)
-  month <- toString(month)
-  subt<- bquote(italic('Canada -'~.(month) *' -' ~.(year_to_start)*' (Start Year)'))
+add_plot_type<- function(curr_plots, type){
+  slope_lab <-expression(paste('Slopes (', degree, 'C)', sep = ""))
   
-  xlab <-expression(paste('Slopes (', degree, 'C)', sep = ""))
-  
+  for(i in 1: length(curr_plots)){
+    if(type == 'histogram'){
+      curr_plots[[i]] <- curr_plots[[i]] + aes(x = slope)+
+        geom_histogram(aes(y=..density..), colour="black", fill="white")+
+        geom_density(alpha=.05, fill="#FF6666") +
+        geom_vline(aes(xintercept=mean(slope)),
+                   color="blue", linetype="dashed", size=1)+
+        labs(y='Frequency', x = slope_lab)
+        
+    }
+    else if(type == 'boxplot'){
+      curr_plots[[i]] <- curr_plots[[i]] + aes(x=prov, y=slope)+
+        geom_boxplot() +
+        stat_summary(fun.y=mean, geom="point", shape=23, size=4)+
+        stat_boxplot(geom = 'errorbar')+
+        labs(y=slope_lab, x = 'Province')
+      
+    }
+  }
+  return(curr_plots)
+    
+}
+meas<- 'min_max_temp'
+month<-'Feb'
+year_to_start <- '1980'
+type <- 'boxplot'
+location <- 'ON'
+setup_plots <- function(meas, month, year_to_start, type, location){
   if(!exists('output_df_all'))
     output_df_all <- getData('temp', month, year_to_start)
   
+  p<-add_plot_data(meas, output_df_all) # returns a list plot(s)
+  p<-add_plot_type(p, type) #constructs plot(s)
+  # print(p)
+  p<- add_plot_labels(p,month, year_to_start, location)
+
+  # grid.draw(p)
+}
+add_plot_data <- function(meas, output_df_all){
+
   if(meas == 'min_max_temp'){
     min_output_df_all <- output_df_all[which(output_df_all$meas_name=='min_temp'),]
     max_output_df_all <- output_df_all[which(output_df_all$meas_name=='max_temp'),]
-    p1<-ggplot(min_output_df_all, aes(x=prov, y=slope))+
-      geom_boxplot() +
-      stat_summary(fun.y=mean, geom="point", shape=23, size=4)+
-      stat_boxplot(geom = 'errorbar')+
+    p1<-ggplot(min_output_df_all) 
+
+    p2<-ggplot(max_output_df_all) 
+    return(list(p1,p2))
+  }
+    else if(meas == 'mean_temp'){
+      mean_output_df_all <- output_df_all[which(output_df_all$meas_name=='mean_temp'),]
+      p<-ggplot(mean_output_df_all) 
+      return(list(p))
+    }
+}
+
+add_plot_labels <-function(curr_plot, month, year_to_start, location){
+  year_to_start <- toString(year_to_start)
+  month <- toString(month)
+  subt<- bquote(italic(.(location)*' -'~.(month) *' -' ~.(year_to_start)*' (Start Year)'))
+  # title_data_val <- added to title i.e. slopes, cis, or rsquared
+
+  # if its Min_max_temp 
+  if (length(curr_plot) == 2){
+    curr_plot[[1]] <- curr_plot[[1]] + 
       ggtitle('Minimum Temperature - Slopes')+
-      labs(y='Frequency', x = xlab)+
       theme(plot.title = element_text(hjust = 0.5, size = 10),
             axis.title.x = element_text(size = 9),
             axis.title.y = element_text(size = 9))
     
-    p2<-ggplot(output_df_all, aes(x=prov, y=slope))+
-      geom_boxplot() +
-      stat_summary(fun.y=mean, geom="point", shape=23, size=4)+
-      stat_boxplot(geom = 'errorbar')+
+    curr_plot[[2]]<- curr_plot[[2]] + 
       ggtitle('Maximum Temperature - Slopes')+
-      labs(y='Frequency', x = xlab)+
       theme(plot.title = element_text(hjust = 0.5, size = 10),
             axis.title.x = element_text(size = 9),
             axis.title.y = element_text(size = 9))
     
-    
-    p<- grid.arrange(
+    p<- arrangeGrob(
       top = textGrob('Minumum vs Maximum Temperature - Slopes',
                      gp=gpar(fontface="bold")),
       sub = textGrob(subt, gp = gpar(col = 'red', fontface='italic',
                                      fontsize = 11 )),
-      p1,
-      p2,
+      curr_plot[[1]],
+      curr_plot[[2]],
       bottom = textGrob(
         "this footnote is right-justified",
         gp = gpar(fontface = 3, fontsize = 9),
@@ -249,17 +293,12 @@ boxplot_slope_nation <-function(meas, month, year_to_start){
       ncol = 1,
       heights=c(0.05, 0.5, 0.55)
     )
-    
-    
+    return(p)
   }
-  else if(meas == 'mean_temp'){
-    mean_output_df_all <- output_df_all[which(output_df_all$meas_name=='mean_temp'),]
-    p<-ggplot(output_df_all, aes(x=prov, y=slope))+
-      geom_boxplot() +
-      stat_summary(fun.y=mean, geom="point", shape=23, size=4)+
-      stat_boxplot(geom = 'errorbar')+
+  else if(length(curr_plot) == 1){
+    p<- curr_plot[[1]]+
       ggtitle('Mean Temperature - Slopes')+
-      labs(y='Frequency', x = xlab, subtitle = subt)+
+      labs(subtitle = subt)+
       theme(plot.title = element_text(hjust = 0.5),
             plot.subtitle = element_text(hjust = 0.5, color = 'red' ))
   }
@@ -281,8 +320,6 @@ hist_slope_nation <- function(meas, month, year_to_start){
   if(!exists('output_df_all'))
     output_df_all <- getData('temp', month, year_to_start)
   
-  # city_vector <- city_prov_vector[which(output_df_all$meas=='min_temp'), ]
-  # index <- which(input_df[, "city"] == city_vector[i])
   if(meas == 'min_max_temp'){
     min_output_df_all <- output_df_all[which(output_df_all$meas_name=='min_temp'),]
     max_output_df_all <- output_df_all[which(output_df_all$meas_name=='max_temp'),]
