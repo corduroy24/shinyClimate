@@ -5,23 +5,10 @@ library(tidyr)
 library(gridExtra)
 library(grid)
 
-# library(sf)
-# library(maps)
-# library(mapproj)
-# library(mapdata)
-# library(rgeos)
-# library(maptools)
-# library(rgdal)
-# library(raster)
-
-# number of estimated values importante ??
-# allow for different models to be used.
-
 logger <- create.logger()
 logfile(logger) <- 'debug.log'
 level(logger) <- 'DEBUG'
 
-# do i need the input data frame ??...#load vs readrds
 getData <- function(meas, month, year_to_start){
   if(file.exists(paste('../RData/',meas,month, year_to_start,'.RData'))){
     load(paste('../RData/',meas,month, year_to_start,'.RData'), .GlobalEnv)
@@ -162,76 +149,77 @@ regression <- function(input_df){
 }
 
 # Interaction Model - Confirm Regression Results
-# 
 # city<- data.table(city_vector, stringsAsFactors = TRUE)
 # fit_2 <- lm(y_temp~ city-1 + city*x_year , data = input_df)
 
 
-hist_slope_prov <- function(prov){
-    index <- which(output_df_all[, "prov"] == prov)
-    prov_df <- output_df_all[index,]
-    # Histogram with density plot and mean line 
-  p<-ggplot(prov_df, aes(x=slope)) + 
-    geom_histogram(aes(y=..density..), colour="black", fill="white")+
-    geom_density(alpha=.2, fill="#FF6666") +
-    geom_vline(aes(xintercept=mean(slope)),
-                color="blue", linetype="dashed", size=1)
-  return(p)
-}
-
-
-# meas<- 'min_max_temp'
-# month<-'Feb'
-# year_to_start <- '1980'
-# plot_type <- 'boxplot'
-# location <- 'ON'
-# loc_type <- 'prov'
-# Histogram with density plot and mean line 
-# just display 1980 -2017 ???
-# df_consts <- data.frame(year_to_start, plot_type, location, loc_type, stringsAsFactors = FALSE)
 setup_plots <- function(meas, month, df_consts){
   year_to_start <- df_consts$year_to_start
   plot_type <- df_consts$plot_type
   location <- df_consts$location
   loc_type <- df_consts$loc_type
-  debug(logger, paste('-----------df_consts ----------',df_consts ))
+  stat<- df_consts$statistic
+  # debug(logger, paste('-----------df_consts ----------',df_consts ))
   
-  # if(!exists('output_df_all'))
-    output_df_all <- getData('temp', month, year_to_start)
+  output_df_all <- getData('temp', month, year_to_start)
   if(loc_type == 'prov'){
     index <- which(output_df_all[, "prov"] == location)
     output_df_all <- output_df_all[index,]
   }
   
   p<-add_plot_data(meas, output_df_all) # returns a list plot(s)
-  p<-add_plot_type(p, plot_type, loc_type) #constructs plot(s)
+  p<-add_plot_type(p, plot_type, loc_type, stat) #constructs plot(s)
   # print(p)
-  p<- add_plot_labels(p,month, year_to_start, location)
+  p<- add_plot_labels(p,month, year_to_start, location, stat)
   grid.draw(p)
 }
 
-add_plot_type<- function(curr_plots, plot_type, loc_type){
-  slope_lab <-expression(paste('Slopes (', degree, 'C)', sep = ""))
+add_plot_data <- function(meas, output_df_all){
   
+  if(meas == 'min_max_temp'){
+    min_output_df_all <- output_df_all[which(output_df_all$meas_name=='min_temp'),]
+    max_output_df_all <- output_df_all[which(output_df_all$meas_name=='max_temp'),]
+    p1<-ggplot(min_output_df_all) 
+    
+    p2<-ggplot(max_output_df_all) 
+    return(list(p1,p2))
+  }
+  else if(meas == 'mean_temp'){
+    mean_output_df_all <- output_df_all[which(output_df_all$meas_name=='mean_temp'),]
+    p<-ggplot(mean_output_df_all) 
+    return(list(p))
+  }
+}
+
+add_plot_type<- function(curr_plots, plot_type, loc_type, stat){
+  stat_lab <-bquote(.(stat)*' ('*degree *'C)')
+
   for(i in 1: length(curr_plots)){
     if(plot_type == 'histogram'){
-      curr_plots[[i]] <- curr_plots[[i]] + aes(x = slope)+
+      aes <- aes(x = slope)
+      aes_vline<- aes(xintercept=mean(slope))
+      if(strsplit(stat, ' ')[[1]][1] == 'R-squared')
+        aes <- aes(x = r.squared); aes_vline<-aes(xintercept=mean(r.squared))
+      
+
+      curr_plots[[i]] <- curr_plots[[i]]+ aes +
         geom_histogram(aes(y=..density..), colour="black", fill="white")+
         geom_density(alpha=.05, fill="#FF6666") +
-        geom_vline(aes(xintercept=mean(slope)),
-                   color="blue", linetype="dashed", size=1)+
-        labs(y='Frequency', x = slope_lab)
-        
+        geom_vline(aes_vline,color="blue", linetype="dashed", size=1)+
+        labs(y='Frequency', x = stat_lab)
     }
     else if(plot_type == 'boxplot'){
       x<- 'prov'
-      # if(loc_type == 'prov') x<- 'city'
 
-      curr_plots[[i]] <- curr_plots[[i]] + aes_string(x=x, y='slope')+
+      aes <- aes(x=x, y=slope)
+      if(strsplit(stat, ' ')[[1]][1] == 'R-squared')
+        aes <- aes_string(x=x, y=r.squared);
+      
+      curr_plots[[i]] <- curr_plots[[i]] + aes +
         geom_boxplot() +
         stat_summary(fun.y=mean, geom="point", shape=23, size=4)+
         stat_boxplot(geom = 'errorbar')+
-        labs(y=slope_lab, x = 'Province')
+        labs(y=stat_lab, x = 'Province')
       
     }
   }
@@ -239,25 +227,8 @@ add_plot_type<- function(curr_plots, plot_type, loc_type){
     
 }
 
-add_plot_data <- function(meas, output_df_all){
 
-  if(meas == 'min_max_temp'){
-    min_output_df_all <- output_df_all[which(output_df_all$meas_name=='min_temp'),]
-    max_output_df_all <- output_df_all[which(output_df_all$meas_name=='max_temp'),]
-    p1<-ggplot(min_output_df_all) 
-
-    p2<-ggplot(max_output_df_all) 
-    return(list(p1,p2))
-  }
-    else if(meas == 'mean_temp'){
-      mean_output_df_all <- output_df_all[which(output_df_all$meas_name=='mean_temp'),]
-      p<-ggplot(mean_output_df_all) 
-      return(list(p))
-    }
-}
-
-
-add_plot_labels <-function(curr_plot, month, year_to_start, location){
+add_plot_labels <-function(curr_plot, month, year_to_start, location, stat){
   year_to_start <- toString(year_to_start)
   month <- toString(month)
   subt<- bquote(italic(.(location)*' -'~.(month) *' -' ~.(year_to_start)*' (Start Year)'))
@@ -266,19 +237,19 @@ add_plot_labels <-function(curr_plot, month, year_to_start, location){
   # if its Min_max_temp 
   if (length(curr_plot) == 2){
     curr_plot[[1]] <- curr_plot[[1]] + 
-      ggtitle('Minimum Temperature - Slopes')+
+      ggtitle(bquote('Minimum Temperature - '~.(stat)))+
       theme(plot.title = element_text(hjust = 0.5, size = 10),
             axis.title.x = element_text(size = 9),
             axis.title.y = element_text(size = 9))
     
     curr_plot[[2]]<- curr_plot[[2]] + 
-      ggtitle('Maximum Temperature - Slopes')+
+      ggtitle(bquote('Maximum Temperature - '~.(stat)))+
       theme(plot.title = element_text(hjust = 0.5, size = 10),
             axis.title.x = element_text(size = 9),
             axis.title.y = element_text(size = 9))
     
     p<- arrangeGrob(
-      top = textGrob('Min. vs Max. Temperature - Slopes',
+      top = textGrob(bquote('Min. vs Max. Temperature - '~.(stat)),
                      gp=gpar(fontface="bold")),
       sub = textGrob(subt, gp = gpar(col = 'red', fontface='italic',
                                      fontsize = 11 )),
@@ -297,7 +268,7 @@ add_plot_labels <-function(curr_plot, month, year_to_start, location){
   }
   else if(length(curr_plot) == 1){
     p<- curr_plot[[1]]+
-      ggtitle('Mean Temperature - Slopes')+
+      ggtitle(bquote('Mean Temperature - '~.(stat)))+
       labs(subtitle = subt)+
       theme(plot.title = element_text(hjust = 0.5),
             plot.subtitle = element_text(hjust = 0.5, color = 'red' ))
@@ -307,11 +278,12 @@ add_plot_labels <-function(curr_plot, month, year_to_start, location){
 
 
 get_city_vector <- function(prov){
+  require(plyr)
   if(file.exists(paste('../RData/','constant_values','.RData'))){
     load(paste('../RData/','constant_values','.RData'), .GlobalEnv)
     city_vector <- city_prov_vector[which(city_prov_vector$prov==prov), ]
-    # city_vector <- select(city_vector, city) # not working?
-    city_vector <- data.frame(city_vector[, 'city'])
+    city_vector <- select(city_vector, city) 
+    # city_vector <- data.frame(city_vector[, 'city'])
     city_vector$city <- as.character(city_vector$city)
     city_v <- sort(city_vector$city)
     return(city_v)
@@ -344,7 +316,7 @@ get_city_vector <- function(prov){
 #   }
 # }
 
-# library(sp)
+# library(sfb)
 # library(raster)
 # map <- function(){
 #   # can0 <- getData("GADM",country="CAN",level=0)
@@ -397,82 +369,3 @@ get_city_vector <- function(prov){
 #     # return(base_sp)
 # }
 # 
-# 
-# newregions<-function(){
-# 
-#   prov <- 'ON'
-#   prov_df_city_slope <- output_df_all[ which(output_df_all$prov==prov),]
-#   prov_df_city_slope <- prov_df_city_slope[,c('city', 'slope')]
-#   prov_df_city_slope$city <- str_to_title(prov_df_city_slope$city)
-#   
-#   cd <- st_read("C:/Environment_Canada_Shiny_App/Data/gcd_000b11a_e/gcd_000b11a_e.shp")
-#   cd_ON <- cd[cd$PRNAME =='Ontario',]
-#   cd_ON_available <- merge(cd_ON, prov_df_city_slope, by.x = 'CDNAME', by.y = 'city')
-#   names(cd_ON_available)[1] <- "city"
-#   
-#   copy_cd_ON_available <-cd_ON_available
-#   st_geometry(copy_cd_ON_available ) <- NULL
-#   # ccs <- st_read("census_consolidated_subdivisions/gccs000b11a_e.shp")
-#   # ccs_ON <- ccs[ccs$PRNAME =='Ontario',]
-#   # ccs_ON_available <- merge(ccs_ON, prov_df_city_slope, by.x = 'CCSNAME', by.y = 'city')
-#   # cd_ccs_ON_available <- merge(ccs_ON, prov_df_city_slope, by.x = 'CDNAME', by.y = 'city')
-#   # names(cd_ccs_ON_available)[1] <- "city"
-#   # names(ccs_ON_available)[1] <- "city"
-# 
-#   # st_geometry(ccs_ON_available) <- NULL
-#   # st_geometry(cd_ON_available) <- NULL
-#   # st_geometry(fed_ON_available) <- NULL
-#   # st_geometry(cma_ON_available) <- NULL
-#   # st_geometry(csd_ON_available) <- NULL
-# 
-#   # copy_cd_ON_available <-cd_ON_available
-#   # st_geometry(copy_cd_ON_available ) <- NULL
-#   # 
-#   # fed <- st_read("Data/gfed000b11a_e/gfed000b11a_e.shp")
-#   # fed_ON <- fed[fed$PRNAME =='Ontario',]
-#   # fed_ON_available <- merge(fed_ON, prov_df_city_slope, by.x = 'CDNAME', by.y = 'city')
-#   # names(fed_ON_available)[1] <- "city"
-# 
-#   # cma <- st_read("gcma000b11a_e/gcma000b11a_e.shp")
-#   # cma_ON <- cma[cma$PRNAME =='Ontario',]
-#   # cma_ON_available <- merge(cma_ON, prov_df_city_slope, by.x = 'CDNAME', by.y = 'city')
-#   # names(cma_ON_available)[1] <- "city"
-# 
-#   # csd <- st_read("C:/Environment_Canada_Shiny_App/Data/gcsd000b11a_e/gcsd000b11a_e.shp")
-#   # csd_ON <- csd[csd$PRNAME =='Ontario',]
-#   # csd_ON_available <- merge(csd_ON, prov_df_city_slope, by.x = 'CSDNAME', by.y = 'city')
-#   # csd_cd_ON_available <- merge(csd_ON, prov_df_city_slope, by.x = 'CDNAME', by.y = 'city')
-#   # copy_csd_cd_ON_available <-csd_cd_ON_available
-#   # st_geometry(copy_csd_cd_ON_available ) <- NULL
-# 
-#   # er <- st_read("ger_000b11a_e/ger_000b11a_e.shp")
-#   # er_ON <- er[er$PRNAME =='Ontario',]
-#   # er_ON_available <- merge(er_ON, prov_df_city_slope, by.x = 'ERNAME', by.y = 'city')
-#   # copy_er_ON_available <-er_ON_available
-#   # st_geometry(er_ON) <- NULL
-# 
-#   # names(csd_ON_available)[1] <- "city"
-#   # copy_check7 <- check7
-#   # st_geometry(copy_check7)<-NULL
-# 
-#   ggplot()+
-#     geom_sf(data = cd_ON_available,aes(fill= slope))+
-#     # geom_sf(data = fed_ON_available,aes(fill= slope))+
-#     # geom_sf(data = cma_ON_available,aes(fill= slope))+
-#     # geom_sf(data = csd_cd_ON_available,aes(fill= slope))+
-#     # geom_sf(data = check7,aes(fill= slope))+
-#     # geom_sf(data = ccs_ON_available,aes(fill= slope))+
-#     # geom_sf(data= cd_ON)+
-#     scale_fill_gradient(name = 'Trends',
-#                         low = "blue", high = "gold2")
-# 
-# 
-# }
-
-# ggplot(data = check2,aes(x=long,y=lat, group = group))+
-#   # geom_polygon(fill = 'grey')+
-#   # geom_path(colour = "grey20", aes(group = group)) +
-#   # geom_path(data= ca.cities,aes(group=group))+
-#   geom_sf(aes(fill= slope))+
-#   scale_fill_gradient(name = 'Trends',
-#                       low = "blue", high = "gold2")

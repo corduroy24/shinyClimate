@@ -13,7 +13,6 @@ library(shinyjs)
 source("homeModule.R")
 source("sidebarModule.R")
 source("helpers.R")
-source("prefModule.R")
 source("triviaModule.R")
 source("moreInfoModule.R")
 
@@ -21,17 +20,6 @@ source("moreInfoModule.R")
 shinyUI<- dashboardPage(
 
   skin = "yellow",
-  
-  #   tags$head(
-  #     tags$style(HTML("
-  #                   .btn {
-  #                     height: 100px;
-  #                     width: 100px;
-  #                     border-radius: 60%;
-  #                     border: 1px solid red;
-  #                     }
-  #                     "))
-  #   ),
   
   dashboardHeader(title = "Climate For You"),
   
@@ -42,8 +30,6 @@ shinyUI<- dashboardPage(
       # menuItem("Trivia", tabName = "trivia", icon = icon("th")),
       sidebarLayoutUI("sidebar")
       # menuItem("More Info", tabName = "more", icon = icon("th")),
-      # useShinyjs(debug = TRUE)
-      # sidebarLayoutUI("sidebar")
     )
   ),
 
@@ -61,10 +47,6 @@ shinyUI<- dashboardPage(
       #         triviaLayoutUI('trivia')
       # ),
       
-      # Third tab content
-      # tabItem(tabName = "pref",
-      #         prefLayoutUI("pref")
-      # )
       # # Fourth tab content
       # tabItem(tabName = "more",
       #         moreInfoUI('more')
