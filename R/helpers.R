@@ -54,7 +54,6 @@ clean_data <- function(var, dir)
 # Find data files 
 find_meas_data <- function(meas){
   # debug(logger, paste("|IM HERE 2|"))
-  
   if(meas == 'min_temp'){
     txt_files_ls = list.files(path="../Data/Homog_monthly_min_temp_cleaned", pattern="*.txt", full.names = TRUE)
     names = list.files(path="../Data/Homog_monthly_min_temp_cleaned", pattern="*.txt")
@@ -74,7 +73,6 @@ find_meas_data <- function(meas){
   # }
   path_names <- list(txt_files_ls, names) 
   # debug(logger, paste('|FIND TEMP DATA|'))
-  
   return(path_names)
 }
 
@@ -101,20 +99,15 @@ load_cleaned_data <- function(year_to_start = 1980, month = 'Feb', meas){
 
       x_year <- suppressWarnings(as.numeric(as.character(unlist(years_greater[,'Year']))))
       # debug(logger, paste('|START YEAR|', year_to_start, '|'))
-      # debug(logger, paste('|MONTH|', x_year, '|'))
-      # debug(logger, paste('|Y_MEAS|', y_meas, '|'))
-      # debug(logger, paste('|X_YEAR|', x_year, '|'))
       temp_df <- data.frame(y_meas, x_year, "city" = nom_city, "prov" = nom_prov, 'meas_name' = meas)
       # debug(logger, paste('|LOAD CLEANED DATA|', 6, '|'))
       input_df <- rbind(input_df, temp_df)
   }
-  # debug(logger, paste('|RETURN|'))
-  
   return(input_df)
 }
 
 
-
+# Perform Regression 
 regression <- function(input_df){
   city_prov_vector <- unique(input_df[,c("city", 'prov')])
   city_vector <- city_prov_vector[, 'city']
@@ -136,9 +129,10 @@ regression <- function(input_df){
     standard_error <- summary(fit)$coef[,2][2]
     margin_error <- critical_value*standard_error
     estimate <- summary(fit)$coef[,1][2]
-    CI_lower <-  estimate - margin_error
-    CI_upper <- estimate + margin_error
+    CI_lower <-  estimate + margin_error
+    CI_upper <- estimate - margin_error
     variance <- (standard_error)^2
+    
     
     curr_results_df <- data.frame("city"=city_vector[i],'prov' = prov_vector[i],  
                                   b,"r.squared"=R_2,CI_lower, CI_upper,variance,
@@ -152,7 +146,14 @@ regression <- function(input_df){
 # city<- data.table(city_vector, stringsAsFactors = TRUE)
 # fit_2 <- lm(y_temp~ city-1 + city*x_year , data = input_df)
 
-
+# Draw plots 
+# year_to_start <- '1980'
+# plot_type <- 'histogram'
+# location <- 'Canada'
+# loc_type <- 'national'
+# stat<- 'CI'
+# meas<-'min_max_temp'
+# month <-'Feb'
 setup_plots <- function(meas, month, df_consts){
   year_to_start <- df_consts$year_to_start
   plot_type <- df_consts$plot_type
@@ -170,7 +171,7 @@ setup_plots <- function(meas, month, df_consts){
   p<-add_plot_data(meas, output_df_all) # returns a list plot(s)
   p<-add_plot_type(p, plot_type, loc_type, stat) #constructs plot(s)
   # print(p)
-  p<- add_plot_labels(p,month, year_to_start, location, stat)
+  p<- create_grid(p,month, year_to_start, location, stat)
   grid.draw(p)
 }
 
@@ -180,8 +181,8 @@ add_plot_data <- function(meas, output_df_all){
     min_output_df_all <- output_df_all[which(output_df_all$meas_name=='min_temp'),]
     max_output_df_all <- output_df_all[which(output_df_all$meas_name=='max_temp'),]
     p1<-ggplot(min_output_df_all) 
-    
     p2<-ggplot(max_output_df_all) 
+    
     return(list(p1,p2))
   }
   else if(meas == 'mean_temp'){
@@ -198,10 +199,16 @@ add_plot_type<- function(curr_plots, plot_type, loc_type, stat){
     if(plot_type == 'histogram'){
       aes <- aes(x = slope)
       aes_vline<- aes(xintercept=mean(slope))
-      if(strsplit(stat, ' ')[[1]][1] == 'R-squared')
+      if(strsplit(stat, ' ')[[1]][1] == 'R-squared'){
         aes <- aes(x = r.squared); aes_vline<-aes(xintercept=mean(r.squared))
-      
-
+      }
+      else if(strsplit(stat, ' ')[[1]][1] == 'CI_lower'){
+        aes <- aes(x = CI_lower); aes_vline<-aes(xintercept=mean(CI_lower))
+      }
+      else if(strsplit(stat, ' ')[[1]][1] == 'CI_upper'){
+        aes <- aes(x = CI_upper); aes_vline<-aes(xintercept=mean(CI_upper))
+      }
+        
       curr_plots[[i]] <- curr_plots[[i]]+ aes +
         geom_histogram(aes(y=..density..), colour="black", fill="white")+
         geom_density(alpha=.05, fill="#FF6666") +
@@ -209,12 +216,12 @@ add_plot_type<- function(curr_plots, plot_type, loc_type, stat){
         labs(y='Frequency', x = stat_lab)
     }
     else if(plot_type == 'boxplot'){
-      x<- 'prov'
+      # x<- 'prov'
 
-      aes <- aes(x=x, y=slope)
+      aes <- aes(x=prov, y=slope)
       if(strsplit(stat, ' ')[[1]][1] == 'R-squared')
-        aes <- aes_string(x=x, y=r.squared);
-      
+        aes <- aes(x=prov, y=r.squared);
+
       curr_plots[[i]] <- curr_plots[[i]] + aes +
         geom_boxplot() +
         stat_summary(fun.y=mean, geom="point", shape=23, size=4)+
@@ -227,26 +234,23 @@ add_plot_type<- function(curr_plots, plot_type, loc_type, stat){
     
 }
 
+add_plot_labels <- function(curr_plot, title_meas, stat){
+  curr_plot <- curr_plot + 
+    ggtitle(bquote(.(title_meas)*' - '~.(stat)))+
+    theme(plot.title = element_text(hjust = 0.5, size = 10),
+          axis.title.x = element_text(size = 9),
+          axis.title.y = element_text(size = 9))
+}
 
-add_plot_labels <-function(curr_plot, month, year_to_start, location, stat){
+create_grid <-function(curr_plot, month, year_to_start, location, stat){
   year_to_start <- toString(year_to_start)
   month <- toString(month)
   subt<- bquote(italic(.(location)*' -'~.(month) *' -' ~.(year_to_start)*' (Start Year)'))
-  # title_data_val <- added to title i.e. slopes, cis, or rsquared
 
   # if its Min_max_temp 
   if (length(curr_plot) == 2){
-    curr_plot[[1]] <- curr_plot[[1]] + 
-      ggtitle(bquote('Minimum Temperature - '~.(stat)))+
-      theme(plot.title = element_text(hjust = 0.5, size = 10),
-            axis.title.x = element_text(size = 9),
-            axis.title.y = element_text(size = 9))
-    
-    curr_plot[[2]]<- curr_plot[[2]] + 
-      ggtitle(bquote('Maximum Temperature - '~.(stat)))+
-      theme(plot.title = element_text(hjust = 0.5, size = 10),
-            axis.title.x = element_text(size = 9),
-            axis.title.y = element_text(size = 9))
+    curr_plot[[1]] <- add_plot_labels(curr_plot[[1]], 'Minimum Temperature', stat)
+    curr_plot[[2]]<- add_plot_labels(curr_plot[[2]], 'Maximum Temperature', stat)
     
     p<- arrangeGrob(
       top = textGrob(bquote('Min. vs Max. Temperature - '~.(stat)),
@@ -256,7 +260,7 @@ add_plot_labels <-function(curr_plot, month, year_to_start, location, stat){
       curr_plot[[1]],
       curr_plot[[2]],
       bottom = textGrob(
-        "this footnote is right-justified",
+        "Source: Environment Canada Temperature Data ",
         gp = gpar(fontface = 3, fontsize = 9),
         hjust = 1,
         x = 1
@@ -264,8 +268,7 @@ add_plot_labels <-function(curr_plot, month, year_to_start, location, stat){
       ncol = 1,
       heights=c(0.05, 0.5, 0.55)
     )
-    return(p)
-  }
+  } # add caption...
   else if(length(curr_plot) == 1){
     p<- curr_plot[[1]]+
       ggtitle(bquote('Mean Temperature - '~.(stat)))+

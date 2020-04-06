@@ -1,6 +1,4 @@
-# source("helpers.R", local = TRUE)
-# tags$style(HTML(".small_icon_test { font-size: 12px; }"))
-# library(shinyjs)
+
 # Status:
 #   primary Blue (sometimes dark blue)
 #   success Green
@@ -15,37 +13,46 @@ homeLayoutUI <- function(id) {
   ns <- NS(id)
 
   tagList(
-    # center later 
     # h2("Temperature Trends"),
-    
     # verbatimTextOutput(NS(id, "txt1")),
     fluidRow(
       box(
         width = "100%", status = 'warning',
-        h3("Showcasing the strongest evidence for climate change"),
+
+        h3("Showcasing the strongest evidence for climate change", style = 'font-weight:bold;text-align:center;'),
+        h5(em("Temperature Trends"), style = 'text-align:center;'),
+        h4('Extreme values, as cautionary bounds'),
+        
         tags$ul(tags$li('February and July'),
                 tags$li('Minimum and Maximum')
         ),
-        h4('Otherwise, known as Extreme values')
+        h3("Highlights"),
+        tags$ul(
+          tags$li('Temperature slopes vary within provinces and cities'),
+          tags$li(HTML(paste('Temperatures increase or decrease at a',tags$strong('slow rate')))),
+          tags$li('Provinces in the ... ')
+        ),
       )
     ),
     fluidRow(
       box(
         title = NULL,
-        # h3("Refer to preferences to change"),
         status = "primary",
         # solidHeader = TRUE,
         height = 100, width = 6,
         # background = "green",
-        selectInput(ns("plot_options"), "Choose a Plot:",
-                    choices = c("Histogram - Slopes - National",
-                                "Histogram - R-Squared for Slopes - National",
-                                "Histogram - Slopes - Provincial",
-                                "Boxplot - Slopes - National/Provincial",
-                                "Boxplot - R-Squared for Slopes - National/Provincial"
-                                # "Histogram of Confidence Intervals for Slopes - National"
+        selectInput(ns("plot_options"), "Choose a Statistic:",
+                    choices = list(
+                      'Slopes' = list("Histogram - Slopes - National",
+                                      "Histogram - Slopes - Provincial",
+                                      "Boxplot - Slopes - National/Provincial"),
+                      'R-squared for Slopes' = list("Histogram - R-Squared for Slopes - National",
+                                         "Boxplot - R-Squared for Slopes - National/Provincial"),
+                      "Confidence Intervals for Slopes" = list("Histogram - CI_lower for Slopes - National",
+                                                    "Histogram - CI_upper for Slopes - National")
+                                
                                 ),
-                    selected = "Histogram of slopes - National"
+                    selected = "Histogram - Slopes - National"
         )
       ),
       box(
@@ -64,13 +71,13 @@ homeLayoutUI <- function(id) {
     fluidRow(
       tabBox(
         id = "tabset1", height = "100%",
-        tabPanel(title = "Min-Max",withSpinner(plotOutput(ns("plot_1_min_max_temp"), height = 300))),
-        tabPanel(title = 'Mean', withSpinner(plotOutput(ns("plot_1_mean_temp"), height = 300)))
+        tabPanel(title = "Min-Max",withSpinner(plotOutput(ns("plot_1_min_max_temp"), height = 350))),
+        tabPanel(title = 'Mean', withSpinner(plotOutput(ns("plot_1_mean_temp"), height = 350)))
       ),
       tabBox(
         id = "tabset2", height = "100%",
-        tabPanel(title = "Min-Max",plotOutput(ns("plot_2_min_max_temp"), height = 300)),
-        tabPanel(title = 'Mean', plotOutput(ns("plot_2_mean_temp"), height = 300))
+        tabPanel(title = "Min-Max",plotOutput(ns("plot_2_min_max_temp"), height = 350)),
+        tabPanel(title = 'Mean', plotOutput(ns("plot_2_mean_temp"), height = 350))
       )
     ),
 
@@ -87,7 +94,20 @@ homeLayoutUI <- function(id) {
       #   color = 'red',
       #   fill = TRUE
       # ),
-    )
+    ),
+    fluidRow(
+      box(
+        width = "100%", status = 'warning',
+        h3("Discover the story!", style = 'font-weight:bold;'),
+        tags$ul(tags$li('How strong is the evidence towards climate change?'),
+                tags$li('Over the years, how much does temperature increase or decrease?'),
+                tags$li('What is the variation in these slopes values?'),
+                tags$li('Should my city - province - country be concerned about climate change?')
+        ),
+        h5("Refer to Preferences -> Other to change months and start year"),
+        h5("Close sidebar menu to have a better look at the plots")
+      )
+    ),
   )
 }
 
@@ -111,13 +131,15 @@ homeLayout <- function(input, output, session, sb_vars) {
 
     div(
       title_1 <- p(str_to_title(plot_type()), style = 'font-weight:bold; font-size:18px;margin:0;padding:0;display:inline'),
-      para_1,
+      para_1
     )
   })
   output$plot_des_2<- renderUI({
     if(statistic() == 'Slopes')
       para_2<- "Slopes Description here"
-    else if(statistic() == 'Confidence Intervals for Slopes')
+    else if(statistic() == ('CI_lower for Slopes'))
+      para_2<- "CI Description here"
+    else if(statistic() == ('CI_upper for Slopes'))
       para_2<- "CI Description here"
     else if(statistic() == 'R-squared for Slopes')
       para_2<- "R-squared Description here"
@@ -169,7 +191,7 @@ homeLayout <- function(input, output, session, sb_vars) {
       })
     }
     else if(input$plot_options == "Boxplot - Slopes - National/Provincial"){
-      plot_type <- 'boxplot';location <- 'Canada';loc_type <- 'nation'; statistic('Slopes')
+      plot_type('boxplot');location <- 'Canada';loc_type <- 'nation'; statistic('Slopes')
       df_consts <- data.frame(year_to_start, plot_type(), location, loc_type, statistic(), stringsAsFactors = FALSE)    
       output$plot_1_min_max_temp<-renderPlot({
         setup_plots('min_max_temp',sb_vars$month_1(), df_consts)
@@ -185,7 +207,7 @@ homeLayout <- function(input, output, session, sb_vars) {
       })
     }    
     else if(input$plot_options == "Histogram - Slopes - Provincial"){
-      plot_type <- 'histogram';location <- sb_vars$prov();loc_type <- 'prov'; statistic('Slopes')
+      plot_type('histogram');location <- sb_vars$prov();loc_type <- 'prov'; statistic('Slopes')
       validate(need(location != '', 'missing prov'))
       df_consts <- data.frame(year_to_start, plot_type(), location, loc_type, statistic(), stringsAsFactors = FALSE)    
       output$plot_1_min_max_temp<-renderPlot({
@@ -200,7 +222,55 @@ homeLayout <- function(input, output, session, sb_vars) {
       output$plot_2_mean_temp<-renderPlot({
         setup_plots('mean_temp',sb_vars$month_2(),df_consts)
       })
-    }  
+    }                                  
+    else if(input$plot_options == "Boxplot - R-Squared for Slopes - National/Provincial"){
+      plot_type('boxplot');location <- 'Canada';loc_type <- 'national'; statistic('R-squared for Slopes')
+      df_consts <- data.frame(year_to_start, plot_type(), location, loc_type, statistic(), stringsAsFactors = FALSE)    
+      output$plot_1_min_max_temp<-renderPlot({
+        setup_plots('min_max_temp',sb_vars$month_1(), df_consts)
+      })
+      output$plot_1_mean_temp<-renderPlot({
+        setup_plots('mean_temp',sb_vars$month_1(), df_consts)
+      })
+      output$plot_2_min_max_temp<-renderPlot({
+        setup_plots('min_max_temp',sb_vars$month_2(), df_consts)
+      })
+      output$plot_2_mean_temp<-renderPlot({
+        setup_plots('mean_temp',sb_vars$month_2(),df_consts)
+      })
+    }    
+    else if(input$plot_options == "Histogram - CI_lower for Slopes - National"){
+      plot_type('histogram');location <- 'Canada';loc_type <- 'national'; statistic('CI_lower for Slopes')
+      df_consts <- data.frame(year_to_start, plot_type(), location, loc_type, statistic(), stringsAsFactors = FALSE)    
+      output$plot_1_min_max_temp<-renderPlot({
+        setup_plots('min_max_temp',sb_vars$month_1(), df_consts)
+      })
+      output$plot_1_mean_temp<-renderPlot({
+        setup_plots('mean_temp',sb_vars$month_1(), df_consts)
+      })
+      output$plot_2_min_max_temp<-renderPlot({
+        setup_plots('min_max_temp',sb_vars$month_2(), df_consts)
+      })
+      output$plot_2_mean_temp<-renderPlot({
+        setup_plots('mean_temp',sb_vars$month_2(),df_consts)
+      })
+    }   
+    else if(input$plot_options == "Histogram - CI_upper for Slopes - National"){
+      plot_type('histogram');location <- 'Canada';loc_type <- 'national'; statistic('CI_upper for Slopes')
+      df_consts <- data.frame(year_to_start, plot_type(), location, loc_type, statistic(), stringsAsFactors = FALSE)    
+      output$plot_1_min_max_temp<-renderPlot({
+        setup_plots('min_max_temp',sb_vars$month_1(), df_consts)
+      })
+      output$plot_1_mean_temp<-renderPlot({
+        setup_plots('mean_temp',sb_vars$month_1(), df_consts)
+      })
+      output$plot_2_min_max_temp<-renderPlot({
+        setup_plots('min_max_temp',sb_vars$month_2(), df_consts)
+      })
+      output$plot_2_mean_temp<-renderPlot({
+        setup_plots('mean_temp',sb_vars$month_2(),df_consts)
+      })
+    }   
   })
 
   return(update)
