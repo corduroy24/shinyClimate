@@ -278,7 +278,7 @@ add_plot_labels <-function(curr_plot, month, year_to_start, location){
             axis.title.y = element_text(size = 9))
     
     p<- arrangeGrob(
-      top = textGrob('Minumum vs Maximum Temperature - Slopes',
+      top = textGrob('Min. vs Max. Temperature - Slopes',
                      gp=gpar(fontface="bold")),
       sub = textGrob(subt, gp = gpar(col = 'red', fontface='italic',
                                      fontsize = 11 )),

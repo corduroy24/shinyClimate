@@ -16,17 +16,18 @@ homeLayoutUI <- function(id) {
 
   tagList(
     # center later 
-    h2("Temperature Trends"),
+    # h2("Temperature Trends"),
     
     # verbatimTextOutput(NS(id, "txt1")),
 
     fluidRow(
       box(
-        title = "Main",
+        title = NULL,
         # h2("These 2 months showcase the strongest evidence for climate change"),
         # h3("Refer to preferences to change"),
         status = "primary",
-        solidHeader = TRUE,
+        # solidHeader = TRUE,
+        height = 100,
         # background = "green",
         selectInput(ns("plot_options"), "Choose a Plot:",
                     choices = c("Histogram of slopes - Provincial",
@@ -34,9 +35,15 @@ homeLayoutUI <- function(id) {
                                 "Histogram of slopes - National",
                                 "Boxplot of slopes - National/Provincial",
                                 "Histogram of Confidence Intervals for slopes - National"),
-                    selected = "Histogram of slopes - Provincial"
+                    selected = "Histogram of slopes - National"
         )
       ),
+      box(
+        title=NULL,
+        height = 100,
+        background = "light-blue",
+        uiOutput(ns('plot_des'))
+      )
     ),
     fluidRow(
       tabBox(
@@ -71,11 +78,37 @@ homeLayoutUI <- function(id) {
 # Module server function
 homeLayout <- function(input, output, session, sb_vars) {
   ns <- session$ns
+  plot_type<-reactiveVal('histogram')
+  meas_type <- reactiveVal('Slopes')
 
   # beginning <- Sys.time()
   # end <- Sys.time()
   # output$txt1 <- renderText({end - beginning})
-
+  output$plot_des<- renderUI({
+    if(plot_type() == 'histogram')
+      para_1<- "Histogram Description here"
+    else if(plot_type() == 'boxplot')
+      para_1<- "Boxplot Description here"
+    
+    if(meas_type() == 'Slopes')
+      para_2<- "Slopes Description here"
+    else if(meas_type() == 'Confidence Intervals')
+      para_2<- "CI Description here"
+    else if(meas_type() == 'R-Squared')
+      para_2<- "R-squared Description here"
+    
+    para_1 <- p(para_1, style = 'margin:0;display:inline;')
+    para_2 <- p(para_2, style = 'margin:0;display:inline;')
+    
+    div(
+      title_1 <- p(str_to_title(plot_type()), style = 'font-weight:bold; font-size:18px;margin:0;padding:0;display:inline'),
+      para_1,
+      br(),
+      title_2 <- p(str_to_title(meas_type()), style = 'font-weight:bold; font-size:18px;margin:0;display:inline'),
+      para_2
+    )
+  
+  })
   observe({
     validate(need(sb_vars$year_to_start() != '', 'missing start year'),
              need(sb_vars$month_1() != '', 'missing month 1'),
@@ -83,10 +116,10 @@ homeLayout <- function(input, output, session, sb_vars) {
     )
     year_to_start<- sb_vars$year_to_start()
     if(input$plot_options == "Histogram of slopes - National"){
-      plot_type <- 'histogram';location <- 'Canada';loc_type <- 'nation'
-      df_consts <- data.frame(year_to_start, plot_type, location, loc_type, stringsAsFactors = FALSE)        
+      plot_type('histogram');location <- 'Canada';loc_type <- 'nation'
+      df_consts <- data.frame(year_to_start, plot_type(), location, loc_type, stringsAsFactors = FALSE)    
       output$plot_1_min_max_temp<-renderPlot({
-        setup_plots('min_max_temp',vars$month_1(), df_consts)
+        setup_plots('min_max_temp',sb_vars$month_1(), df_consts)
       })
       output$plot_1_mean_temp<-renderPlot({
         setup_plots('mean_temp',sb_vars$month_1(), df_consts)

@@ -22,5 +22,4 @@ shinyServer(function(input, output, session) {
 
   # callModule(moreInfo, 'more')
   
-  
 })
