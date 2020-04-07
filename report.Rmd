@@ -1,0 +1,26 @@
+---
+title: "Dynamic Report"
+author: "Korede Adegboye"
+params:
+  p1: NA
+  p2: NA
+  p3: NA
+  p4: NA
+---
+
+
+To learn more, see [Interactive Documents](http://rmarkdown.rstudio.com/authoring_shiny.html).
+
+## Plots
+```{r}
+# The `params` object is available in the document.
+grid.draw(params$p1)
+grid.draw(params$p2)
+grid.draw(params$p3)
+grid.draw(params$p4)
+
+```
+
+
+
+

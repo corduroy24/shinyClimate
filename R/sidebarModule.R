@@ -5,8 +5,6 @@ sidebarLayoutUI <- function(id) {
   ns <- NS(id)
   
   tagList(
-    menuItem("Preferences", tabName = "pref", icon = icon("th"),
-             startExpanded = TRUE,
              selectInput(ns("prov"), "Choose a province:",
                          choices = c()
              ),
@@ -29,7 +27,6 @@ sidebarLayoutUI <- function(id) {
                )
              )
     )
-  )
 }
 
 # Module server function

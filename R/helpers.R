@@ -173,6 +173,7 @@ setup_plots <- function(meas, month, df_consts){
   # print(p)
   p<- create_grid(p,month, year_to_start, location, stat)
   grid.draw(p)
+  invisible(p)
 }
 
 add_plot_data <- function(meas, output_df_all){

@@ -10,11 +10,14 @@
 library(shiny)
 library(shinydashboard)
 library(shinyjs)
+library(rmarkdown)
 source("homeModule.R")
 source("sidebarModule.R")
 source("helpers.R")
 source("triviaModule.R")
 source("moreInfoModule.R")
+source('infoModule.R')
+source('downloadModule.R')
 
 
 shinyUI<- dashboardPage(
@@ -26,9 +29,12 @@ shinyUI<- dashboardPage(
   #SideBar content 
   dashboardSidebar(
     sidebarMenu(
-      menuItem("Home", tabName = "home", icon = icon("dashboard")),
+      menuItem("Home", tabName = "home", icon = icon("home")),
+      menuItem("Preferences", tabName = "pref", icon = icon("cog"),
+               startExpanded = TRUE,
+               sidebarLayoutUI("sidebar")
+               )
       # menuItem("Trivia", tabName = "trivia", icon = icon("th")),
-      sidebarLayoutUI("sidebar")
       # menuItem("More Info", tabName = "more", icon = icon("th")),
     )
   ),
@@ -39,7 +45,7 @@ shinyUI<- dashboardPage(
     tabItems(
       tabItem(tabName = "home",
               useShinyjs(debug = TRUE),
-              homeLayoutUI("home")
+              homeLayoutUI("home"),
       )
       
       # Second tab content
