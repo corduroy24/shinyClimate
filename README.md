@@ -30,7 +30,7 @@ For more information refer to [man/data_cleaning.ipynb]
  
 
 ## App skeleton
-This app is packaged into 3 shiny modules that tightly interact together to pass useful informations. 
+This app is packaged into 4 shiny modules that tightly interact together to pass useful informations. 
 
 ## Interface
 
