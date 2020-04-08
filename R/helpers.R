@@ -230,7 +230,6 @@ add_plot_type<- function(curr_plots, plot_type, loc_type, stat){
     }
   }
   return(curr_plots)
-    
 }
 
 ##########################################
@@ -245,6 +244,7 @@ add_plot_labels <- function(curr_plot, title_meas, stat){
           axis.title.x = element_text(size = 9),
           axis.title.y = element_text(size = 9))
 }
+
 #############################################################################
 # Purpose: creating grid for displaying both min and max plots on same panel
 ##########################################################################
@@ -303,6 +303,12 @@ get_city_vector <- function(prov){
   }
 }
 
+get_city_stats<- function(city, month, year_to_start){
+  output_df_all <- getData('temp', month, year_to_start)
+  mean_output_df_all <- output_df_all[which(output_df_all$meas_name=='mean_temp'),]
+  mean_stats <- mean_output_df_all[which(mean_output_df_all$city==city),]
+  return(mean_stats)
+}
 
 ######################################################
 ######################################################

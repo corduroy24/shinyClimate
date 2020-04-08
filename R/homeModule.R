@@ -22,10 +22,10 @@ homeLayoutUI <- function(id) {
         tags$ul(
           tags$li('Temperature slopes vary within Canada, provinces and cities'),
           tags$li(HTML(paste('Majority of Canada is in fact, experiencing ', strong('increasing'),' temperatures'))),
-          tags$li(HTML(paste('Nunavut and the Northwest Territories - ', strong('North Region'),' temperatures increase at a faster rate than the other'))),
-
+          tags$li(HTML(paste('Nunavut and the Northwest Territories - ', strong('North Region'),' temperatures increase at a faster rate than the southern regions'))),
+          tags$li(HTML(paste(strong('December through February'), 'warm faster than the other months'))),
         ),
-        h3("Discover your regions Story!"),
+        h3("Discover your regions story!"),
         tags$ul(
           tags$li(HTML(paste(strong('Begin'),' with the', strong('slopes'), ' to evaluate the steepness of the temperature trend'))),
           tags$li(HTML(paste('Proceed to, ', strong('Confidence Intervals'), 'taking into account the variation of the slopes found within a region'))),
@@ -73,6 +73,7 @@ homeLayoutUI <- function(id) {
       valueBoxOutput(ns('info_ci')),
       valueBoxOutput(ns('info_r2'))
     ),
+    h5(em('The above is for annual mean temperatures for the specified cities'), style = 'text-align: center'),
     
     fluidRow(
       box(
@@ -108,18 +109,19 @@ homeLayout <- function(input, output, session, sb_vars) {
   
 
   output$info_slope<- renderValueBox({
-    slope <- 0
-    city <- sb_vars$city()
-    valueBox(value = 0, subtitle = paste(city, 'Slope'), color = 'blue', icon = icon('info-circle'))
+    df <- get_city_stats(sb_vars$city(), 'Annual',1980)
+    valueBox(value = signif(df$slope,4), subtitle = paste(sb_vars$city(), '-Slope'), color = 'blue', icon = icon('info-circle'))
   })
   
   output$info_ci<- renderValueBox({
-    slope <- 0
-    valueBox(value = 0, subtitle = paste(sb_vars$city(), 'CI'), color = 'blue', icon = icon('info-circle'))
+    df <- get_city_stats(sb_vars$city(), 'Annual',1980)
+    v<- paste('(', signif(df$CI_lower,3), ',' ,signif(df$CI_upper,3),')')
+    v<- tags$p(v, style = "font-size:27px;")
+    valueBox(value = v, subtitle = paste(sb_vars$city(), '-CI'), color = 'blue', icon = icon('info-circle'))
   })
   output$info_r2<- renderValueBox({
-    slope <- 0
-    valueBox(value = 0, subtitle = sb_vars$city(), color = 'blue', icon = icon('info-circle'))
+    df <- get_city_stats(sb_vars$city(), 'Annual',1980)
+    valueBox(value = signif(df$r.squared,4), subtitle = paste(sb_vars$city(), '-R2'), color = 'blue', icon = icon('info-circle'))
   })
   
   output$plot_des_1<- renderUI({
@@ -158,7 +160,6 @@ homeLayout <- function(input, output, session, sb_vars) {
   # beginning <- Sys.time()
   # end <- Sys.time()
   # output$txt1 <- renderText({end - beginning})
-
 
   return(p_vars)
 }
