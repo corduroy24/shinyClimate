@@ -13,7 +13,7 @@ This app was designed for two reasons:
 
 
 ## Original Data
-The original data were produced by [Canada.ca] (https://www.canada.ca/en/environment-climate-change/services/climate-change/canadian-centre-climate-services/display-download.html). However, I received it from my Supervisor. Which in turn, sourced from Environment Canada.
+The original data were produced by [Canada.ca](https://www.canada.ca/en/environment-climate-change/services/climate-change/canadian-centre-climate-services/display-download.html). However, I received it from my Supervisor. Which in turn, sourced from Environment Canada.
 As time permitted, only Temperature data was used. Specifically, Second Generation of Homogenized Temperatures for Canada - Update to December 2017. Furthermore, mimimum, maximum and mean monthly temperatures. 
 The features included:
 - station number 
@@ -25,7 +25,7 @@ The features included:
 - led by tidyverse 
 - Rename files, by station number, city, province  
 - reomve estimated (E) and missing (M) data labels
-For more information refer to [man/data_cleaning.ipynb]
+For more information refer to [data cleaning notebook](man/data_cleaning.ipynb)
 
  
 
