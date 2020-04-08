@@ -54,7 +54,7 @@ This app is packaged into 3 shiny modules that tightly interact together to pass
 ### Plot(s) display: 
 
 <br>
-<img src="man/figures/month_month.png">
+<img src="man/figures/month_month.PNG">
 <br>
 <br>
 
@@ -62,38 +62,38 @@ This app is packaged into 3 shiny modules that tightly interact together to pass
 
 
 <br>
-<img src="man/figures/plot_stat_description.png">
+<img src="man/figures/plot_stat_description.PNG">
 <br>
 <br>
 
 
 ### Preferences 
 <br>
-<img src="man/figures/sidebar.png">
+<img src="man/figures/sidebar.PNG">
 <br>
 <br>
 
 <br>
-<img src="man/figures/other_expanded.png">
+<img src="man/figures/other_expanded.PNG">
 <br>
 <br>
 
 ### City statistics 
 <br>
-<img src="man/figures/city_stats.png">
+<img src="man/figures/city_stats.PNG">
 <br>
 <br>
 
 ### Downloadable Report 
 <br>
-<img src="man/figures/example_report.png">
+<img src="man/figures/example_report.PNG">
 <br>
 <br>
  
 ## Further projects
 - Expand on story told by the temperature slopes; regional maps
-- Allow user to take notes as they explore
-- Include more data; precipation, snow, sea level temperature... 
+- Include more data; precipation, snow, sea level temperatures
+- better report format
 Develope family friendly feel
 - Random Question & answer of the day
 - Trivia 
