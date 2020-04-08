@@ -15,11 +15,11 @@ sidebarLayoutUI <- function(id) {
              ),
              
              menuItem("Other",
-                      selectInput(ns("month_1"), "Choose a month (1) :",
+                      selectInput(ns("month_1"), "Choose a month (L) :",
                                   choices = c("January", "February", "March","April","May","June","July","August","September","October","November", "December"),
                                   selected = 'February'
                       ),
-                      selectInput(ns("month_2"), "Choose a month (2):",
+                      selectInput(ns("month_2"), "Choose a month (R):",
                                   choices = c("January", "February", "March","April","May","June","July","August","September","October","November", "December"),
                                   selected = 'July'
                       ),
