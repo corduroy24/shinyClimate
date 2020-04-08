@@ -54,7 +54,7 @@ This app is packaged into 4 shiny modules that tightly interact together to pass
 ### Plot(s) display: 
 
 <br>
-<img src="man/figures/month_month.PNG">
+<img src="man/figures/month_month.PNG" height = "300" width = "500">
 <br>
 <br>
 
@@ -62,31 +62,28 @@ This app is packaged into 4 shiny modules that tightly interact together to pass
 
 
 <br>
-<img src="man/figures/plot_stat_description.PNG">
+<img src="man/figures/plot_stat_description.PNG" height = "150" width = "500">
 <br>
 <br>
 
 
 ### Preferences 
 <br>
-<img src="man/figures/sidebar.PNG">
-<br>
-<br>
+<img src="man/figures/sidebar.PNG" height = '300' width = '200'>
 
-<br>
-<img src="man/figures/other_expanded.PNG">
+<img src="man/figures/other_expanded.PNG" height = '300' width = '200'>
 <br>
 <br>
 
 ### City statistics 
 <br>
-<img src="man/figures/city_stats.PNG">
+<img src="man/figures/city_stats.PNG" width="400">
 <br>
 <br>
 
 ### Downloadable Report 
 <br>
-<img src="man/figures/example_report.PNG">
+<img src="man/figures/example_report.PNG" height = "400" width = "275">
 <br>
 <br>
  
