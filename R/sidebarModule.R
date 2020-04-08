@@ -5,6 +5,8 @@ sidebarLayoutUI <- function(id) {
   ns <- NS(id)
   
   tagList(
+    menuItem("Preferences", tabName = "pref", icon = icon("cog"),
+             startExpanded = TRUE,
              selectInput(ns("prov"), "Choose a province:",
                          choices = c()
              ),
@@ -13,24 +15,29 @@ sidebarLayoutUI <- function(id) {
              ),
              
              menuItem("Other",
-               selectInput(ns("month_1"), "Choose a month (1) :",
-                           choices = c("January", "February", "March","April","May","June","July","August","September","October","November", "December"),
-                           selected = 'February'
-                           ),
-               selectInput(ns("month_2"), "Choose a month (2):",
-                           choices = c("January", "February", "March","April","May","June","July","August","September","October","November", "December"),
-                           selected = 'July'
-               ),
-               selectInput(ns("year_to_start"), "Start Year",
-                           choices = seq(1840, 1986), 
-                           selected = 1980
-               )
+                      selectInput(ns("month_1"), "Choose a month (1) :",
+                                  choices = c("January", "February", "March","April","May","June","July","August","September","October","November", "December"),
+                                  selected = 'February'
+                      ),
+                      selectInput(ns("month_2"), "Choose a month (2):",
+                                  choices = c("January", "February", "March","April","May","June","July","August","September","October","November", "December"),
+                                  selected = 'July'
+                      ),
+                      selectInput(ns("year_to_start"), "Start Year",
+                                  choices = seq(1840, 1986), 
+                                  selected = 1980
+                      )
              )
+      ),
+    
+    br(),
+    downloadUI(ns("inner_dl"))
+    
     )
 }
 
 # Module server function
-sidebarLayout <- function(input, output, session) {
+sidebarLayout <- function(input, output, session, vars_plot) {
   prov_vector <- c("ON","AB","BC","YT","NT","NU","SK", "MB", "QC", "NB", "NS", "PE", "NL")
   
   observe({
@@ -46,7 +53,8 @@ sidebarLayout <- function(input, output, session) {
                       choices = city_vector,
                       selected = 'TORONTO')
   })
-  # temp_val = reactive({input$temp_val})
+
+  callModule(download, 'inner_dl', plots = vars_plot$pp)
   
   return(
     list(

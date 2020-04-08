@@ -9,6 +9,11 @@ logger <- create.logger()
 logfile(logger) <- 'debug.log'
 level(logger) <- 'DEBUG'
 
+# Purpose: Retrieve the necessary data 
+# Input: @meas - temp, previously - min_temp, max_temp, mean_temp
+#       @month: all months of the year 
+#       @year_to_start: 
+# Output: output_df_all
 getData <- function(meas, month, year_to_start){
   if(file.exists(paste('../RData/',meas,month, year_to_start,'.RData'))){
     load(paste('../RData/',meas,month, year_to_start,'.RData'), .GlobalEnv)
@@ -28,29 +33,6 @@ getData <- function(meas, month, year_to_start){
   return(output_df_all)
 }
 
-clean_data <- function(var, dir)
-  for (i in 1:length(var)){
-    df = read.delim(var[i], skip = 0, header = FALSE, as.is=TRUE, dec=".", sep = ",", na.strings=c(" ", "",'NA'), strip.white = TRUE)
-    stationNum_city_prov <- paste(select(df, V1)[1,1], trimws(select(df, V2)[1,1]), province <- select(df, V3)[1,1], sep="_")
-    #forward slash for precipatation files - "7025250_MONTREAL/PIERRE ELLIOTT T_QC"
-    stationNum_city_prov<- str_replace_all(stationNum_city_prov, "/",'-')
-    seq(from = 3, to = 35, by = 2)
-    
-    df <- select(df, -seq(from = 3, to = 35, by = 2))
-    data <- slice(df, 5:n()) 
-    (hdr <- slice(df, 3)) 
-    is.na(hdr)
-    
-    df <- plyr::rename(data, hdr)
-    #filter out -9999.9 - default values
-    df <- data.frame(lapply(df, function(x){
-      gsub("-9999.9", "NA", x)
-    }))
-
-    filePath= sprintf("%s_cleaned/%s.txt",dir,stationNum_city_prov)
-    write.table(df, filePath, append = FALSE, sep = " ", dec = ".",
-                row.names = FALSE, col.names = TRUE)
-  }
 # Find data files 
 find_meas_data <- function(meas){
   # debug(logger, paste("|IM HERE 2|"))
@@ -76,7 +58,7 @@ find_meas_data <- function(meas){
   return(path_names)
 }
 
-# Load data from cleaning step
+# Purpose: Load data from cleaning step
 load_cleaned_data <- function(year_to_start = 1980, month = 'Feb', meas){
   # debug(logger, paste("|IM HERE 1|"))
   path_names <- find_meas_data(meas)
@@ -106,8 +88,11 @@ load_cleaned_data <- function(year_to_start = 1980, month = 'Feb', meas){
   return(input_df)
 }
 
-
-# Perform Regression 
+#########################################################
+# Purpose: Perform Regression 
+# Input: years, temp, city, prov 
+# Output: statistical data 
+#########################################################
 regression <- function(input_df){
   city_prov_vector <- unique(input_df[,c("city", 'prov')])
   city_vector <- city_prov_vector[, 'city']
@@ -154,6 +139,13 @@ regression <- function(input_df){
 # stat<- 'CI'
 # meas<-'min_max_temp'
 # month <-'Feb'
+
+
+##################################################################
+# Purpose: Modularize plotting - Mediator for other plot function
+# Input: meas, month, dataframe containing more variables 
+# output: grid drawn on UI, and grob object 
+#################################################################
 setup_plots <- function(meas, month, df_consts){
   year_to_start <- df_consts$year_to_start
   plot_type <- df_consts$plot_type
@@ -176,6 +168,7 @@ setup_plots <- function(meas, month, df_consts){
   invisible(p)
 }
 
+
 add_plot_data <- function(meas, output_df_all){
   
   if(meas == 'min_max_temp'){
@@ -193,6 +186,9 @@ add_plot_data <- function(meas, output_df_all){
   }
 }
 
+####################################################
+# Purpose: setup plot types, such as histogram or boxplot 
+################################################
 add_plot_type<- function(curr_plots, plot_type, loc_type, stat){
   stat_lab <-bquote(.(stat)*' ('*degree *'C)')
 
@@ -201,6 +197,8 @@ add_plot_type<- function(curr_plots, plot_type, loc_type, stat){
       aes <- aes(x = slope)
       aes_vline<- aes(xintercept=mean(slope))
       if(strsplit(stat, ' ')[[1]][1] == 'R-squared'){
+        stat_lab <-bquote(.(stat)*' (%)')
+        
         aes <- aes(x = r.squared); aes_vline<-aes(xintercept=mean(r.squared))
       }
       else if(strsplit(stat, ' ')[[1]][1] == 'CI_lower'){
@@ -217,11 +215,11 @@ add_plot_type<- function(curr_plots, plot_type, loc_type, stat){
         labs(y='Frequency', x = stat_lab)
     }
     else if(plot_type == 'boxplot'){
-      # x<- 'prov'
 
       aes <- aes(x=prov, y=slope)
       if(strsplit(stat, ' ')[[1]][1] == 'R-squared')
-        aes <- aes(x=prov, y=r.squared);
+        aes <- aes(x=prov, y=r.squared);stat_lab <-bquote(.(stat)*' (%)')
+
 
       curr_plots[[i]] <- curr_plots[[i]] + aes +
         geom_boxplot() +
@@ -235,6 +233,11 @@ add_plot_type<- function(curr_plots, plot_type, loc_type, stat){
     
 }
 
+##########################################
+# Purpose: adding plot labels
+# Input: curr_plot, title, meas, stat
+# Output:
+##########################################
 add_plot_labels <- function(curr_plot, title_meas, stat){
   curr_plot <- curr_plot + 
     ggtitle(bquote(.(title_meas)*' - '~.(stat)))+
@@ -242,7 +245,9 @@ add_plot_labels <- function(curr_plot, title_meas, stat){
           axis.title.x = element_text(size = 9),
           axis.title.y = element_text(size = 9))
 }
-
+#############################################################################
+# Purpose: creating grid for displaying both min and max plots on same panel
+##########################################################################
 create_grid <-function(curr_plot, month, year_to_start, location, stat){
   year_to_start <- toString(year_to_start)
   month <- toString(month)
@@ -261,7 +266,7 @@ create_grid <-function(curr_plot, month, year_to_start, location, stat){
       curr_plot[[1]],
       curr_plot[[2]],
       bottom = textGrob(
-        "Source: Environment Canada Temperature Data ",
+        "Source: Environment Canada Temperature Data - 2017",
         gp = gpar(fontface = 3, fontsize = 9),
         hjust = 1,
         x = 1
@@ -280,7 +285,11 @@ create_grid <-function(curr_plot, month, year_to_start, location, stat){
   return(p)
 }
 
-
+###################################################
+# Purpose: get names of city for a given province 
+# input: prov 
+# output: vector with names of city 
+###################################################
 get_city_vector <- function(prov){
   require(plyr)
   if(file.exists(paste('../RData/','constant_values','.RData'))){
@@ -294,6 +303,44 @@ get_city_vector <- function(prov){
   }
 }
 
+
+######################################################
+######################################################
+# The following functions are not needed for the app 
+# clean_data
+# check_start_year_cutoff
+# get_prov_vector(
+# map
+#####################################################
+#####################################################
+# # Purpose: Data cleaning step 
+# # Input: @var, @dir 
+# # Output: No return; writes to file 
+# # Not needed for app... 
+# clean_data <- function(var, dir){
+#   for (i in 1:length(var)){
+#     df = read.delim(var[i], skip = 0, header = FALSE, as.is=TRUE, dec=".", sep = ",", na.strings=c(" ", "",'NA'), strip.white = TRUE)
+#     stationNum_city_prov <- paste(select(df, V1)[1,1], trimws(select(df, V2)[1,1]), province <- select(df, V3)[1,1], sep="_")
+#     #forward slash for precipatation files - "7025250_MONTREAL/PIERRE ELLIOTT T_QC"
+#     stationNum_city_prov<- str_replace_all(stationNum_city_prov, "/",'-')
+#     seq(from = 3, to = 35, by = 2)
+#     
+#     df <- select(df, -seq(from = 3, to = 35, by = 2))
+#     data <- slice(df, 5:n()) 
+#     (hdr <- slice(df, 3)) 
+#     is.na(hdr)
+#     
+#     df <- plyr::rename(data, hdr)
+#     #filter out -9999.9 - default values
+#     df <- data.frame(lapply(df, function(x){
+#       gsub("-9999.9", "NA", x)
+#     }))
+# 
+#     filePath= sprintf("%s_cleaned/%s.txt",dir,stationNum_city_prov)
+#     write.table(df, filePath, append = FALSE, sep = " ", dec = ".",
+#                 row.names = FALSE, col.names = TRUE)
+#   }
+# }
 # check_start_year_cutoff <- function(meas){
 #   temp_object <- find_meas_data(meas)
 #   txt_files_ls <- temp_object[[1]]

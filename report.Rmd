@@ -1,6 +1,8 @@
 ---
 title: "Dynamic Report"
 author: "Korede Adegboye"
+header-includes:
+  - \usepackage{pdfpages}
 params:
   p1: NA
   p2: NA
@@ -9,18 +11,24 @@ params:
 ---
 
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 To learn more, see [Interactive Documents](http://rmarkdown.rstudio.com/authoring_shiny.html).
 
 ## Plots
-```{r}
-# The `params` object is available in the document.
-grid.draw(params$p1)
-grid.draw(params$p2)
-grid.draw(params$p3)
-grid.draw(params$p4)
-
+```{r echo = FALSE}
+  grid.draw(params$p1)
 ```
 
+```{r echo = FALSE}
+  grid.draw(params$p2)
+```
 
+```{r echo = FALSE}
+  grid.draw(params$p3)
+```
 
-
+```{r echo = FALSE}
+  grid.draw(params$p4)
+```

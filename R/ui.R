@@ -16,9 +16,8 @@ source("sidebarModule.R")
 source("helpers.R")
 source("triviaModule.R")
 source("moreInfoModule.R")
-source('infoModule.R')
 source('downloadModule.R')
-
+source('plotModule.R')
 
 shinyUI<- dashboardPage(
 
@@ -30,10 +29,7 @@ shinyUI<- dashboardPage(
   dashboardSidebar(
     sidebarMenu(
       menuItem("Home", tabName = "home", icon = icon("home")),
-      menuItem("Preferences", tabName = "pref", icon = icon("cog"),
-               startExpanded = TRUE,
-               sidebarLayoutUI("sidebar")
-               )
+      sidebarLayoutUI("sidebar")
       # menuItem("Trivia", tabName = "trivia", icon = icon("th")),
       # menuItem("More Info", tabName = "more", icon = icon("th")),
     )
