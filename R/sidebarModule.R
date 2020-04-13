@@ -71,9 +71,12 @@ sidebarLayout <- function(input, output, session, vars_plot) {
   
   observeEvent(input$prov,{
     city_vector<- get_city_vector(input$prov)
+    city<- NULL
+    if(input$prov == 'ON') city <- 'TORONTO'
+    
     updateSelectInput(session, "city", "Choose a city",
                       choices = city_vector,
-                      selected = 'TORONTO')
+                      selected = city)
   })
 
   callModule(download, 'inner_dl', plots = vars_plot$pp)

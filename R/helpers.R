@@ -156,6 +156,8 @@ setup_plots <- function(meas, month, df_consts){
   city <- df_consts$city
   prov <- df_consts$prov
   city_lab <- df_consts$prov
+  print(city)
+  print(prov)
   # debug(logger, paste('-----------df_consts ----------',df_consts ))
   
   output_df_all <- getData('temp', month, year_to_start)
@@ -164,8 +166,8 @@ setup_plots <- function(meas, month, df_consts){
     output_df_all <- output_df_all[index,]
   }
   else if(region == 'City'){
-    city <- strsplit(location, ',')[[1]][1]
-    prov <- strsplit(location, ',')[[1]][2]
+    # city <- strsplit(location, ',')[[1]][1]
+    # prov <- strsplit(location, ',')[[1]][2]
     index <- which(input_df_all$prov==prov
                                     & input_df_all$city == city)
     output_df_all <- input_df_all[index,] # chnage name.. .
@@ -205,7 +207,8 @@ add_plot_data <- function(meas, output_df_all){
 add_plot_type<- function(curr_plots, df_consts){
   plot_type <- df_consts$plot_type
   region <- df_consts$region
-  stat <- df_consts$city
+  stat <- df_consts$stat
+  city <- df_consts$city
   prov <- df_consts$prov
   city_lab <- df_consts$city_lab
   
@@ -337,8 +340,8 @@ create_grid <-function(curr_plot, month, df_consts){
       bottom = textGrob(
         "Source: Environment Canada Temperature Data - 2017",
         gp = gpar(fontface = 3, fontsize = 9),
-        hjust = 1,
-        x = 1
+        hjust = 1
+        # x = 1
       ),
       ncol = 1,
       heights=c(0.05, 0.5, 0.55)

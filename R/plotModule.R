@@ -61,28 +61,26 @@ plot <- function(input, output, session, sb_vars, h_vars) {
              need(sb_vars$city() != '', 'missing city')
     )
     year_to_start<- sb_vars$year_to_start()
+    city <- sb_vars$city()
+    prov <- sb_vars$prov()
+    region <- sb_vars$region()
+    city_lab <- sb_vars$city_lab()
     
     if(sb_vars$region() == 'City'){
       location <- paste0(sb_vars$city(),',' ,sb_vars$prov())
-      city <- sb_vars$city()
     }
     else if(sb_vars$region() == 'Province'){
       location <- sb_vars$prov()
-      city <- sb_vars$city()
-      prov <- sb_vars$prov()
     }
     else if(sb_vars$region() == 'Canada'){
       location <- 'Canada'
-      city <- sb_vars$city()
-      prov <- sb_vars$prov()
     }
     
     plot_type(trimws((strsplit(tolower(h_vars$plot_ops),'-'))[[1]][1]))
     statistic(trimws((strsplit(h_vars$plot_ops,'-'))[[1]][2]))
     
 
-    region <- sb_vars$region()
-    city_lab <- sb_vars$city_lab()
+
     # print(plot_type())
     # print(statistic())
     # print(region)
@@ -90,18 +88,18 @@ plot <- function(input, output, session, sb_vars, h_vars) {
     
     df_consts <- data.frame(year_to_start, plot_type(), location, region,
                             statistic(),city,prov, city_lab, stringsAsFactors = FALSE)    
-    output$plot_1_min_max_temp<-renderPlot({
+    output$plot_1_min_max_temp<-renderCachedPlot({
       pp$p1<-(setup_plots('min_max_temp',sb_vars$month_1(), df_consts))
-    })
-    output$plot_1_mean_temp<-renderPlot({
+    }, cacheKeyExpr = {list('min_max_temp', sb_vars$month_1(), df_consts)})
+    output$plot_1_mean_temp<-renderCachedPlot({
       pp$p2<-(setup_plots('mean_temp',sb_vars$month_1(), df_consts))
-    })
-    output$plot_2_min_max_temp<-renderPlot({
+    }, cacheKeyExpr = {list('mean_temp', sb_vars$month_1(), df_consts)})
+    output$plot_2_min_max_temp<-renderCachedPlot({
       pp$p3<-(setup_plots('min_max_temp',sb_vars$month_2(),df_consts))
-    })
-    output$plot_2_mean_temp<-renderPlot({
+    }, cacheKeyExpr = {list('min_max_temp', sb_vars$month_2(), df_consts)})
+    output$plot_2_mean_temp<-renderCachedPlot({
       pp$p4<-(setup_plots('mean_temp',sb_vars$month_2(),df_consts))
-    })
+    }, cacheKeyExpr = {list('mean_temp', sb_vars$month_2(), df_consts)})
     
   })
   

@@ -10,6 +10,8 @@
 
 library(shiny)
 library(tidyverse)
+shinyOptions(cache = diskCache("./myapp-cache"))
+
 
 
 shinyServer(function(input, output, session) {
