@@ -64,13 +64,20 @@ plot <- function(input, output, session, sb_vars, h_vars) {
       validate(need(sb_vars$prov() != '', 'missing province'))
       validate(need(sb_vars$city() != '', 'missing city'))
       location <- paste0(sb_vars$city(),',' ,sb_vars$prov())
+      city <- sb_vars$city()
     }
     else if(sb_vars$region() == 'Province'){
       validate(need(sb_vars$prov() != '', 'missing province'))
+      validate(need(sb_vars$city() != '', 'missing city'))
       location <- sb_vars$prov()
+      city <- sb_vars$city()
     }
     else if(sb_vars$region() == 'Canada'){
       location <- 'Canada'
+      validate(need(sb_vars$prov() != '', 'missing province'))
+      validate(need(sb_vars$city() != '', 'missing city'))
+      city <- sb_vars$city()
+      prov <- sb_vars$prov()
     }
     
     plot_type(trimws((strsplit(tolower(h_vars$plot_ops),'-'))[[1]][1]))
@@ -82,7 +89,7 @@ plot <- function(input, output, session, sb_vars, h_vars) {
     print(region)
     print(location)
     
-    df_consts <- data.frame(year_to_start, plot_type(), location, region, statistic(), stringsAsFactors = FALSE)    
+    df_consts <- data.frame(year_to_start, plot_type(), location, region, statistic(),city,prov, stringsAsFactors = FALSE)    
     output$plot_1_min_max_temp<-renderPlot({
       pp$p1<-(setup_plots('min_max_temp',sb_vars$month_1(), df_consts))
     })

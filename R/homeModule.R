@@ -24,6 +24,8 @@ homeLayoutUI <- function(id) {
           tags$li(HTML(paste('Majority of Canada is in fact, experiencing ', strong('increasing'),' temperatures'))),
           tags$li(HTML(paste('Nunavut and the Northwest Territories - ', strong('North Region'),' temperatures increase at a faster rate than the southern regions'))),
           tags$li(HTML(paste(strong('December through February'), 'warm faster than the other months'))),
+          tags$li(HTML(paste('Minimum temperatures can be', strong('decreasing') ,'(or increasing)', 'while maximum temperatures', strong('increasing'), '(or decreasing)')))
+          
         ),
         h3("Discover your regions story!"),
         tags$ul(
@@ -181,15 +183,15 @@ homeLayout <- function(input, output, session, sb_vars) {
     else if(p_vars$statistic() == 'CI_upper for Slopes')
       para_2<- "The upper bound of a range of values we are fairly (95%) sure our true value lies in."
     else if(p_vars$statistic() == 'R-squared for Slopes')
-      para_2<- "How well the data fit the trend - goodness of fit. "
+      para_2<- "How well the data fit the trend - goodness of fit."
     else{
       title_2 <- div(
         title_2_1 <- p('Slope', style = 'font-weight:bold; font-size:16px;margin:0;display:inline'),
         para_2_1 <-"The rate of change in x"
       )
       para_2 <- div (
-        title_2_1 <- p('R-Squared for Slope', style = 'font-weight:bold; font-size:16px;margin:0;display:inline'),
-        para_2_2<- "goodness of fit",
+        title_2_1 <- p('R-Squared', style = 'font-weight:bold; font-size:16px;margin:0;display:inline'),
+        para_2_2<- HTML(paste0("goodness of fit. 0 < R", tags$sup(2), "< 1 ( <-> %)")),
       )
     }
     

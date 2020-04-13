@@ -133,13 +133,13 @@ regression <- function(input_df){
 # fit_2 <- lm(y_temp~ city-1 + city*x_year , data = input_df)
 
 # Draw plots
-year_to_start <- '1980'
-plot_type <- 'regression line'
-location <- 'TORONTO,ON'
-region <- 'city'
-stat<- 'Slopes'
-meas<-'min_max_temp'
-month <-'Feb'
+# year_to_start <- '1980'
+# plot_type <- 'regression line'
+# location <- 'TORONTO,ON'
+# region <- 'city'
+# stat<- 'Slopes'
+# meas<-'min_max_temp'
+# month <-'Feb'
 
 
 ##################################################################
@@ -153,6 +153,8 @@ setup_plots <- function(meas, month, df_consts){
   location <- df_consts$location
   region <- df_consts$region
   stat<- df_consts$statistic
+  city <- df_consts$city
+  prov <- df_consts$prov
   # debug(logger, paste('-----------df_consts ----------',df_consts ))
   
   output_df_all <- getData('temp', month, year_to_start)
@@ -169,9 +171,9 @@ setup_plots <- function(meas, month, df_consts){
   }
   
   p<-add_plot_data(meas, output_df_all) # returns a list plot(s)
-  p<-add_plot_type(p, plot_type, region, stat) #constructs plot(s)
+  p<-add_plot_type(p, plot_type, region, stat, city, prov) #constructs plot(s)
   # print(p)
-  p<- create_grid(p,month, year_to_start, location, stat)
+  p<- create_grid(p,month, year_to_start, location, stat, region)
   grid.draw(p)
   invisible(p)
 }
@@ -199,7 +201,7 @@ add_plot_data <- function(meas, output_df_all){
 ####################################################
 # Purpose: setup plot types, such as histogram or boxplot 
 ################################################
-add_plot_type<- function(curr_plots, plot_type, region, stat){
+add_plot_type<- function(curr_plots, plot_type, region, stat, city, prov){
   stat_lab <-bquote(.(stat)*' ('*degree *'C)')
 
   for(i in 1: length(curr_plots)){
@@ -225,6 +227,18 @@ add_plot_type<- function(curr_plots, plot_type, region, stat){
         geom_density(alpha=.05, fill="#FF6666") +
         # geom_vline(aes_vline,color="blue", linetype="dashed", size=1)+
         labs(y='Frequency', x = stat_lab)
+      
+      dat <- curr_plots[[i]]$data
+      index <- which(dat$prov==prov
+                     & dat$city == city)
+      dat_city <- dat[index,] 
+      x_city <- dat_city$slope 
+      
+      
+      curr_plots[[i]] <- curr_plots[[i]] +
+      geom_point(x = x_city ,y = 5, colour = 'purple')+
+      annotate("text", x = x_city, y = 4  , vjust = 1,
+               label = city, parse = TRUE, colour= 'purple')
     }
     else if(plot_type == 'boxplot'){
 
@@ -241,27 +255,24 @@ add_plot_type<- function(curr_plots, plot_type, region, stat){
       
     }
     else if(plot_type == 'regression line'){
-      fit <- 0 
       dat <- curr_plots[[i]]$data
       aes <- aes(x = x_year, y = y_temp)
       fit <- lm(y_temp~x_year, data = dat)
-      # else if(numVar == 2)
-      # fit <- lm(y_meas.x[index]~y_meas.y[index], data = input_df)
       R_2 <- as.numeric(unlist(summary(fit)$r.squared))
-      print(R_2)
-      critical_value <- qt((1-0.95)/2, (nrow(fit$model)-1))
-      standard_error <- summary(fit)$coef[,2][2]
-      margin_error <- critical_value*standard_error
-      estimate <- summary(fit)$coef[,1][2]
-      CI_lower <-  estimate + margin_error
-      CI_upper <- estimate - margin_error
+      # print(R_2)
+      # critical_value <- qt((1-0.95)/2, (nrow(fit$model)-1))
+      # standard_error <- summary(fit)$coef[,2][2]
+      # margin_error <- critical_value*standard_error
+      # estimate <- summary(fit)$coef[,1][2]
+      # CI_lower <-  estimate + margin_error
+      # CI_upper <- estimate - margin_error
       curr_plots[[i]] <- curr_plots[[i]]+ aes +
         geom_point(size = 1)+
         stat_smooth(method = 'lm', se = FALSE)+
         labs(y=stat_lab, x = 'Years')+
         scale_x_continuous(breaks  = seq(1980,2020, by = 5))
 
-      ymin <- min(curr_plots[[i]]$data$y_temp)
+      # ymin <- min(curr_plots[[i]]$data$y_temp)
       curr_plots[[i]] <- curr_plots[[i]] +
         ggpubr::stat_regline_equation(label.x.npc = 'left', label.y.npc='bottom', colour= 'purple')+
         annotate("text", x = 1985, y = -Inf  , vjust = -0.5,
@@ -291,10 +302,11 @@ add_plot_labels <- function(curr_plot, title_meas, stat){
 #############################################################################
 # Purpose: creating grid for displaying both min and max plots on same panel
 ##########################################################################
-create_grid <-function(curr_plot, month, year_to_start, location, stat){
+create_grid <-function(curr_plot, month, year_to_start, location, stat, region){
   year_to_start <- toString(year_to_start)
   month <- toString(month)
-  subt<- bquote(italic(.(location)*' -'~.(month) *' - ('* .(year_to_start)*' - 2020)'))
+  year_end <- switch(region, 'City' = max(curr_plot[[1]]$data$x_year), {'2017'}) 
+  subt<- bquote(italic(.(location)*' -'~.(month) *' - ('* .(year_to_start)*' - '* .(year_end) *')'))
 
   # if its Min_max_temp 
   if (length(curr_plot) == 2){
