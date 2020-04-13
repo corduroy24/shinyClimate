@@ -155,6 +155,7 @@ setup_plots <- function(meas, month, df_consts){
   stat<- df_consts$statistic
   city <- df_consts$city
   prov <- df_consts$prov
+  city_lab <- df_consts$prov
   # debug(logger, paste('-----------df_consts ----------',df_consts ))
   
   output_df_all <- getData('temp', month, year_to_start)
@@ -171,9 +172,9 @@ setup_plots <- function(meas, month, df_consts){
   }
   
   p<-add_plot_data(meas, output_df_all) # returns a list plot(s)
-  p<-add_plot_type(p, plot_type, region, stat, city, prov) #constructs plot(s)
+  p<-add_plot_type(p, df_consts) #constructs plot(s)
   # print(p)
-  p<- create_grid(p,month, year_to_start, location, stat, region)
+  p<- create_grid(p,month, df_consts)
   grid.draw(p)
   invisible(p)
 }
@@ -201,25 +202,39 @@ add_plot_data <- function(meas, output_df_all){
 ####################################################
 # Purpose: setup plot types, such as histogram or boxplot 
 ################################################
-add_plot_type<- function(curr_plots, plot_type, region, stat, city, prov){
+add_plot_type<- function(curr_plots, df_consts){
+  plot_type <- df_consts$plot_type
+  region <- df_consts$region
+  stat <- df_consts$city
+  prov <- df_consts$prov
+  city_lab <- df_consts$city_lab
+  
   stat_lab <-bquote(.(stat)*' ('*degree *'C)')
 
   for(i in 1: length(curr_plots)){
+    dat <- curr_plots[[i]]$data
+    index <- which(dat$prov==prov& dat$city == city)
+    dat_city <- dat[index,] 
     if(plot_type == 'histogram'){
       aes <- aes(x = slope)
-      aes_vline<- aes(xintercept=mean(slope))
+      # aes_vline<- aes(xintercept=mean(slope))
+      x_city <- dat_city$slope 
+      
       if(strsplit(stat, ' ')[[1]][1] == 'R-squared'){
         stat_lab <-bquote(.(stat)*' (%)')
         aes <- aes(x = r.squared)
         # aes_vline<-aes(xintercept=mean(r.squared))
+        x_city <- dat_city$r.squared 
       }
       else if(strsplit(stat, ' ')[[1]][1] == 'CI_lower'){
         aes <- aes(x = CI_lower)
         # aes_vline<-aes(xintercept=mean(CI_lower))
+        x_city <- dat_city$CI_lower 
       }
       else if(strsplit(stat, ' ')[[1]][1] == 'CI_upper'){
         aes <- aes(x = CI_upper); 
         # aes_vline<-aes(xintercept=mean(CI_upper))
+        x_city <- dat_city$CI_upper
       }
         
       curr_plots[[i]] <- curr_plots[[i]]+ aes +
@@ -227,37 +242,30 @@ add_plot_type<- function(curr_plots, plot_type, region, stat, city, prov){
         geom_density(alpha=.05, fill="#FF6666") +
         # geom_vline(aes_vline,color="blue", linetype="dashed", size=1)+
         labs(y='Frequency', x = stat_lab)
-      
-      dat <- curr_plots[[i]]$data
-      index <- which(dat$prov==prov
-                     & dat$city == city)
-      dat_city <- dat[index,] 
-      x_city <- dat_city$slope 
-      
-      
-      curr_plots[[i]] <- curr_plots[[i]] +
-      geom_point(x = x_city ,y = 5, colour = 'purple')+
-      annotate("text", x = x_city, y = 4  , vjust = 1,
-               label = city, parse = TRUE, colour= 'purple')
+
+      if(city_lab == 'Enable')
+        curr_plots[[i]] <- curr_plots[[i]] +
+        geom_point(x = x_city ,y = 5, colour = 'purple')+
+        annotate("text", x = x_city, y = 4  , vjust = 1,
+                 label = city, parse = TRUE, colour= 'purple')
+
     }
     else if(plot_type == 'boxplot'){
+      aes <- aes(x=prov, y=slope) #For slope.. 
 
-      aes <- aes(x=prov, y=slope)
       if(strsplit(stat, ' ')[[1]][1] == 'R-squared')
         aes <- aes(x=prov, y=r.squared);stat_lab <-bquote(.(stat)*' (%)')
-
-
+        
       curr_plots[[i]] <- curr_plots[[i]] + aes +
         geom_boxplot() +
         stat_summary(fun.y=mean, geom="point", shape=23, size=4)+
         stat_boxplot(geom = 'errorbar')+
         labs(y=stat_lab, x = 'Province')
-      
     }
     else if(plot_type == 'regression line'){
       dat <- curr_plots[[i]]$data
-      aes <- aes(x = x_year, y = y_temp)
-      fit <- lm(y_temp~x_year, data = dat)
+      aes <- suppressMessages(aes(x = x_year, y = y_temp))
+      fit <- suppressMessages(lm(y_temp~x_year, data = dat))
       R_2 <- as.numeric(unlist(summary(fit)$r.squared))
       # print(R_2)
       # critical_value <- qt((1-0.95)/2, (nrow(fit$model)-1))
@@ -271,8 +279,7 @@ add_plot_type<- function(curr_plots, plot_type, region, stat, city, prov){
         stat_smooth(method = 'lm', se = FALSE)+
         labs(y=stat_lab, x = 'Years')+
         scale_x_continuous(breaks  = seq(1980,2020, by = 5))
-
-      # ymin <- min(curr_plots[[i]]$data$y_temp)
+      
       curr_plots[[i]] <- curr_plots[[i]] +
         ggpubr::stat_regline_equation(label.x.npc = 'left', label.y.npc='bottom', colour= 'purple')+
         annotate("text", x = 1985, y = -Inf  , vjust = -0.5,
@@ -290,8 +297,8 @@ add_plot_type<- function(curr_plots, plot_type, region, stat, city, prov){
 ##########################################
 add_plot_labels <- function(curr_plot, title_meas, stat){
   title  = bquote(.(title_meas)*' - '~.(stat))
-  if (stat == "Temperatures")
-    title  = bquote(.(title_meas))
+  if (stat == "Temperatures vs Years")
+    title  = bquote(.(title_meas) *' vs Years')
   curr_plot <- curr_plot + 
     ggtitle(title)+
     theme(plot.title = element_text(hjust = 0.5, size = 10),
@@ -302,8 +309,12 @@ add_plot_labels <- function(curr_plot, title_meas, stat){
 #############################################################################
 # Purpose: creating grid for displaying both min and max plots on same panel
 ##########################################################################
-create_grid <-function(curr_plot, month, year_to_start, location, stat, region){
-  year_to_start <- toString(year_to_start)
+create_grid <-function(curr_plot, month, df_consts){
+  year_to_start <- toString(df_consts$year_to_start)
+  location <- df_consts$location
+  stat <- df_consts$stat
+  region <- df_consts$region
+  
   month <- toString(month)
   year_end <- switch(region, 'City' = max(curr_plot[[1]]$data$x_year), {'2017'}) 
   subt<- bquote(italic(.(location)*' -'~.(month) *' - ('* .(year_to_start)*' - '* .(year_end) *')'))
@@ -314,7 +325,7 @@ create_grid <-function(curr_plot, month, year_to_start, location, stat, region){
     curr_plot[[2]]<- add_plot_labels(curr_plot[[2]], 'Maximum Temperatures', stat)
     title = bquote('Min. vs Max. Temperatures - '~.(stat))
     
-    if(stat == 'Temperatures')
+    if(stat == 'Temperatures vs Years')
       title = bquote('Min. vs Max. Temperatures')
     
     p<- arrangeGrob(

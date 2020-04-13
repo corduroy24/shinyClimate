@@ -29,7 +29,10 @@ sidebarLayoutUI <- function(id) {
                       selectInput(ns("year_to_start"), "Start Year",
                                   choices = seq(1840, 1986), 
                                   selected = 1980
-                      )
+                      ),
+                      div(style="text-align: center;",
+                          radioButtons(ns('city_lab'), 'City Label',
+                                   choices = c('Enable','Disable')))
              )
       ),
     
@@ -56,8 +59,9 @@ sidebarLayout <- function(input, output, session, vars_plot) {
       hideElement('city')
       hideElement('prov')
     }
-
   })
+  
+  # change to renderUI??
   observe({
     prov_vector_sorted <- sort(prov_vector)
     updateSelectInput(session, "prov", "Choose a province",
@@ -81,7 +85,8 @@ sidebarLayout <- function(input, output, session, vars_plot) {
       city = reactive({input$city}),
       month_1 = reactive({strtrim(input$month_1, 3)}),
       month_2 = reactive({strtrim(input$month_2, 3)}),
-      year_to_start = reactive({input$year_to_start})
+      year_to_start = reactive({input$year_to_start}),
+      city_lab = reactive({input$city_lab})
     )
   )
 }

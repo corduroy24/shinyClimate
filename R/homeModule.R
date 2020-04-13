@@ -30,7 +30,7 @@ homeLayoutUI <- function(id) {
         h3("Discover your regions story!"),
         tags$ul(
           tags$li(HTML(paste(strong('Begin'),' with the', strong('slopes'), ' to evaluate the steepness of the temperature trend'))),
-          tags$li(HTML(paste('Proceed to, ', strong('Confidence Intervals'), 'taking into account the variation of the slopes found within a region'))),
+          tags$li(HTML(paste('Proceed to, ', strong('Confidence Intervals'), 'taking into account the variation of the slopes found within a region (Province, Nation)'))),
           tags$li(HTML(paste(strong('R-Squared'), 'to assess the goodness of the model. How much of the variation in slopes is explained by the temperatures over the years')))
         ),
       )
@@ -85,8 +85,10 @@ homeLayoutUI <- function(id) {
         ),
         h3("More"),
         h5("Refer to Preferences -> Other to change months and start year"),
+        h5("Refer to Preferences -> Other to enable - disable city label for histograms"),
         h5("Close sidebar menu to have a better look at the plots"),
-        h5("Download a report on the plots currently displayed")
+        h5("Download a report on the plots currently displayed"),
+        
       )
     ),
   )
@@ -109,9 +111,9 @@ homeLayout <- function(input, output, session, sb_vars) {
     if(sb_vars$region()  == 'City'){
       updateSelectInput(session, 'plot_options',
                            choices = list(
-                              Trend = list("Regression line - Temperatures")
+                              Trend = list("Regression line - Temperatures vs Years")
                            ),
-                           selected = "Regression line - Temperatures")
+                           selected = "Regression line - Temperatures vs Years")
     }
     
     else if(sb_vars$region()  == 'Province'){
@@ -184,7 +186,7 @@ homeLayout <- function(input, output, session, sb_vars) {
       para_2<- "The upper bound of a range of values we are fairly (95%) sure our true value lies in."
     else if(p_vars$statistic() == 'R-squared for Slopes')
       para_2<- "How well the data fit the trend - goodness of fit."
-    else{
+    else {
       title_2 <- div(
         title_2_1 <- p('Slope', style = 'font-weight:bold; font-size:16px;margin:0;display:inline'),
         para_2_1 <-"The rate of change in x"
