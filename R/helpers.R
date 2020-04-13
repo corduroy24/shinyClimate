@@ -133,13 +133,17 @@ regression <- function(input_df){
 # fit_2 <- lm(y_temp~ city-1 + city*x_year , data = input_df)
 
 # Draw plots
-# year_to_start <- '1980'
-# plot_type <- 'regression line'
-# location <- 'TORONTO,ON'
-# region <- 'city'
-# stat<- 'Slopes'
-# meas<-'min_max_temp'
-# month <-'Feb'
+# df_consts <- data.frame(year_to_start <- '1980',
+# plot_type <- 'regression line',
+# location <- 'TORONTO,ON',
+# region <- 'Province',
+# stat<- 'Slopes',
+# meas<-'min_max_temp',
+# month <-'Feb',
+# city <- 'TOROMTO',
+# prov <- 'ON',
+# city_lab <-'Enable')
+
 
 
 ##################################################################
@@ -156,8 +160,8 @@ setup_plots <- function(meas, month, df_consts){
   city <- df_consts$city
   prov <- df_consts$prov
   city_lab <- df_consts$prov
-  print(city)
-  print(prov)
+  # print(city)
+  # print(prov)
   # debug(logger, paste('-----------df_consts ----------',df_consts ))
   
   output_df_all <- getData('temp', month, year_to_start)
@@ -177,7 +181,7 @@ setup_plots <- function(meas, month, df_consts){
   p<-add_plot_type(p, df_consts) #constructs plot(s)
   # print(p)
   p<- create_grid(p,month, df_consts)
-  grid.draw(p)
+  suppressMessages( grid.draw(p))
   invisible(p)
 }
 
@@ -222,22 +226,25 @@ add_plot_type<- function(curr_plots, df_consts){
       aes <- aes(x = slope)
       # aes_vline<- aes(xintercept=mean(slope))
       x_city <- dat_city$slope 
-      
+      x_dat <- mean(dat$slope)
       if(strsplit(stat, ' ')[[1]][1] == 'R-squared'){
         stat_lab <-bquote(.(stat)*' (%)')
         aes <- aes(x = r.squared)
         # aes_vline<-aes(xintercept=mean(r.squared))
         x_city <- dat_city$r.squared 
+        x_dat <- mean(dat$r.squared)
       }
       else if(strsplit(stat, ' ')[[1]][1] == 'CI_lower'){
         aes <- aes(x = CI_lower)
         # aes_vline<-aes(xintercept=mean(CI_lower))
         x_city <- dat_city$CI_lower 
+        x_dat <- mean(dat$CI_lower)
       }
       else if(strsplit(stat, ' ')[[1]][1] == 'CI_upper'){
         aes <- aes(x = CI_upper); 
         # aes_vline<-aes(xintercept=mean(CI_upper))
         x_city <- dat_city$CI_upper
+        x_dat <- mean(dat$CI_upper)
       }
         
       curr_plots[[i]] <- curr_plots[[i]]+ aes +
@@ -249,8 +256,8 @@ add_plot_type<- function(curr_plots, df_consts){
       if(city_lab == 'Enable')
         curr_plots[[i]] <- curr_plots[[i]] +
         geom_point(x = x_city ,y = 5, colour = 'purple')+
-        annotate("text", x = x_city, y = 4  , vjust = 1,
-                 label = city, parse = TRUE, colour= 'purple')
+        annotate("text", x = x_dat, y = 10  , vjust = 1, hjust = 1,
+                 label = str_replace(city," ","_"), parse = TRUE, colour= 'purple')
 
     }
     else if(plot_type == 'boxplot'){
@@ -317,7 +324,7 @@ create_grid <-function(curr_plot, month, df_consts){
   location <- df_consts$location
   stat <- df_consts$stat
   region <- df_consts$region
-  
+  print(location)
   month <- toString(month)
   year_end <- switch(region, 'City' = max(curr_plot[[1]]$data$x_year), {'2017'}) 
   subt<- bquote(italic(.(location)*' -'~.(month) *' - ('* .(year_to_start)*' - '* .(year_end) *')'))
@@ -340,8 +347,8 @@ create_grid <-function(curr_plot, month, df_consts){
       bottom = textGrob(
         "Source: Environment Canada Temperature Data - 2017",
         gp = gpar(fontface = 3, fontsize = 9),
-        hjust = 1
-        # x = 1
+        hjust = 1,
+        x = 1
       ),
       ncol = 1,
       heights=c(0.05, 0.5, 0.55)
