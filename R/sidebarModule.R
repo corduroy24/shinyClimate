@@ -7,6 +7,9 @@ sidebarLayoutUI <- function(id) {
   tagList(
     menuItem("Preferences", tabName = "pref", icon = icon("cog"),
              startExpanded = TRUE,
+             selectInput(ns("region"), "Choose a Region:",
+                         choices = c('City', 'Province', 'Canada')
+             ),
              selectInput(ns("prov"), "Choose a province:",
                          choices = c()
              ),
@@ -40,6 +43,21 @@ sidebarLayoutUI <- function(id) {
 sidebarLayout <- function(input, output, session, vars_plot) {
   prov_vector <- c("ON","AB","BC","YT","NT","NU","SK", "MB", "QC", "NB", "NS", "PE", "NL")
   
+  observeEvent(input$region,{
+    if(input$region == 'City'){
+      showElement('city')
+      showElement('prov')
+    }
+    else if(input$region == 'Province'){
+      hideElement('city')
+    }
+      
+    else if(input$region == 'Canada'){
+      hideElement('city')
+      hideElement('prov')
+    }
+
+  })
   observe({
     prov_vector_sorted <- sort(prov_vector)
     updateSelectInput(session, "prov", "Choose a province",
@@ -58,6 +76,7 @@ sidebarLayout <- function(input, output, session, vars_plot) {
   
   return(
     list(
+      region = reactive({input$region}),
       prov = reactive({input$prov}),
       city = reactive({input$city}),
       month_1 = reactive({strtrim(input$month_1, 3)}),

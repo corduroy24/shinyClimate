@@ -42,14 +42,14 @@ download <- function(input, output, session, plots) {
       # from the code in this app).
       
       out = rmarkdown::render(tempReport, pdf_document(),
-                              params = params, output_dir = '..', output_file = 'report.pdf',
+                              params = params, output_file = 'report.pdf',
                               envir = new.env(parent = globalenv())
       )
+      file.rename(out, file) # move pdf to file for downloading
+      
     }
 
     
-      # file.rename(out, file) # move pdf to file for downloading
-      
   )
 }
 

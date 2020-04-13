@@ -10,7 +10,16 @@ params:
   p4: NA
 ---
 
-
+# Showcasing the strongest evidence for climate change
+Temperature Trends
+Extreme values, as cautionary bounds
+February and July
+Minimum and Maximum
+Highlights
+Temperature slopes vary within Canada, provinces and cities
+Majority of Canada is in fact, experiencing increasing temperatures
+Nunavut and the Northwest Territories - North Region temperatures increase at a faster rate than the southern regions
+December through February warm faster than the other months
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
