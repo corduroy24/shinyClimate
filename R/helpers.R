@@ -95,15 +95,33 @@ load_cleaned_data <- function(year_to_start = 1980, month = 'Feb', meas){
 # Output: statistical data 
 #########################################################
 regression <- function(input_df){
+  # input_df <- input_df_all
   city_prov_vector <- unique(input_df[,c("city", 'prov')])
   city_vector <- city_prov_vector[, 'city']
   prov_vector <- city_prov_vector[, 'prov']
   meas <- unique(input_df$meas_name)
-  
+  # print(prov_vector)
   output_df <- data.frame()
-  for (i in 1:length(city_vector)){
-    index <- which(input_df[, "city"] == city_vector[i])
+  # print(city_vector[55])
+  # print(prov_vector[55])
+  
+  for (i in 1:nrow(city_prov_vector)){
+    
+    # input_df <- input_df[which(input_df[,'prov'] == prov_vector[i]),]
+    # print(input_df)
+    # print(i)
+    index <- which(input_df$prov==prov_vector[i]
+                   & input_df$city == city_vector[i])
+    # gg <- which(input_df[, "prov"] == city_prov_vector$prov[i])
+    # input_df <- input_df[gg,]
+    # index <- which(input_df[, "city"] == city_prov_vector$city[i])
     # if(numVar == 1)
+    # if(i == 55)print(input_df);
+    # if(i == 55){
+    #   print(city_prov_vector$city[i])
+    #   print(city_prov_vector$prov[i])
+    #   
+    # }
     fit <- lm(y_temp[index]~x_year[index], data = input_df)
     # else if(numVar == 2)
       # fit <- lm(y_meas.x[index]~y_meas.y[index], data = input_df)
@@ -202,9 +220,42 @@ add_plot_data <- function(meas, output_df_all){
     return(list(p))
   }
 }
+##issue with woodstock...
+# dummy algorithm for finding extreme warming within a province
+extreme_warning <- function(curr_prov, up_bound){
+  # up_bound <- 10
+  # curr_prov <- 'NB'
+  month_1 <- 'Jan'
+  month_2 <- 'Jul'
+  year_to_start <- '1980'
+  output_df_all <- getData('temp', month_1, year_to_start)
+  
+  tt <- output_df_all[which(output_df_all[, "prov"] == curr_prov),]
+  
+  tt_min <- tt[which(tt[, "meas_name"] == 'min_temp'),]
+  tt_max <- tt[which(tt[, "meas_name"] == 'max_temp'),]
+  tt_min_sorted <- tt_min[order(-tt_min$slope),]
+  tt_max_sorted <- tt_max[order(-tt_max$slope),]
+  top_15_min <- slice(tt_min_sorted , 1:up_bound)
+  top_15_max <- slice(tt_max_sorted, 1:up_bound)
+  result_1 <- merge(top_15_min, top_15_max, by = 'city')
+  
+  output_df_all <- getData('temp', month_2, year_to_start)
+  tt <- output_df_all[which(output_df_all[, "prov"] == curr_prov),]
+  
+  tt_min <- tt[which(tt[, "meas_name"] == 'min_temp'),]
+  tt_max <- tt[which(tt[, "meas_name"] == 'max_temp'),]
+  tt_min_sorted <- tt_min[order(-tt_min$slope),]
+  tt_max_sorted <- tt_max[order(-tt_max$slope),]
+  top_15_min <- slice(tt_min_sorted , 1:up_bound)
+  top_15_max <- slice(tt_max_sorted, 1:up_bound)
+  result_2 <- merge(top_15_min, top_15_max, by = 'city')
 
-
-
+  
+  return(result_3 <- merge(result_1, result_2, by = 'city'))
+  
+  
+}
 ####################################################
 # Purpose: setup plot types, such as histogram or boxplot 
 ################################################
@@ -278,12 +329,12 @@ add_plot_type<- function(curr_plots, df_consts){
       fit <- suppressMessages(lm(y_temp~x_year, data = dat))
       R_2 <- as.numeric(unlist(summary(fit)$r.squared))
       # print(R_2)
-      # critical_value <- qt((1-0.95)/2, (nrow(fit$model)-1))
-      # standard_error <- summary(fit)$coef[,2][2]
-      # margin_error <- critical_value*standard_error
-      # estimate <- summary(fit)$coef[,1][2]
-      # CI_lower <-  estimate + margin_error
-      # CI_upper <- estimate - margin_error
+      critical_value <- qt((1-0.95)/2, (nrow(fit$model)-1))
+      standard_error <- summary(fit)$coef[,2][2]
+      margin_error <- critical_value*standard_error
+      estimate <- summary(fit)$coef[,1][2]
+      CI_lower <-  estimate + margin_error
+      CI_upper <- estimate - margin_error
       curr_plots[[i]] <- curr_plots[[i]]+ aes +
         geom_point(size = 1)+
         stat_smooth(method = 'lm', se = FALSE)+
@@ -293,7 +344,9 @@ add_plot_type<- function(curr_plots, df_consts){
       curr_plots[[i]] <- curr_plots[[i]] +
         ggpubr::stat_regline_equation(label.x.npc = 'left', label.y.npc='bottom', colour= 'purple')+
         annotate("text", x = 1985, y = -Inf  , vjust = -0.5,
-                 label = paste('R^2 == ', signif(R_2,2)), parse = TRUE, colour= 'purple')
+                 label = paste('R^2 == ', signif(R_2,2)), parse = TRUE, colour= 'purple')+
+        annotate("text", x = Inf, y = -Inf  , vjust = -0.5, hjust= 1.5,
+                 label = paste('CI = (', signif(CI_lower,2), ',',signif(CI_upper,2),')') , colour= 'purple')
 
     }
   }
@@ -355,8 +408,12 @@ create_grid <-function(curr_plot, month, df_consts){
     )
   } # add caption...
   else if(length(curr_plot) == 1){
+    title = bquote('Mean Temperatures - '~.(stat))
+    if (stat == "Temperatures vs Years")
+      title = 'Mean Temperatures vs Years'
+                     
     p<- curr_plot[[1]]+
-      ggtitle(bquote('Mean Temperature - '~.(stat)))+
+      ggtitle(title)+
       labs(subtitle = subt)+
       theme(plot.title = element_text(hjust = 0.5),
             plot.subtitle = element_text(hjust = 0.5, color = 'red' ))

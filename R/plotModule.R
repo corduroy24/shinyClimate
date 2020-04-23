@@ -33,24 +33,17 @@ plot <- function(input, output, session, sb_vars, h_vars) {
   # p4 <- reactiveVal()
   pp <- reactiveValues()
   plots <- reactiveValues()
-  index <-reactiveVal(1)
-  rv <- reactiveValues(dfnew=data.frame(matrix(ncol = 2, nrow = 0)) ,count=1)
-  
+  index <-reactiveVal()
+  rv <- reactiveValues(dfnew=list() ,count=1)
+  plot_num <- reactiveVal()
   observe(print(h_vars$plot_ops))
-  # observe(print(df()))
-  # 
+
   # storedvalues <- observeEvent(pp$p1, {
-  #     rv$dfnew <- rbind(rv$dfnew, df())
+  #     rv$table <- rbind(rv$dfnew, df())
   #     rv$count = rv$count + 1
-  # 
+  #     print(rv$count)
   # })
-  # 
-  # df <- reactive({
-  #   data.frame(
-  #     id = rv$count,
-  #     value = pp$p1
-  #   )
-  # })
+
   
   
   observe({
@@ -65,6 +58,7 @@ plot <- function(input, output, session, sb_vars, h_vars) {
     prov <- sb_vars$prov()
     region <- sb_vars$region()
     city_lab <- sb_vars$city_lab()
+
     
     if(sb_vars$region() == 'City'){
       location <- paste0(sb_vars$city(),',' ,sb_vars$prov())
@@ -79,8 +73,6 @@ plot <- function(input, output, session, sb_vars, h_vars) {
     plot_type(trimws((strsplit(tolower(h_vars$plot_ops),'-'))[[1]][1]))
     statistic(trimws((strsplit(h_vars$plot_ops,'-'))[[1]][2]))
     
-
-
     # print(plot_type())
     # print(statistic())
     # print(region)
@@ -89,20 +81,43 @@ plot <- function(input, output, session, sb_vars, h_vars) {
     df_consts <- data.frame(year_to_start, plot_type(), location, region,
                             statistic(),city,prov, city_lab, stringsAsFactors = FALSE)    
     output$plot_1_min_max_temp<-renderCachedPlot({
+
       pp$p1<-(setup_plots('min_max_temp',sb_vars$month_1(), df_consts))
+
+      rv$dfnew[[rv$count]] <- pp$p1
+      rv$count = rv$count + 1
+        
+  
+
     }, cacheKeyExpr = {list('min_max_temp', sb_vars$month_1(), df_consts)})
     output$plot_1_mean_temp<-renderCachedPlot({
+
       pp$p2<-(setup_plots('mean_temp',sb_vars$month_1(), df_consts))
+      rv$dfnew[[rv$count]] <- pp$p2
+      rv$count = rv$count + 1
+
     }, cacheKeyExpr = {list('mean_temp', sb_vars$month_1(), df_consts)})
     output$plot_2_min_max_temp<-renderCachedPlot({
+
       pp$p3<-(setup_plots('min_max_temp',sb_vars$month_2(),df_consts))
+      rv$dfnew[[rv$count]] <- pp$p3
+      rv$count = rv$count + 1
+
     }, cacheKeyExpr = {list('min_max_temp', sb_vars$month_2(), df_consts)})
     output$plot_2_mean_temp<-renderCachedPlot({
       pp$p4<-(setup_plots('mean_temp',sb_vars$month_2(),df_consts))
+      rv$dfnew[[rv$count]] <- pp$p4
+      rv$count = rv$count + 1
+
     }, cacheKeyExpr = {list('mean_temp', sb_vars$month_2(), df_consts)})
-    
+    print(rv$count)
   })
   
+  observeEvent(pp$p1,{
+    validate(need(pp$p1 != '', 'missing'))
+          print(pp$p1)
+  }
+  )
   
   # observe(print(reactiveValuesToList(pp)))
   
@@ -110,7 +125,8 @@ plot <- function(input, output, session, sb_vars, h_vars) {
     list(
       plot_type = reactive({plot_type()}),
       statistic = reactive({statistic()}),
-      pp = pp 
+      pp = pp,
+      rv = rv
     )
   )
 }

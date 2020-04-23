@@ -20,7 +20,7 @@ sidebarLayoutUI <- function(id) {
              menuItem("Other",
                       selectInput(ns("month_1"), "Choose a month (L) :",
                                   choices = c("January", "February", "March","April","May","June","July","August","September","October","November", "December"),
-                                  selected = 'February'
+                                  selected = 'January'
                       ),
                       selectInput(ns("month_2"), "Choose a month (R):",
                                   choices = c("January", "February", "March","April","May","June","July","August","September","October","November", "December"),
@@ -79,7 +79,7 @@ sidebarLayout <- function(input, output, session, vars_plot) {
                       selected = city)
   })
 
-  callModule(download, 'inner_dl', plots = vars_plot$pp)
+  callModule(download, 'inner_dl', plots = vars_plot$pp, rv = vars_plot$rv)
   
   return(
     list(

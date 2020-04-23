@@ -13,9 +13,8 @@ downloadUI <- function(id) {
 }
 
 
-
 # Module server function
-download <- function(input, output, session, plots) {
+download <- function(input, output, session, plots, rv) {
   report <- reactiveValues(num = 0) 
   
   observeEvent(plots,{
@@ -24,7 +23,7 @@ download <- function(input, output, session, plots) {
   
 
   output$report <- downloadHandler(
-    filename = "report.pdf",
+    filename = "report.html",
     
     content <- function(file) {
       # Copy the report file to a temporary directory before processing it, in
@@ -32,17 +31,19 @@ download <- function(input, output, session, plots) {
       # can happen when deployed).
       tempReport <- file.path(tempdir(), "report.Rmd")
       file.copy("../report.Rmd", tempReport, overwrite = TRUE)
-      
+
+      temp <- tempdir()
       # Set up parameters to pass to Rmd document
       params <- list(p1 = isolate(plots$p1), p2 = isolate(plots$p2),
-                     p3 = isolate(plots$p3), p4 = isolate(plots$p4)
-      )
+                     p3 = isolate(plots$p3), p4 = isolate(plots$p4),
+                     dfnew = isolate(rv$dfnew), count  = isolate(rv$count)
+                     )
       # Knit the document, passing in the `params` list, and eval it in a
       # child of the global environment (this isolates the code in the document
       # from the code in this app).
       
-      out = rmarkdown::render(tempReport, pdf_document(),
-                              params = params, output_file = 'report.pdf',
+      out = rmarkdown::render(tempReport, html_document(),
+                              params = params, output_file = 'report.html',
                               envir = new.env(parent = globalenv())
       )
       file.rename(out, file) # move pdf to file for downloading

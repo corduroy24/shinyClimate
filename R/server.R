@@ -10,7 +10,7 @@
 
 library(shiny)
 library(tidyverse)
-shinyOptions(cache = diskCache("./myapp-cache"))
+# shinyOptions(cache = diskCache("./myapp-cache"))
 
 
 

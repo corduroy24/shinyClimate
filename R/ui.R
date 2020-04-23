@@ -30,6 +30,7 @@ shinyUI<- dashboardPage(
     sidebarMenu(
       menuItem("Home", tabName = "home", icon = icon("home")),
       sidebarLayoutUI("sidebar")
+
       # menuItem("Trivia", tabName = "trivia", icon = icon("th")),
       # menuItem("More Info", tabName = "more", icon = icon("th")),
     )
@@ -41,7 +42,7 @@ shinyUI<- dashboardPage(
     tabItems(
       tabItem(tabName = "home",
               useShinyjs(debug = TRUE),
-              homeLayoutUI("home"),
+              homeLayoutUI("home")
       )
       
       # Second tab content

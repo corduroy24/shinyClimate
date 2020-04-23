@@ -24,8 +24,17 @@ homeLayoutUI <- function(id) {
           tags$li(HTML(paste('Majority of Canada is in fact, experiencing ', strong('increasing'),' temperatures'))),
           tags$li(HTML(paste('Nunavut and the Northwest Territories - ', strong('North Region'),' temperatures increase at a faster rate than the southern regions'))),
           tags$li(HTML(paste(strong('December through February'), 'warm faster than the other months'))),
-          tags$li(HTML(paste('Minimum temperatures can be', strong('decreasing') ,'(or increasing)', 'while maximum temperatures', strong('increasing'), '(or decreasing)')))
-          
+          tags$li(HTML(paste('Minimum temperatures can be', strong('decreasing') ,'(or increasing)', 'while maximum temperatures', strong('increasing'), '(or decreasing)'))),
+          tags$li(HTML(paste('Cities with', strong('extreme warming'), '(within a few provinces)'))),
+          tags$ul(
+            tags$li(strong("Yukon Territory"), "- Dawson, Pelly Ranch", strong("Northwest Territories"),"- Fort Good Hope, Fort Smith", strong("Nunavut"), "- Pelly Bay, Ennadai Lake"),
+            tags$li(strong("British Columbia"), "- Creston, Glacier, Kelowna"),
+            tags$li(strong("Manitoba"), "- Flin Flon, Norway House", strong("Saskatchewan"),"- Waskesiu Lake, Loon Lake, Yellow Grass", strong("Alberta"), "- Coronation, Entrance"),
+            tags$li(strong("Quebec"), "- Bagotville, Kuujjuarapik", strong("Ontario"),"- Beatrice, Cornwall, Dryden, Ottawa"),
+            tags$li(strong("Newfoundland and Labrador"), "- Cartwright, Nain", strong("Prince Edward Island"),"- Charlottetown, Monticello, Summerside",
+                    strong("Nova Scotia"), "- Collegeville, Greenwood, Yarmouth", strong("New Brunswick"), "- Moncton, Woodstock")
+          )
+
         ),
         h3("Discover your regions story!"),
         tags$ul(
@@ -70,7 +79,7 @@ homeLayoutUI <- function(id) {
     #   valueBoxOutput(ns('info_r2'))
     # ),
     
-    h5(em(textOutput(ns('city_stats'))), style = 'text-align: center'),
+    # h5(em(textOutput(ns('city_stats'))), style = 'text-align: center'),
     # h5(em('The above is for annual mean temperatures for the specified cities'), style = 'text-align: center'),
     
     fluidRow(
@@ -157,9 +166,9 @@ homeLayout <- function(input, output, session, sb_vars) {
     valueBox(value = signif(df$r.squared,4), subtitle = paste(sb_vars$city(), '- R2 for slopes'), color = 'blue', icon = icon('info-circle'))
   })
   
-  output$city_stats <- renderText({
-    'The above is for annual mean temperatures for the specified cities'
-  })
+  # output$city_stats <- renderText({
+  #   'The above is for annual mean temperatures for the specified cities'
+  # })
   output$plot_des_1<- renderUI({
     if(p_vars$plot_type() == 'histogram')
       para_1<- "Summarize the distribution of data"

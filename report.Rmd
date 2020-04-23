@@ -8,10 +8,12 @@ params:
   p2: NA
   p3: NA
   p4: NA
+  dfnew: NA
+  count: NA
 ---
 
 # Showcasing the strongest evidence for climate change
-Temperature Trends
+### Temperature Trends
 Extreme values, as cautionary bounds
 February and July
 Minimum and Maximum
@@ -21,22 +23,40 @@ Majority of Canada is in fact, experiencing increasing temperatures
 Nunavut and the Northwest Territories - North Region temperatures increase at a faster rate than the southern regions
 December through February warm faster than the other months
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 ```
 
-## Plots
-```{r echo = FALSE}
-  grid.draw(params$p1)
+## Results 
+```{r kxpand, echo= FALSE, results = 'asis'}
+library(knitr)
+kexpand <- function(plot) {
+
+    cat(
+      knit(text=knit_expand(
+        text=(
+"```{r child, echo = FALSE}
+grid.draw(plot) 
+```"),
+        plot = plot
+  )))
+}
 ```
 
-```{r echo = FALSE}
-  grid.draw(params$p2)
+```{r for_loop, echo=FALSE, results = 'asis'}
+  # L <- htmltools::tagList()
+  # L[[1]] <- grid.draw(params$dfnew[[1]])
+  # L[[2]] <- grid.draw(params$dfnew[[2]])
+
+  L <- htmltools::tagList()
+
+for(i in 1:length(params$dfnew)){
+  # print(length(params$dfnew))
+  # kexpand(params$dfnew[[i]])
+  L[[i]] <- invisible(params$dfnew[[i]])
+  # htmltools:tagList(i)
+  kexpand(L[[i]])
+
+}
+
 ```
 
-```{r echo = FALSE}
-  grid.draw(params$p3)
-```
-
-```{r echo = FALSE}
-  grid.draw(params$p4)
-```
