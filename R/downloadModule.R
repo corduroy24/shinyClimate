@@ -23,7 +23,7 @@ download <- function(input, output, session, plots, rv) {
   
 
   output$report <- downloadHandler(
-    filename = "report.html",
+    filename = "report.pdf",
     
     content <- function(file) {
       # Copy the report file to a temporary directory before processing it, in
@@ -42,15 +42,13 @@ download <- function(input, output, session, plots, rv) {
       # child of the global environment (this isolates the code in the document
       # from the code in this app).
       
-      out = rmarkdown::render(tempReport, html_document(),
-                              params = params, output_file = 'report.html',
+      out = rmarkdown::render(tempReport, pdf_document(),
+                              params = params, output_file = 'report.pdf',
                               envir = new.env(parent = globalenv())
       )
       file.rename(out, file) # move pdf to file for downloading
       
     }
-
-    
   )
 }
 

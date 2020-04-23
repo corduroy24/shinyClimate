@@ -25,14 +25,14 @@ homeLayoutUI <- function(id) {
           tags$li(HTML(paste('Nunavut and the Northwest Territories - ', strong('North Region'),' temperatures increase at a faster rate than the southern regions'))),
           tags$li(HTML(paste(strong('December through February'), 'warm faster than the other months'))),
           tags$li(HTML(paste('Minimum temperatures can be', strong('decreasing') ,'(or increasing)', 'while maximum temperatures', strong('increasing'), '(or decreasing)'))),
-          tags$li(HTML(paste('Cities with', strong('extreme warming'), '(within a few provinces)'))),
+          tags$li(HTML(paste('Cities with', strong('extreme warming'), '(within a province)'))),
           tags$ul(
-            tags$li(strong("Yukon Territory"), "- Dawson, Pelly Ranch", strong("Northwest Territories"),"- Fort Good Hope, Fort Smith", strong("Nunavut"), "- Pelly Bay, Ennadai Lake"),
-            tags$li(strong("British Columbia"), "- Creston, Glacier, Kelowna"),
-            tags$li(strong("Manitoba"), "- Flin Flon, Norway House", strong("Saskatchewan"),"- Waskesiu Lake, Loon Lake, Yellow Grass", strong("Alberta"), "- Coronation, Entrance"),
-            tags$li(strong("Quebec"), "- Bagotville, Kuujjuarapik", strong("Ontario"),"- Beatrice, Cornwall, Dryden, Ottawa"),
-            tags$li(strong("Newfoundland and Labrador"), "- Cartwright, Nain", strong("Prince Edward Island"),"- Charlottetown, Monticello, Summerside",
-                    strong("Nova Scotia"), "- Collegeville, Greenwood, Yarmouth", strong("New Brunswick"), "- Moncton, Woodstock")
+            tags$li(strong("Yukon Territory"), " (Dawson, Pelly Ranch), ", strong("Northwest Territories")," (Fort Good Hope, Fort Smith), ", strong("Nunavut"), " (Pelly Bay, Ennadai Lake)"),
+            tags$li(strong("British Columbia"), " (Creston, Glacier, Kelowna)"),
+            tags$li(strong("Manitoba"), " (Flin Flon, Norway House), ", strong("Saskatchewan")," (Waskesiu Lake, Loon Lake, Yellow Grass), ", strong("Alberta"), " (Coronation, Entrance)"),
+            tags$li(strong("Quebec"), " (Bagotville, Kuujjuarapik), ", strong("Ontario")," (Beatrice, Cornwall, Dryden, Ottawa)"),
+            tags$li(strong("Newfoundland and Labrador"), " (Cartwright, Nain), ", strong("Prince Edward Island")," (Charlottetown, Monticello, Summerside), ",
+                    strong("Nova Scotia"), " (Collegeville, Greenwood, Yarmouth), ", strong("New Brunswick"), " (Moncton, Woodstock)")
           )
 
         ),
