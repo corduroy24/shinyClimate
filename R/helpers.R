@@ -220,42 +220,7 @@ add_plot_data <- function(meas, output_df_all){
     return(list(p))
   }
 }
-##issue with woodstock...
-# dummy algorithm for finding extreme warming within a province
-extreme_warning <- function(curr_prov, up_bound){
-  # up_bound <- 10
-  # curr_prov <- 'NB'
-  month_1 <- 'Jan'
-  month_2 <- 'Jul'
-  year_to_start <- '1980'
-  output_df_all <- getData('temp', month_1, year_to_start)
-  
-  tt <- output_df_all[which(output_df_all[, "prov"] == curr_prov),]
-  
-  tt_min <- tt[which(tt[, "meas_name"] == 'min_temp'),]
-  tt_max <- tt[which(tt[, "meas_name"] == 'max_temp'),]
-  tt_min_sorted <- tt_min[order(-tt_min$slope),]
-  tt_max_sorted <- tt_max[order(-tt_max$slope),]
-  top_15_min <- slice(tt_min_sorted , 1:up_bound)
-  top_15_max <- slice(tt_max_sorted, 1:up_bound)
-  result_1 <- merge(top_15_min, top_15_max, by = 'city')
-  
-  output_df_all <- getData('temp', month_2, year_to_start)
-  tt <- output_df_all[which(output_df_all[, "prov"] == curr_prov),]
-  
-  tt_min <- tt[which(tt[, "meas_name"] == 'min_temp'),]
-  tt_max <- tt[which(tt[, "meas_name"] == 'max_temp'),]
-  tt_min_sorted <- tt_min[order(-tt_min$slope),]
-  tt_max_sorted <- tt_max[order(-tt_max$slope),]
-  top_15_min <- slice(tt_min_sorted , 1:up_bound)
-  top_15_max <- slice(tt_max_sorted, 1:up_bound)
-  result_2 <- merge(top_15_min, top_15_max, by = 'city')
 
-  
-  return(result_3 <- merge(result_1, result_2, by = 'city'))
-  
-  
-}
 ####################################################
 # Purpose: setup plot types, such as histogram or boxplot 
 ################################################
@@ -446,15 +411,57 @@ get_city_stats<- function(city, month, year_to_start){
   return(mean_stats)
 }
 
+
+
+
 ######################################################
 ######################################################
 # The following functions are not needed for the app 
+# extreme_warming
 # clean_data
 # check_start_year_cutoff
 # get_prov_vector(
 # map
 #####################################################
 #####################################################
+
+
+# PurposeL dummy algorithm for finding extreme warming within a province
+# extreme_warming <- function(curr_prov, up_bound){
+#   # up_bound <- 10
+#   # curr_prov <- 'NB'
+#   month_1 <- 'Jan'
+#   month_2 <- 'Jul'
+#   year_to_start <- '1980'
+#   output_df_all <- getData('temp', month_1, year_to_start)
+#   
+#   tt <- output_df_all[which(output_df_all[, "prov"] == curr_prov),]
+#   
+#   tt_min <- tt[which(tt[, "meas_name"] == 'min_temp'),]
+#   tt_max <- tt[which(tt[, "meas_name"] == 'max_temp'),]
+#   tt_min_sorted <- tt_min[order(-tt_min$slope),]
+#   tt_max_sorted <- tt_max[order(-tt_max$slope),]
+#   top_15_min <- slice(tt_min_sorted , 1:up_bound)
+#   top_15_max <- slice(tt_max_sorted, 1:up_bound)
+#   result_1 <- merge(top_15_min, top_15_max, by = 'city')
+#   
+#   output_df_all <- getData('temp', month_2, year_to_start)
+#   tt <- output_df_all[which(output_df_all[, "prov"] == curr_prov),]
+#   
+#   tt_min <- tt[which(tt[, "meas_name"] == 'min_temp'),]
+#   tt_max <- tt[which(tt[, "meas_name"] == 'max_temp'),]
+#   tt_min_sorted <- tt_min[order(-tt_min$slope),]
+#   tt_max_sorted <- tt_max[order(-tt_max$slope),]
+#   top_15_min <- slice(tt_min_sorted , 1:up_bound)
+#   top_15_max <- slice(tt_max_sorted, 1:up_bound)
+#   result_2 <- merge(top_15_min, top_15_max, by = 'city')
+# 
+#   
+#   return(result_3 <- merge(result_1, result_2, by = 'city'))
+#   
+# }
+
+
 # # Purpose: Data cleaning step 
 # # Input: @var, @dir 
 # # Output: No return; writes to file 
