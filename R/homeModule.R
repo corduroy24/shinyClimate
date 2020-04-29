@@ -39,7 +39,7 @@ homeLayoutUI <- function(id) {
         h3("Discover your regions story!"),
         tags$ul(
           tags$li(HTML(paste(strong('Begin'),' with the', strong('slopes'), ' to evaluate the steepness of the temperature trend'))),
-          tags$li(HTML(paste('Proceed to, ', strong('Confidence Intervals'), 'taking into account the variation of the slopes found within a region (Province, Nation)'))),
+          tags$li(HTML(paste('Proceed to, ', strong('Confidence Intervals'), 'considering the variation of the slopes found within a region'))),
           tags$li(HTML(paste(strong('R-Squared'), 'to assess the goodness of the model. How much of the variation in slopes is explained by the temperatures over the years')))
         ),
       )
@@ -110,11 +110,12 @@ homeLayout <- function(input, output, session, sb_vars) {
   # output$test<-renderPlot({
   #   grid.draw(vars_plot$pp$p1)
   # })
+  
   h_vars <- reactiveValues()
   
   observe(h_vars$plot_ops <- input$plot_options)
   
-  p_vars <- callModule(plot, 'inner_plot', sb_vars = sb_vars, h_vars = h_vars)
+  plot_vars <- callModule(plots, 'inner_plot', sb_vars = sb_vars, h_vars = h_vars)
   
   observeEvent(sb_vars$region(),{
     if(sb_vars$region()  == 'City'){
@@ -131,7 +132,7 @@ homeLayout <- function(input, output, session, sb_vars) {
                           'Slopes' = list("Histogram - Slopes"),
                           "Confidence Intervals for Slopes" = list("Histogram - CI_lower for Slopes",
                                                                    "Histogram - CI_upper for Slopes"),
-                          'R-squared for Slopes' = list("Histogram - R-Squared for Slopes")
+                          'R_squared for Slopes' = list("Histogram - R_squared for Slopes")
                         ),
                         selected = "Histogram - Slopes")
     }
@@ -142,58 +143,58 @@ homeLayout <- function(input, output, session, sb_vars) {
                                           "Boxplot - Slopes"),
                           "Confidence Intervals for Slopes" = list("Histogram - CI_lower for Slopes",
                                                                    "Histogram - CI_upper for Slopes"),
-                          'R-squared for Slopes' = list("Histogram - R-Squared for Slopes",
-                                                        "Boxplot - R-Squared for Slopes")
+                          'R_squared for Slopes' = list("Histogram - R_squared for Slopes",
+                                                        "Boxplot - R_squared for Slopes")
                         ),
                         selected = "Histogram - Slopes")
     }
   })
 
-  output$info_slope<- renderValueBox({
-    df <- get_city_stats(sb_vars$city(), 'Annual',1980)
-    val <-   stat_lab <-expression(signif(df$slope,4) *'( '*degree *'C)')
-    valueBox(value = val, subtitle = paste(sb_vars$city(), '-Slope'), color = 'blue', icon = icon('info-circle'))
-  })
-  
-  output$info_ci<- renderValueBox({
-    df <- get_city_stats(sb_vars$city(), 'Annual',1980)
-    v<- paste('(', signif(df$CI_lower,3), ',' ,signif(df$CI_upper,3),')')
-    v<- tags$p(v, style = "font-size:27px;")
-    valueBox(value = v, subtitle = paste(sb_vars$city(), '- CI for slopes'), color = 'blue', icon = icon('info-circle'))
-  })
-  output$info_r2<- renderValueBox({
-    df <- get_city_stats(sb_vars$city(), 'Annual',1980)
-    valueBox(value = signif(df$r.squared,4), subtitle = paste(sb_vars$city(), '- R2 for slopes'), color = 'blue', icon = icon('info-circle'))
-  })
+  # output$info_slope<- renderValueBox({
+  #   df <- get_city_stats(sb_vars$city(), 'Annual',1980)
+  #   val <-   stat_lab <-expression(signif(df$slope,4) *'( '*degree *'C)')
+  #   valueBox(value = val, subtitle = paste(sb_vars$city(), '-Slope'), color = 'blue', icon = icon('info-circle'))
+  # })
+  # 
+  # output$info_ci<- renderValueBox({
+  #   df <- get_city_stats(sb_vars$city(), 'Annual',1980)
+  #   v<- paste('(', signif(df$CI_lower,3), ',' ,signif(df$CI_upper,3),')')
+  #   v<- tags$p(v, style = "font-size:27px;")
+  #   valueBox(value = v, subtitle = paste(sb_vars$city(), '- CI for slopes'), color = 'blue', icon = icon('info-circle'))
+  # })
+  # output$info_r2<- renderValueBox({
+  #   df <- get_city_stats(sb_vars$city(), 'Annual',1980)
+  #   valueBox(value = signif(df$r.squared,4), subtitle = paste(sb_vars$city(), '- R^2 for slopes'), color = 'blue', icon = icon('info-circle'))
+  # })
   
   # output$city_stats <- renderText({
   #   'The above is for annual mean temperatures for the specified cities'
   # })
   output$plot_des_1<- renderUI({
-    if(p_vars$plot_type() == 'histogram')
+    if(plot_vars$plot_type() == 'histogram')
       para_1<- "Summarize the distribution of data"
-    else if(p_vars$plot_type() == 'boxplot')
+    else if(plot_vars$plot_type() == 'boxplot')
       para_1<- "Look for skewed data (whiskers and mean line), outliers (dots), and comparing spreads (variation)"
-    else if(p_vars$plot_type() == 'regression line')
+    else if(plot_vars$plot_type() == 'regression line')
       para_1<- "Best fitted line - y = b + mx, where b - intercept and m - slope"
     
     para_1 <- p(para_1, style = 'margin:0;display:inline;')
     
     div(
-      title_1 <- p(str_to_title(p_vars$plot_type()), style = 'font-weight:bold; font-size:16px;margin:0;padding:0;display:inline'),
+      title_1 <- p(str_to_title(plot_vars$plot_type()), style = 'font-weight:bold; font-size:16px;margin:0;padding:0;display:inline'),
       para_1
     )
   })
   
   output$plot_des_2<- renderUI({
-    title_2 <- p(strsplit(str_to_title(p_vars$statistic()), '_')[[1]][1], style = 'font-weight:bold; font-size:16px;margin:0;display:inline')
-    if(p_vars$statistic() == 'Slopes')
+    title_2 <- p(strsplit(str_to_title(plot_vars$statistic()), '_')[[1]][1], style = 'font-weight:bold; font-size:16px;margin:0;display:inline')
+    if(plot_vars$statistic() == 'Slopes')
       para_2<- "The rate of change in x - Years as y - temperature changes."
-    else if(p_vars$statistic() == 'CI_lower for Slopes')
+    else if(plot_vars$statistic() == 'CI_lower for Slopes')
       para_2<- "The lower bound of a range of values we are fairly (95%) sure our true value lies in."
-    else if(p_vars$statistic() == 'CI_upper for Slopes')
+    else if(plot_vars$statistic() == 'CI_upper for Slopes')
       para_2<- "The upper bound of a range of values we are fairly (95%) sure our true value lies in."
-    else if(p_vars$statistic() == 'R-squared for Slopes')
+    else if(plot_vars$statistic() == 'R-squared for Slopes')
       para_2<- "How well the data fit the trend - goodness of fit."
     else {
       title_2 <- div(
@@ -220,5 +221,5 @@ homeLayout <- function(input, output, session, sb_vars) {
   # end <- Sys.time()
   # output$txt1 <- renderText({end - beginning})
 
-  return(p_vars)
+  return(plot_vars)
 }

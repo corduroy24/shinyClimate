@@ -24,7 +24,7 @@ plotUI <- function(id) {
 
 
 # Module server function
-plot <- function(input, output, session, sb_vars, h_vars) {
+plots <- function(input, output, session, sb_vars, h_vars) {
   plot_type<-reactiveVal('regression line')
   statistic <- reactiveVal('temperatures vs years')
   # p1 <- reactiveVal()
@@ -57,7 +57,7 @@ plot <- function(input, output, session, sb_vars, h_vars) {
     city <- sb_vars$city()
     prov <- sb_vars$prov()
     region <- sb_vars$region()
-    city_lab <- sb_vars$city_lab()
+    show_city_lab <- sb_vars$show_city_lab()
 
     
     if(sb_vars$region() == 'City'){
@@ -79,7 +79,7 @@ plot <- function(input, output, session, sb_vars, h_vars) {
     # print(location)
     
     df_consts <- data.frame(year_to_start, plot_type(), location, region,
-                            statistic(),city,prov, city_lab, stringsAsFactors = FALSE)    
+                            statistic(),city,prov, show_city_lab, stringsAsFactors = FALSE)    
     output$plot_1_min_max_temp<-renderCachedPlot({
 
       pp$p1<-(setup_plots('min_max_temp',sb_vars$month_1(), df_consts))
@@ -110,14 +110,14 @@ plot <- function(input, output, session, sb_vars, h_vars) {
       rv$count = rv$count + 1
 
     }, cacheKeyExpr = {list('mean_temp', sb_vars$month_2(), df_consts)})
-    print(rv$count)
+    # print(rv$count)
   })
   
-  observeEvent(pp$p1,{
-    validate(need(pp$p1 != '', 'missing'))
-          print(pp$p1)
-  }
-  )
+  # observeEvent(pp$p1,{
+  #   validate(need(pp$p1 != '', 'missing'))
+  #         print(pp$p1)
+  # }
+  # )
   
   # observe(print(reactiveValuesToList(pp)))
   

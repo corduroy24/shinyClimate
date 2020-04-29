@@ -14,7 +14,7 @@ level(logger) <- 'DEBUG'
 #       @month: all months of the year 
 #       @year_to_start: 
 # Output: output_df_all
-getData <- function(meas, month, year_to_start){
+get_data <- function(meas, month, year_to_start){
   if(file.exists(paste('../RData/',meas,month, year_to_start,'.RData'))){
     load(paste('../RData/',meas,month, year_to_start,'.RData'), .GlobalEnv)
     debug(logger, paste("Rdata exists"))
@@ -91,41 +91,20 @@ load_cleaned_data <- function(year_to_start = 1980, month = 'Feb', meas){
 
 #########################################################
 # Purpose: Perform Regression 
-# Input: years, temp, city, prov 
+# Input: input_df, containing years, temp, city, prov 
 # Output: statistical data 
 #########################################################
 regression <- function(input_df){
-  # input_df <- input_df_all
   city_prov_vector <- unique(input_df[,c("city", 'prov')])
   city_vector <- city_prov_vector[, 'city']
   prov_vector <- city_prov_vector[, 'prov']
   meas <- unique(input_df$meas_name)
-  # print(prov_vector)
   output_df <- data.frame()
-  # print(city_vector[55])
-  # print(prov_vector[55])
   
   for (i in 1:nrow(city_prov_vector)){
-    
-    # input_df <- input_df[which(input_df[,'prov'] == prov_vector[i]),]
-    # print(input_df)
-    # print(i)
     index <- which(input_df$prov==prov_vector[i]
                    & input_df$city == city_vector[i])
-    # gg <- which(input_df[, "prov"] == city_prov_vector$prov[i])
-    # input_df <- input_df[gg,]
-    # index <- which(input_df[, "city"] == city_prov_vector$city[i])
-    # if(numVar == 1)
-    # if(i == 55)print(input_df);
-    # if(i == 55){
-    #   print(city_prov_vector$city[i])
-    #   print(city_prov_vector$prov[i])
-    #   
-    # }
     fit <- lm(y_temp[index]~x_year[index], data = input_df)
-    # else if(numVar == 2)
-      # fit <- lm(y_meas.x[index]~y_meas.y[index], data = input_df)
-    
     b <- data.frame("intercept" = fit$coefficients[1], "slope" = fit$coefficients[2])
     R_2 <- data.frame("r.squared" = as.numeric(unlist(summary(fit)$r.squared)))
     # CIs <- ci(fit, 0.95, alpha=1-0.95, na.rm = TRUE)
@@ -136,8 +115,6 @@ regression <- function(input_df){
     CI_lower <-  estimate + margin_error
     CI_upper <- estimate - margin_error
     variance <- (standard_error)^2
-    
-    
     curr_results_df <- data.frame("city"=city_vector[i],'prov' = prov_vector[i],  
                                   b,"r.squared"=R_2,CI_lower, CI_upper,variance,
                                   "n"=nrow(fit$model), 'meas_name' = meas,  row.names = NULL)
@@ -182,7 +159,7 @@ setup_plots <- function(meas, month, df_consts){
   # print(prov)
   # debug(logger, paste('-----------df_consts ----------',df_consts ))
   
-  output_df_all <- getData('temp', month, year_to_start)
+  output_df_all <- get_data('temp', month, year_to_start)
   if(region == 'Province'){
     index <- which(output_df_all[, "prov"] == location)
     output_df_all <- output_df_all[index,]
@@ -230,10 +207,11 @@ add_plot_type<- function(curr_plots, df_consts){
   stat <- df_consts$stat
   city <- df_consts$city
   prov <- df_consts$prov
-  city_lab <- df_consts$city_lab
+  show_city_lab <- df_consts$show_city_lab
   
   stat_lab <-bquote(.(stat)*' ('*degree *'C)')
-
+  print(strsplit(stat, ' ')[[1]][1])
+  
   for(i in 1: length(curr_plots)){
     dat <- curr_plots[[i]]$data
     index <- which(dat$prov==prov& dat$city == city)
@@ -243,7 +221,7 @@ add_plot_type<- function(curr_plots, df_consts){
       # aes_vline<- aes(xintercept=mean(slope))
       x_city <- dat_city$slope 
       x_dat <- mean(dat$slope)
-      if(strsplit(stat, ' ')[[1]][1] == 'R-squared'){
+      if(strsplit(stat, ' ')[[1]][1] == 'R_squared'){
         stat_lab <-bquote(.(stat)*' (%)')
         aes <- aes(x = r.squared)
         # aes_vline<-aes(xintercept=mean(r.squared))
@@ -269,7 +247,7 @@ add_plot_type<- function(curr_plots, df_consts){
         # geom_vline(aes_vline,color="blue", linetype="dashed", size=1)+
         labs(y='Frequency', x = stat_lab)
 
-      if(city_lab == 'Enable')
+      if(show_city_lab == 'Enable')
         curr_plots[[i]] <- curr_plots[[i]] +
         geom_point(x = x_city ,y = 5, colour = 'purple')+
         annotate("text", x = x_dat, y = 10  , vjust = 1, hjust = 1,
@@ -278,10 +256,10 @@ add_plot_type<- function(curr_plots, df_consts){
     }
     else if(plot_type == 'boxplot'){
       aes <- aes(x=prov, y=slope) #For slope.. 
-
-      if(strsplit(stat, ' ')[[1]][1] == 'R-squared')
-        aes <- aes(x=prov, y=r.squared);stat_lab <-bquote(.(stat)*' (%)')
-        
+      if(strsplit(stat, ' ')[[1]][1] == 'R_squared'){
+        aes <- aes(x=prov, y=r.squared)
+        print("HEREEEEEE------------------")
+      }
       curr_plots[[i]] <- curr_plots[[i]] + aes +
         geom_boxplot() +
         stat_summary(fun.y=mean, geom="point", shape=23, size=4)+
@@ -323,7 +301,7 @@ add_plot_type<- function(curr_plots, df_consts){
 # Input: curr_plot, title, meas, stat
 # Output:
 ##########################################
-add_plot_labels <- function(curr_plot, title_meas, stat){
+add_grid_labels <- function(curr_plot, title_meas, stat){
   title  = bquote(.(title_meas)*' - '~.(stat))
   if (stat == "Temperatures vs Years")
     title  = bquote(.(title_meas) *' vs Years')
@@ -349,8 +327,8 @@ create_grid <-function(curr_plot, month, df_consts){
 
   # if its Min_max_temp 
   if (length(curr_plot) == 2){
-    curr_plot[[1]] <- add_plot_labels(curr_plot[[1]], 'Minimum Temperatures', stat)
-    curr_plot[[2]]<- add_plot_labels(curr_plot[[2]], 'Maximum Temperatures', stat)
+    curr_plot[[1]] <- add_grid_labels(curr_plot[[1]], 'Minimum Temperatures', stat)
+    curr_plot[[2]]<- add_grid_labels(curr_plot[[2]], 'Maximum Temperatures', stat)
     title = bquote('Min. vs Max. Temperatures - '~.(stat))
     
     if(stat == 'Temperatures vs Years')
@@ -404,13 +382,6 @@ get_city_vector <- function(prov){
   }
 }
 
-get_city_stats<- function(city, month, year_to_start){
-  output_df_all <- getData('temp', month, year_to_start)
-  mean_output_df_all <- output_df_all[which(output_df_all$meas_name=='mean_temp'),]
-  mean_stats <- mean_output_df_all[which(mean_output_df_all$city==city),]
-  return(mean_stats)
-}
-
 
 
 
@@ -433,7 +404,7 @@ get_city_stats<- function(city, month, year_to_start){
 #   month_1 <- 'Jan'
 #   month_2 <- 'Jul'
 #   year_to_start <- '1980'
-#   output_df_all <- getData('temp', month_1, year_to_start)
+#   output_df_all <- get_data('temp', month_1, year_to_start)
 #   
 #   tt <- output_df_all[which(output_df_all[, "prov"] == curr_prov),]
 #   
@@ -445,7 +416,7 @@ get_city_stats<- function(city, month, year_to_start){
 #   top_15_max <- slice(tt_max_sorted, 1:up_bound)
 #   result_1 <- merge(top_15_min, top_15_max, by = 'city')
 #   
-#   output_df_all <- getData('temp', month_2, year_to_start)
+#   output_df_all <- get_data('temp', month_2, year_to_start)
 #   tt <- output_df_all[which(output_df_all[, "prov"] == curr_prov),]
 #   
 #   tt_min <- tt[which(tt[, "meas_name"] == 'min_temp'),]

@@ -31,14 +31,13 @@ knitr::opts_chunk$set(echo = FALSE)
 library(knitr)
 kexpand <- function(plot) {
 
-    cat(
-      knit(text=knit_expand(
+    c(knit_child(
         text=(
-"```{r child, echo = FALSE}
+"```{r child, results = 'asis', echo = FALSE}
 grid.draw(plot) 
 ```"),
-        plot = plot
-  )))
+      quiet  = TRUE
+  ))
 }
 ```
 

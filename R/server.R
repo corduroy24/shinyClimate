@@ -16,9 +16,10 @@ library(tidyverse)
 
 shinyServer(function(input, output, session) {
 
-  sb_vars <- callModule(sidebarLayout, 'sidebar', vars_plot) 
+  # sb_vars 
+  sb_vars <- callModule(sidebarLayout, 'sidebar', home_plot_vars) 
   
-  vars_plot <- callModule(homeLayout, 'home', sb_vars = sb_vars)
+  home_plot_vars <- callModule(homeLayout, 'home', sb_vars = sb_vars)
   
 
   # callModule(triviaLayout, 'trivia')

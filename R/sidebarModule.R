@@ -31,7 +31,7 @@ sidebarLayoutUI <- function(id) {
                                   selected = 1980
                       ),
                       div(style="text-align: center;",
-                          radioButtons(ns('city_lab'), 'City Label',
+                          radioButtons(ns('show_city_lab'), 'City Label',
                                    choices = c('Enable','Disable')))
              )
       ),
@@ -43,7 +43,7 @@ sidebarLayoutUI <- function(id) {
 }
 
 # Module server function
-sidebarLayout <- function(input, output, session, vars_plot) {
+sidebarLayout <- function(input, output, session, plot_vars) {
   prov_vector <- c("ON","AB","BC","YT","NT","NU","SK", "MB", "QC", "NB", "NS", "PE", "NL")
   
   observeEvent(input$region,{
@@ -52,6 +52,7 @@ sidebarLayout <- function(input, output, session, vars_plot) {
       showElement('prov')
     }
     else if(input$region == 'Province'){
+      showElement('prov')
       hideElement('city')
     }
       
@@ -79,7 +80,7 @@ sidebarLayout <- function(input, output, session, vars_plot) {
                       selected = city)
   })
 
-  callModule(download, 'inner_dl', plots = vars_plot$pp, rv = vars_plot$rv)
+  callModule(download, 'inner_dl', plots = plot_vars$pp, rv = plot_vars$rv)
   
   return(
     list(
@@ -89,7 +90,7 @@ sidebarLayout <- function(input, output, session, vars_plot) {
       month_1 = reactive({strtrim(input$month_1, 3)}),
       month_2 = reactive({strtrim(input$month_2, 3)}),
       year_to_start = reactive({input$year_to_start}),
-      city_lab = reactive({input$city_lab})
+      show_city_lab = reactive({input$show_city_lab})
     )
   )
 }
