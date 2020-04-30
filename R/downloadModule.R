@@ -30,13 +30,12 @@ download <- function(input, output, session, plots, rv) {
       # case we don't have write permissions to the current working dir (which
       # can happen when deployed).
       tempReport <- file.path(tempdir(), "report.Rmd")
-      file.copy("../report.Rmd", tempReport, overwrite = TRUE)
+      file.copy("./report.Rmd", tempReport, overwrite = TRUE)
 
       temp <- tempdir()
       # Set up parameters to pass to Rmd document
-      params <- list(p1 = isolate(plots$p1), p2 = isolate(plots$p2),
-                     p3 = isolate(plots$p3), p4 = isolate(plots$p4),
-                     dfnew = isolate(rv$dfnew), count  = isolate(rv$count)
+      params <- list(dfnew = isolate(rv$dfnew), 
+                     count  = isolate(rv$count)
                      )
       # Knit the document, passing in the `params` list, and eval it in a
       # child of the global environment (this isolates the code in the document

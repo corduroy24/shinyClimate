@@ -14,10 +14,10 @@ library(rmarkdown)
 source("homeModule.R")
 source("sidebarModule.R")
 source("helpers.R")
-source("triviaModule.R")
-source("moreInfoModule.R")
 source('downloadModule.R')
 source('plotModule.R')
+# source("triviaModule.R")
+# source("moreInfoModule.R")
 
 shinyUI<- dashboardPage(
 

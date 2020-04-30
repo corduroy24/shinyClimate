@@ -15,10 +15,15 @@ level(logger) <- 'DEBUG'
 #       @year_to_start: 
 # Output: output_df_all
 get_data <- function(meas, month, year_to_start){
-  if(file.exists(paste('../RData/',meas,month, year_to_start,'.RData'))){
-    load(paste('../RData/',meas,month, year_to_start,'.RData'), .GlobalEnv)
+  # cc <- list.files(pattern="*.RData", full.names = TRUE)
+  # print(cc)
+  # if(file.exists(paste('../RData/',meas,month, year_to_start,'.RData'))){
+  if(file.exists(paste('RData/',meas,month, year_to_start,'.RData'))){
+    # load(paste('../R/RData/',meas,month, year_to_start,'.RData'), .GlobalEnv)
+    load(paste('RData/',meas,month, year_to_start,'.RData'), .GlobalEnv)
     debug(logger, paste("Rdata exists"))
   } else {
+    # print("here_1")
     debug(logger, paste("RData does not exists"))
     # ugly...
     min_input_df_all <- load_cleaned_data(year_to_start, month, 'min_temp') #data matrix X
@@ -28,8 +33,10 @@ get_data <- function(meas, month, year_to_start){
     mean_input_df_all <- load_cleaned_data(year_to_start, month, 'mean_temp') #data matrix X
     output_df_all <- rbind(output_df_all,regression(mean_input_df_all)) #reg results 
     input_df_all <- rbind(min_input_df_all, max_input_df_all, mean_input_df_all)
-    save(output_df_all,input_df_all, file = paste('../RData/',meas,month, year_to_start,'.RData'))
-    load(paste('../RData/',meas,month, year_to_start,'.RData'), .GlobalEnv)
+    save(output_df_all,input_df_all, file = paste('RData/',meas,month, year_to_start,'.RData'))
+    # save(output_df_all,input_df_all, file = paste('../R/RData/',meas,month, year_to_start,'.RData'))
+    # load(paste(meas,month, year_to_start,'.RData'), .GlobalEnv)
+    load(paste('RData/',meas,month, year_to_start,'.RData'), .GlobalEnv)
   }
   return(output_df_all)
 }
@@ -37,17 +44,19 @@ get_data <- function(meas, month, year_to_start){
 # Find data files 
 find_meas_data <- function(meas){
   # debug(logger, paste("|IM HERE 2|"))
+  # print("finding data...")
+  # print(list.files('./Data'))
   if(meas == 'min_temp'){
-    txt_files_ls = list.files(path="../Data/Homog_monthly_min_temp_cleaned", pattern="*.txt", full.names = TRUE)
-    names = list.files(path="../Data/Homog_monthly_min_temp_cleaned", pattern="*.txt")
+    txt_files_ls = list.files(path="./Data/Homog_monthly_min_temp_cleaned", pattern="*.txt", full.names = TRUE)
+    names = list.files(path="./Data/Homog_monthly_min_temp_cleaned", pattern="*.txt")
   }
   else if(meas == 'max_temp'){
-    txt_files_ls = list.files(path="../Data/Homog_monthly_max_temp_cleaned", pattern="*.txt", full.names = TRUE)
-    names = list.files(path="../Data/Homog_monthly_max_temp_cleaned", pattern="*.txt")
+    txt_files_ls = list.files(path="./Data/Homog_monthly_max_temp_cleaned", pattern="*.txt", full.names = TRUE)
+    names = list.files(path="./Data/Homog_monthly_max_temp_cleaned", pattern="*.txt")
   }
   else if(meas == 'mean_temp'){
-    txt_files_ls = list.files(path="../Data/Homog_monthly_mean_temp_cleaned", pattern="*.txt", full.names = TRUE)
-    names = list.files(path="../Data/Homog_monthly_mean_temp_cleaned", pattern="*.txt")
+    txt_files_ls = list.files(path="./Data/Homog_monthly_mean_temp_cleaned", pattern="*.txt", full.names = TRUE)
+    names = list.files(path="./Data/Homog_monthly_mean_temp_cleaned", pattern="*.txt")
   }
   # else if(meas == 'precip'){
   #   debug(logger, paste("|IM HERE 3|"))
@@ -210,7 +219,7 @@ add_plot_type<- function(curr_plots, df_consts){
   show_city_lab <- df_consts$show_city_lab
   
   stat_lab <-bquote(.(stat)*' ('*degree *'C)')
-  print(strsplit(stat, ' ')[[1]][1])
+  # print(strsplit(stat, ' ')[[1]][1])
   
   for(i in 1: length(curr_plots)){
     dat <- curr_plots[[i]]$data
@@ -258,7 +267,7 @@ add_plot_type<- function(curr_plots, df_consts){
       aes <- aes(x=prov, y=slope) #For slope.. 
       if(strsplit(stat, ' ')[[1]][1] == 'R_squared'){
         aes <- aes(x=prov, y=r.squared)
-        print("HEREEEEEE------------------")
+        # print("HEREEEEEE------------------")
       }
       curr_plots[[i]] <- curr_plots[[i]] + aes +
         geom_boxplot() +
@@ -370,9 +379,13 @@ create_grid <-function(curr_plot, month, df_consts){
 # output: vector with names of city 
 ###################################################
 get_city_vector <- function(prov){
+  # print(getwd())
+  # cc <- list.files(full.names = TRUE)
+  # print(cc)
   require(plyr)
-  if(file.exists(paste('../RData/','constant_values','.RData'))){
-    load(paste('../RData/','constant_values','.RData'), .GlobalEnv)
+  if(file.exists(paste('RData/', 'constant_values','.RData'))){
+    # print("exists!!!")
+    load(paste('RData/','constant_values','.RData'), .GlobalEnv)
     city_vector <- city_prov_vector[which(city_prov_vector$prov==prov), ]
     city_vector <- select(city_vector, city) 
     # city_vector <- data.frame(city_vector[, 'city'])

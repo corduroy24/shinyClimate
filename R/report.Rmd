@@ -1,0 +1,74 @@
+---
+title: "Dynamic Report"
+author: "Korede Adegboye"
+header-includes:
+  - \usepackage{pdfpages}
+params:
+  dfnew: NA
+  count: NA
+---
+
+# Showcasing the strongest evidence for climate change
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(grid)
+library(knitr)
+num_plots <-length(params$dfnew)
+```
+
+## Results 
+```{r echo = FALSE}
+if(num_plots >= 1)
+  grid.draw(params$dfnew[[1]])
+```
+
+```{r echo = FALSE}
+if(num_plots >= 2)
+  grid.draw(params$dfnew[[2]])
+```
+
+```{r echo = FALSE}
+if(num_plots >= 3)
+  grid.draw(params$dfnew[[3]])
+```
+
+```{r echo = FALSE}
+if(num_plots >= 4)
+  grid.draw(params$dfnew[[4]])
+```
+
+```{r echo = FALSE}
+if(num_plots >= 5)
+  grid.draw(params$dfnew[[5]])
+```
+
+
+```{r echo = FALSE}
+if(num_plots >= 6)
+  grid.draw(params$dfnew[[6]])
+```
+
+
+```{r echo = FALSE}
+if(num_plots >= 7)
+  grid.draw(params$dfnew[[7]])
+```
+
+
+```{r echo = FALSE}
+if(num_plots >= 8)
+  grid.draw(params$dfnew[[8]])
+```
+
+
+```{r echo = FALSE}
+if(num_plots >= 9)
+  grid.draw(params$dfnew[[9]])
+```
+
+
+```{r echo = FALSE}
+if(num_plots >= 10)
+  grid.draw(params$dfnew[[10]])
+```

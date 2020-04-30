@@ -1,0 +1,13 @@
+name: shinyClimate
+title: shinyClimate
+username:
+account: ka97
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2211993
+bundleId: 3084333
+url: https://ka97.shinyapps.io/shinyClimate/
+when: 1588219589.24599
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: debug.log|moreInfoModule.R|triviaModule.R
