@@ -133,8 +133,8 @@ regression <- function(input_df){
 }
 
 # Interaction Model - Confirm Regression Results
-# city<- data.table(city_vector, stringsAsFactors = TRUE)
-# fit_2 <- lm(y_temp~ city-1 + city*x_year , data = input_df)
+# city<- data.table(get_city_vector('ON'), stringsAsFactors = TRUE)
+# fit_2 <- lm(y_temp~city-1+city*x_year-x_year , data = input_df)
 
 # Draw plots
 # df_consts <- data.frame(year_to_start <- '1980',
