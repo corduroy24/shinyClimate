@@ -25,7 +25,7 @@ The features included:
 - led by tidyverse 
 - Rename files, by station number, city, province  
 - reomve estimated (E) and missing (M) data labels
-For more information refer to [data cleaning notebook](man/data_cleaning.ipynb)
+For more information refer to [data cleaning notebook](docs/data_cleaning.ipynb)
 
  
 
