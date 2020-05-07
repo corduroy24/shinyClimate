@@ -28,7 +28,7 @@ sidebarLayoutUI <- function(id) {
                       ),
                       selectInput(ns("year_to_start"), "Start Year",
                                   choices = seq(1840, 1986), 
-                                  selected = 1980
+                                  selected = 1960
                       ),
                       div(style="text-align: center;",
                           radioButtons(ns('show_city_lab'), 'City Label',
@@ -67,13 +67,13 @@ sidebarLayout <- function(input, output, session, plot_vars) {
     prov_vector_sorted <- sort(prov_vector)
     updateSelectInput(session, "prov", "Choose a province",
                       choices = prov_vector_sorted,
-                      selected = 'ON')
+                      selected = 'MB')
   }, priority = 200)
   
   observeEvent(input$prov,{
     city_vector<- get_city_vector(input$prov)
     city<- NULL
-    if(input$prov == 'ON') city <- 'TORONTO'
+    if(input$prov == 'MB') city <- 'FLIN FLON'
     
     updateSelectInput(session, "city", "Choose a city",
                       choices = city_vector,

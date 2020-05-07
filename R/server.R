@@ -26,4 +26,17 @@ shinyServer(function(input, output, session) {
 
   # callModule(moreInfo, 'more')
   
+  observeEvent(input$show, {
+    showModal(modalDialog(
+      title = "About",
+      h3("More"),
+      h4("Refer to Preferences -> Other to change months and start year"),
+      h4("Refer to Preferences -> Other to enable - disable city label for histograms"),
+      h4("Close sidebar menu to have a better look at the plots"),
+      h4("Download a report on the plots currently displayed"),
+      easyClose = TRUE,
+      footer = NULL
+    ))
+  })
+  
 })

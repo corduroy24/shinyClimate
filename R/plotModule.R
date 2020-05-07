@@ -8,13 +8,13 @@ plotUI <- function(id) {
     fluidRow(
       tabBox(
         id = "tabset1", height = "100%",
-        tabPanel(title = "Min-Max",withSpinner(plotOutput(ns("plot_1_min_max_temp"), height = 350))),
-        tabPanel(title = 'Mean', withSpinner(plotOutput(ns("plot_1_mean_temp"), height = 350)))
+        tabPanel(title = "Min-Max",withSpinner(plotOutput(ns("plot_1_min_max_temp"), height = 350)))
+        # tabPanel(title = 'Mean', withSpinner(plotOutput(ns("plot_1_mean_temp"), height = 350)))
       ),
       tabBox(
         id = "tabset2", height = "100%",
-        tabPanel(title = "Min-Max",withSpinner(plotOutput(ns("plot_2_min_max_temp"), height = 350))),
-        tabPanel(title = 'Mean', withSpinner(plotOutput(ns("plot_2_mean_temp"), height = 350)))
+        tabPanel(title = "Min-Max",withSpinner(plotOutput(ns("plot_2_min_max_temp"), height = 350)))
+        # tabPanel(title = 'Mean', withSpinner(plotOutput(ns("plot_2_mean_temp"), height = 350)))
       )
     ),
     
@@ -27,10 +27,7 @@ plotUI <- function(id) {
 plots <- function(input, output, session, sb_vars, h_vars) {
   plot_type<-reactiveVal('regression line')
   statistic <- reactiveVal('temperatures vs years')
-  # p1 <- reactiveVal()
-  # p2 <- reactiveVal()
-  # p3 <- reactiveVal()
-  # p4 <- reactiveVal()
+
   pp <- reactiveValues()
   plots <- reactiveValues()
   index <-reactiveVal()
@@ -51,7 +48,9 @@ plots <- function(input, output, session, sb_vars, h_vars) {
              need(sb_vars$month_1() != '', 'missing month 1'),
              need(sb_vars$month_2() != '', 'missing month 2'),
              need(sb_vars$prov() != '', 'missing province'),
-             need(sb_vars$city() != '', 'missing city')
+             need(sb_vars$city() != '', 'missing city'),
+             need(sb_vars$region() != '', 'missing region')
+             
     )
     year_to_start<- sb_vars$year_to_start()
     city <- sb_vars$city()
@@ -86,8 +85,6 @@ plots <- function(input, output, session, sb_vars, h_vars) {
 
       rv$dfnew[[rv$count]] <- pp$p1
       rv$count = rv$count + 1
-        
-  
 
     }, cacheKeyExpr = {list('min_max_temp', sb_vars$month_1(), df_consts)})
     output$plot_1_mean_temp<-renderCachedPlot({

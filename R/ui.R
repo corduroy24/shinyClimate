@@ -9,6 +9,7 @@
 
 library(shiny)
 library(shinydashboard)
+library(shinydashboardPlus)
 library(shinyjs)
 library(rmarkdown)
 source("homeModule.R")
@@ -16,6 +17,7 @@ source("sidebarModule.R")
 source("helpers.R")
 source('downloadModule.R')
 source('plotModule.R')
+source('analysisModule.R')
 # source("triviaModule.R")
 # source("moreInfoModule.R")
 
@@ -23,7 +25,10 @@ shinyUI<- dashboardPage(
 
   skin = "yellow",
   
-  dashboardHeader(title = "Climate For You"),
+  dashboardHeader(title = "Climate For You",
+                  tags$li(class = "dropdown", actionLink("show", "About"))
+  
+                  ),
   
   #SideBar content 
   dashboardSidebar(
@@ -35,6 +40,7 @@ shinyUI<- dashboardPage(
       # menuItem("More Info", tabName = "more", icon = icon("th")),
     )
   ),
+  
 
   # Body content 
   dashboardBody(

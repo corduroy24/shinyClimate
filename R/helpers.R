@@ -136,7 +136,7 @@ regression <- function(input_df){
 # city<- data.table(get_city_vector('ON'), stringsAsFactors = TRUE)
 # fit_2 <- lm(y_temp~city-1+city*x_year-x_year , data = input_df)
 
-# Draw plots
+# # Draw plots
 # df_consts <- data.frame(year_to_start <- '1980',
 # plot_type <- 'regression line',
 # location <- 'TORONTO,ON',
@@ -187,6 +187,7 @@ setup_plots <- function(meas, month, df_consts){
   p<- create_grid(p,month, df_consts)
   suppressMessages( grid.draw(p))
   invisible(p)
+
 }
 
 
@@ -217,8 +218,9 @@ add_plot_type<- function(curr_plots, df_consts){
   city <- df_consts$city
   prov <- df_consts$prov
   show_city_lab <- df_consts$show_city_lab
-  
-  stat_lab <-bquote(.(stat)*' ('*degree *'C)')
+  year_to_start <- df_consts$year_to_start
+
+  stat_lab <-bquote(.(stat)*' ('*degree *'C per year)')
   # print(strsplit(stat, ' ')[[1]][1])
   
   for(i in 1: length(curr_plots)){
@@ -230,20 +232,21 @@ add_plot_type<- function(curr_plots, df_consts){
       # aes_vline<- aes(xintercept=mean(slope))
       x_city <- dat_city$slope 
       x_dat <- mean(dat$slope)
-      if(strsplit(stat, ' ')[[1]][1] == 'R_squared'){
-        stat_lab <-bquote(.(stat)*' (%)')
+      if(strsplit(stat, ' ')[[1]][1] == 'R\U000B2'){
+        # stat_lab <-bquote(R^2 *' ('*degree *'C per year)')
+        stat_lab <-bquote(R^2)
         aes <- aes(x = r.squared)
         # aes_vline<-aes(xintercept=mean(r.squared))
         x_city <- dat_city$r.squared 
         x_dat <- mean(dat$r.squared)
       }
-      else if(strsplit(stat, ' ')[[1]][1] == 'CI_lower'){
+      else if(strsplit(stat, ' ')[[1]][1] == 'Lower.Bound'){
         aes <- aes(x = CI_lower)
         # aes_vline<-aes(xintercept=mean(CI_lower))
         x_city <- dat_city$CI_lower 
         x_dat <- mean(dat$CI_lower)
       }
-      else if(strsplit(stat, ' ')[[1]][1] == 'CI_upper'){
+      else if(strsplit(stat, ' ')[[1]][1] == 'Upper.Bound'){
         aes <- aes(x = CI_upper); 
         # aes_vline<-aes(xintercept=mean(CI_upper))
         x_city <- dat_city$CI_upper
@@ -265,7 +268,8 @@ add_plot_type<- function(curr_plots, df_consts){
     }
     else if(plot_type == 'boxplot'){
       aes <- aes(x=prov, y=slope) #For slope.. 
-      if(strsplit(stat, ' ')[[1]][1] == 'R_squared'){
+      if(strsplit(stat, ' ')[[1]][1] == 'R\U000B2'){
+        stat_lab <-bquote(R^2)
         aes <- aes(x=prov, y=r.squared)
         # print("HEREEEEEE------------------")
       }
@@ -273,6 +277,7 @@ add_plot_type<- function(curr_plots, df_consts){
         geom_boxplot() +
         stat_summary(fun.y=mean, geom="point", shape=23, size=4)+
         stat_boxplot(geom = 'errorbar')+
+        geom_hline(yintercept=0, linetype="dashed", color = "red", size = 1.2)+
         labs(y=stat_lab, x = 'Province')
     }
     else if(plot_type == 'regression line'){
@@ -291,7 +296,7 @@ add_plot_type<- function(curr_plots, df_consts){
         geom_point(size = 1)+
         stat_smooth(method = 'lm', se = FALSE)+
         labs(y=stat_lab, x = 'Years')+
-        scale_x_continuous(breaks  = seq(1980,2020, by = 5))
+        scale_x_continuous(breaks  = seq(year_to_start,2020, by = 5))
       
       curr_plots[[i]] <- curr_plots[[i]] +
         ggpubr::stat_regline_equation(label.x.npc = 'left', label.y.npc='bottom', colour= 'purple')+
@@ -333,7 +338,8 @@ create_grid <-function(curr_plot, month, df_consts){
   month <- toString(month)
   year_end <- switch(region, 'City' = max(curr_plot[[1]]$data$x_year), {'2017'}) 
   subt<- bquote(italic(.(location)*' -'~.(month) *' - ('* .(year_to_start)*' - '* .(year_end) *')'))
-
+  if(strsplit(stat, ' ')[[1]][1] == 'R\U000B2')
+    stat <- bquote(R^2)
   # if its Min_max_temp 
   if (length(curr_plot) == 2){
     curr_plot[[1]] <- add_grid_labels(curr_plot[[1]], 'Minimum Temperatures', stat)
@@ -382,12 +388,11 @@ get_city_vector <- function(prov){
   # print(getwd())
   # cc <- list.files(full.names = TRUE)
   # print(cc)
-  require(plyr)
   if(file.exists(paste('RData/', 'constant_values','.RData'))){
     # print("exists!!!")
     load(paste('RData/','constant_values','.RData'), .GlobalEnv)
     city_vector <- city_prov_vector[which(city_prov_vector$prov==prov), ]
-    city_vector <- select(city_vector, city) 
+    city_vector <- dplyr::select(city_vector, city) 
     # city_vector <- data.frame(city_vector[, 'city'])
     city_vector$city <- as.character(city_vector$city)
     city_v <- sort(city_vector$city)
@@ -395,8 +400,267 @@ get_city_vector <- function(prov){
   }
 }
 
+get_city_stats <- function(month, df_consts){
+  city<- df_consts$city
+  prov <- df_consts$prov
+  year_to_start <- df_consts$year_to_start
+  output_df_all <- get_data('temp', month, year_to_start)
+
+  # if(region == 'City'){
+    index <- which(output_df_all$prov==prov
+                   & output_df_all$city == city)
+    output_df_all <- output_df_all[index,]
+  # }
+  
+  # if(meas == 'min_max_temp'){
+  #   min_output_df_all <- output_df_all[which(output_df_all$meas_name=='min_temp'),]
+  #   max_output_df_all <- output_df_all[which(output_df_all$meas_name=='max_temp'),]
+  #   slope_min <- min_output_df_all$slope
+  #   slope_max <- max_output_df_all$slope
+  #   return(list(p1,p2))
+  # }
+  # else if(meas == 'mean_temp'){
+  #   mean_output_df_all <- output_df_all[which(output_df_all$meas_name=='mean_temp'),]
+  #   slope_mean <- max_output_df_all$slope
+  #   return(list(p))
+  # }
+  
+
+} 
 
 
+
+
+new_des_block_city<- function(number,res, name){
+  color = NULL
+  icon = NULL
+  if(name == 'SLOPE'){
+    color <- evaluate_color(number)
+    icon <- evaluate_icon(number)
+    number  <- paste0(number, ' \U00B0','C per year')
+  }
+  else if(name == 'R\U000B2')
+    number <- paste0(number*100, '%')
+  else if(name  == 'CONFIDENCE INTERVAL')
+    number  <- paste0(number, ' \U00B0','C per year')
+  
+
+  descriptionBlock(
+    number = number, 
+    number_color = color, 
+    number_icon = icon,
+    header = res, 
+    text = name, 
+    right_border = TRUE,
+    margin_bottom = FALSE
+  )
+}
+
+new_des_block_prov_can<- function(number, res, name){
+  color = NULL
+  icon = NULL
+  # if(name == 'SLOPE'){
+  #   color <- evaluate_color(number)
+  #   icon <- evaluate_icon(number)
+  #   number  <- paste0(number, ' \U00B0','C per year')
+  # }
+  # else if(name == 'R\U000B2')
+  #   number <- paste0(number*100, '%')
+  # else if(name  == 'CONFIDENCE INTERVAL')
+  #   number  <- paste0(number, ' \U00B0','C per year')
+  
+  descriptionBlock(
+    # number = paste('Central Tendacy:', signif(number$mean,2),'median:',
+    #                signif(number$med,2), 'mode:',signif(number$mode,2) ),
+    # number = 
+    # number_color = color,
+    # number_icon = icon,
+    header = res, 
+    text = name,
+    right_border = TRUE,
+    margin_bottom = FALSE
+  )
+}
+# city_month_eval<- function(min, max){
+#   if(min)
+#   if(min$slope_res == 'Decreasing relatively fast'){
+#     if(max$slope_res == 'Decreasing relatively fast'){
+#       result_1 <- ''
+#     }
+#     else if (max$slope_res == 'Decreasing relatively slow'){}
+#     else if (max$slope_res == 'Increasing relatively fast' ){}
+#     else if (max$slope_res == 'Increasing relatively slow'){}
+#   }
+#   else if (min$slope_res == 'Decreasing relatively slow'){
+#     if(max$slope_res == 'Decreasing relatively fast'){}
+#     else if (max$slope_res == 'Decreasing relatively slow'){}
+#     else if (max$slope_res == 'Increasing relatively fast' ){}
+#     else if (max$slope_res == 'Increasing relatively slow'){}
+#   }
+#   else if (min$slope_res == 'Increasing relatively fast' ){
+#     if(max$slope_res == 'Decreasing relatively fast'){}
+#     else if (max$slope_res == 'Decreasing relatively slow'){}
+#     else if (max$slope_res == 'Increasing relatively fast' ){}
+#     else if (max$slope_res == 'Increasing relatively slow'){}
+#   }
+#   else if (min$slope_res == 'Increasing relatively slow'){
+#     if(max$slope_res == 'Decreasing relatively fast'){}
+#     else if (max$slope_res == 'Decreasing relatively slow'){}
+#     else if (max$slope_res == 'Increasing relatively fast' ){}
+#     else if (max$slope_res == 'Increasing relatively slow'){}
+#   }
+#         
+# 
+# 
+#   
+# }
+
+
+eval_hist <- function(month, df_consts){
+  city<- df_consts$city
+  prov <- df_consts$prov
+  year_to_start <- df_consts$year_to_start
+  region <- df_consts$region
+  output_df_all <- get_data('temp', month, year_to_start)
+
+  if(region == "Province"){
+    index <- which(output_df_all$prov==prov)
+    output_df_all <- output_df_all[index,]
+  }
+
+  slope_eval <- stat_eval('slope', output_df_all)
+  lower_eval <- stat_eval('CI_lower', output_df_all)
+  upper_eval<- suppressWarnings( stat_eval('CI_upper', output_df_all))
+  r2_eval<- stat_eval('r.squared', output_df_all)
+  list <- list(slope = slope_eval, lower =lower_eval, upper = upper_eval, r2 = r2_eval)
+    
+  
+  return(list)
+} 
+
+stat_eval<-function(stat, output_df_all){
+  
+  min_output_df_all <- output_df_all[which(output_df_all$meas_name=='min_temp'),]
+  max_output_df_all <- output_df_all[which(output_df_all$meas_name=='max_temp'),]
+  # mean_output_df_all <- output_df_all[which(output_df_all$meas_name=='mean_temp'),]
+  # print(LaplacesDemon::is.bimodal(min_output_df_all$slope))
+  skewness<- round(skewness(min_output_df_all[,stat]))
+  print(skewness)
+  
+  if(LaplacesDemon::is.bimodal(min_output_df_all[,stat]))
+    min_result <- 'bimodal'
+  else if(skewness > 1 )
+    min_result<-'highly right-skewed'
+  else if(skewness < (-1))
+    min_result<-'highly left-skewed'
+  else if(skewness >= (-1) && skewness < (-0.5) )
+    min_result<-'moderately left-skewed'
+  else if(skewness <= (1) && skewness >=(0.5) )
+    min_result<-'moderately right-skewed'
+  else if(skewness >= (-0.5) && skewness <= 0.5)
+    min_result<-'approximately symmetric'
+  else
+    min_result<-"undetected"
+  
+  # print(LaplacesDemon::is.bimodal(max_output_df_all$slope))
+  skewness<- round(skewness(max_output_df_all[,stat]),2)
+  print(skewness)
+  
+  if(LaplacesDemon::is.bimodal(max_output_df_all[,stat]))
+    max_result<-'bimodal'
+  else if(skewness > 1 )
+    max_result<-'highly right-skewed'
+  else if(skewness < (-1))
+    max_result<-'highly left-skewed'
+  else if(skewness >= (-1) && skewness <= (-0.5) )
+    max_result<-'moderately left-skewed'
+  else if(skewness <= (1) && skewness >=(0.5) )
+    max_result<-'moderately right-skewed'
+  else if(skewness >= (-0.5) && skewness <= 0.5)
+    max_result<-'approximately symmetric'
+  else
+    max_result<-"undetected"
+  
+  density_estimate_1 <- density(min_output_df_all[,stat])
+  print(min_mode <- signif(density_estimate_1$x[which.max(density_estimate_1$y)],1))
+  density_estimate_1 <- density(max_output_df_all[,stat])
+  print(max_mode <- signif(density_estimate_1$x[which.max(density_estimate_1$y)],1))
+  
+  values_min = list(mean = mean(min_output_df_all[,stat]), med = median(min_output_df_all[,stat]), mode = min_mode)
+  values_max = list(mean = mean(max_output_df_all[,stat]), med = median(max_output_df_all[,stat]), mode = max_mode)
+  
+  values = list(min = values_min, max = values_max) 
+  new_df <- list(value = values, min = min_result,max =  max_result)
+  # df<- rbind(df, new_df)
+}
+test<- function(){
+
+index <- which(output_df_all$prov=='MB')
+output_df_all <- output_df_all[index,]
+  min_output_df_all <- output_df_all[which(output_df_all$meas_name=='min_temp'),]
+
+get_mode(min_output_df_all)
+}
+
+get_mode <- function(v) {
+  uniqv <- unique(v$slope)
+  uniqv[which.max(tabulate(match(v$slope, uniqv)))]
+}
+
+evaluate_color<- function(stat){
+  # print(typeof(stat))
+  if(stat < 0) result <- 'red'
+  else if (stat > 0) result <- 'green' 
+  return(result)
+}
+evaluate_icon <- function(stat){
+  if(stat < 0) result <- 'fa fa-caret-down'
+  else if (stat > 0) result <- 'fa fa-caret-up' 
+  else result <- NULL
+  return(result)
+}
+evaluate_slope <- function(slope){
+  if(slope < 0) {
+    if(-(slope) > 0.099)
+      result <- 'Decreasing relatively fast'
+    else 
+      result <- 'Decreasing relatively slow'
+  }
+  else if (slope > 0){
+    if(slope > 0.099)
+      result <- 'Increasing relatively fast' 
+    else 
+      result <- 'Increasing relatively slow'
+  }
+  else result <- 'neither'
+  return(result)
+}
+
+evaluate_ci <- function(lower, upper){
+  #hypothesis test 
+  # strong evidence or significant evidence
+  if(lower < 0 && upper < 0) result <- 'Slope is significant'
+  else if (lower < 0 && upper > 0) result <- 'Slope is not significant'
+  else if (lower > 0 && upper > 0) result <-  'Slope is significant'
+  return(result)
+}
+
+
+evaluate_r2 <- function(slope){
+  
+  if(slope == 1)
+    result <- 'Model is strong. Model explains all temperature variability '
+  else if(slope == 0)
+    result <- 'Model is inadmissable. Explains none of the temperature variability '
+  else if (slope > 0.5)
+    result <- 'Model is good. Explains most of the temperature variablity'
+  else if(slope >=  0.1)
+    result <- 'Model is acceptable. Explains some temperature variability '
+  else if (slope < 0.1)
+    result <- 'Model is weak. Explains a small amount of temperature variablity'
+  
+  return(result)
+}
 
 ######################################################
 ######################################################
