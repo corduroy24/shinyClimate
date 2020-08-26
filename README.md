@@ -2,7 +2,8 @@
 
 > shiny app for climate change 
 
-
+## Project Report
+[Click here](https://carleton.ca/math/wp-content/uploads/Korede-Adegboye-Honours-Project.pdf) to see the report
 
 ## Purpose of this App:
 This app was designed for two reasons:
