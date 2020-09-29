@@ -5,9 +5,9 @@ account: ka97
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 2211993
-bundleId: 3116834
+bundleId: 3116972
 url: https://ka97.shinyapps.io/shinyClimate/
-when: 1588867344.74412
+when: 1588869303.74354
 asMultiple: FALSE
 asStatic: FALSE
 ignoredFiles: debug.log|moreInfoModule.R|triviaModule.R

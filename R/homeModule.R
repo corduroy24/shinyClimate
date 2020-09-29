@@ -73,6 +73,7 @@ homeLayoutUI <- function(id) {
 
     plotUI(ns("inner_plot")),
     analysisUI(ns("inner_analysis")),
+    addNoteUI(ns('inner_note')),
     
     
     
@@ -105,6 +106,7 @@ homeLayout <- function(input, output, session, sb_vars) {
   
   plot_vars <- callModule(plots, 'inner_plot', sb_vars = sb_vars, h_vars = h_vars)
   a_vars <- callModule(analysis, 'inner_analysis', sb_vars = sb_vars, p_vars = plot_vars)
+  note_vars <- callModule(addNote, 'inner_notes')
   
   observeEvent(sb_vars$region(),{
     if(sb_vars$region()  == 'City'){
@@ -137,6 +139,18 @@ homeLayout <- function(input, output, session, sb_vars) {
                         ),
                         selected = "Histogram - Slopes")
     }
+    else if(sb_vars$region()  == 'North'){
+      updateSelectInput(session, 'plot_options',
+                        choices = list(
+                          'Slopes' = list("Histogram - Slopes",
+                                          "Boxplot - Slopes"),
+                          "Confidence Intervals for Slopes" = list("Histogram - Lower.Bound",
+                                                                   "Histogram - Upper.Bound"),
+                          'R\U000B2 for Slopes' = list("Histogram - R\U000B2",
+                                                       "Boxplot - R\U000B2")
+                        ),
+                        selected = "Histogram - Slopes")
+    }
   })
 
   
@@ -158,7 +172,7 @@ homeLayout <- function(input, output, session, sb_vars) {
   })
   
   output$plot_des_2<- renderUI({
-    title_2 <- p(strsplit(str_to_title(plot_vars$statistic()), '_')[[1]][1], style = 'font-weight:bold; font-size:16px;margin:0;display:inline')
+    title_2 <- p(str_to_title(plot_vars$statistic()), style = 'font-weight:bold; font-size:16px;margin:0;display:inline')
     if(plot_vars$statistic() == 'Slopes')
       para_2<- "The rate of change in x - Years as y - temperature changes."
     else if(plot_vars$statistic() == 'Lower.Bound')

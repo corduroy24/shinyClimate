@@ -109,8 +109,32 @@ analysisUI <- function(id) {
         
         # h4('just some text to summarize the results for the month....later')
       ),
-      
-    )
+    ),
+    
+    # fluidRow(
+    #   tabBox(
+    #     height = "100%",
+    #     tabPanel(title = "Min-Max",withSpinner(plotOutput(ns("bimodal_eval_1_n"), height = 350)))
+    #     # tabPanel(title = 'Mean', withSpinner(plotOutput(ns("plot_1_mean_temp"), height = 350)))
+    #   ),
+    #   tabBox(
+    #     height = "100%",
+    #     tabPanel(title = "Min-Max",withSpinner(plotOutput(ns("bimodal_eval_1_s"), height = 350)))
+    #     # tabPanel(title = 'Mean', withSpinner(plotOutput(ns("plot_2_mean_temp"), height = 350)))
+    #   )
+    # )
+    # fluidRow(
+    #   tabBox(
+    #     height = "100%",
+    #     tabPanel(title = "Min-Max",withSpinner(plotOutput(ns("bimodal_eval_2_n"), height = 350)))
+    #     # tabPanel(title = 'Mean', withSpinner(plotOutput(ns("plot_1_mean_temp"), height = 350)))
+    #   ),
+    #   tabBox(
+    #     height = "100%",
+    #     tabPanel(title = "Min-Max",withSpinner(plotOutput(ns("bimodal_eval_2_s"), height = 350)))
+    #     # tabPanel(title = 'Mean', withSpinner(plotOutput(ns("plot_2_mean_temp"), height = 350)))
+    #   )
+    # )
     # fluidRow(
     #   box(
     #     width = 12,
@@ -123,7 +147,7 @@ analysisUI <- function(id) {
     # )
     
   )
-
+  
 }
 
 
@@ -144,19 +168,20 @@ analysis <- function(input, output, session, sb_vars, p_vars) {
     else if(sb_vars$region()  == 'Canada'){
       hideElement('city_eval')
       showElement('prov_can_eval')
+      
+      observeEvent(p_vars$plot_type(),{
+        if(p_vars$plot_type() == 'boxplot'){
+          # hideElement('city_eval')
+          hideElement('prov_can_eval')
+        }
+        else{
+          showElement('prov_can_eval')
+        }
+      })
     }
   })
   
-  observeEvent(p_vars$plot_type(),{
-    if(p_vars$plot_type() == 'boxplot'){
-      # hideElement('city_eval')
-      hideElement('prov_can_eval')
-    }
-    else{
-      showElement('prov_can_eval')
-    }
-    
-  })
+
   
   observe({
     validate(need(sb_vars$year_to_start() != '', 'missing start year'),
@@ -167,14 +192,13 @@ analysis <- function(input, output, session, sb_vars, p_vars) {
     )
     
     
-    df_consts <- data.frame('year_to_start' = sb_vars$year_to_start(), 
+    df_consts <- data.frame('year_to_start' = sb_vars$year_to_start(), 'location' = p_vars$location(), 'plot_type' = p_vars$plot_type(),
                             'prov'=sb_vars$prov(),'city' = sb_vars$city(), stringsAsFactors = FALSE )
     stats <- get_city_stats(sb_vars$month_1(), df_consts)
     # print(stats)
     min_stats <- stats[which(stats$meas_name=='min_temp'),]
     max_stats <- stats[which(stats$meas_name=='max_temp'),]
     mean_stats <- stats[which(stats$meas_name=='mean_temp'),]
-    # r2_text <- HTML(paste0('R', tags$sup(2)))
     output$month_1 <- renderUI({
       # location <- paste0(sb_vars$city(),',' ,sb_vars$prov())
       # paste(sb_vars$month_1(), '-' ,location, '- (', sb_vars$year_to_start(), '- 2017)')
@@ -209,9 +233,9 @@ analysis <- function(input, output, session, sb_vars, p_vars) {
         
       )
     })
-    df_consts_2 <- data.frame('year_to_start' = sb_vars$year_to_start(), 
-                              'prov'=sb_vars$prov(),'city' = sb_vars$city(), stringsAsFactors = FALSE )
-    stats_2 <- get_city_stats(sb_vars$month_2(), df_consts_2)
+    # df_consts_2 <- data.frame('year_to_start' = sb_vars$year_to_start(), 'location' = p_vars$location(), 'plot_type' = p_vars$plot_type(),
+    #                           'prov'=sb_vars$prov(),'city' = sb_vars$city(), stringsAsFactors = FALSE )
+    stats_2 <- get_city_stats(sb_vars$month_2(), df_consts)
     # print(stats)
     min_stats_2 <- stats_2[which(stats_2$meas_name=='min_temp'),]
     max_stats_2 <- stats_2[which(stats_2$meas_name=='max_temp'),]
@@ -249,7 +273,6 @@ analysis <- function(input, output, session, sb_vars, p_vars) {
         new_des_block_city(signif(max_stats_2$r.squared,2),res_3_2 , 'R\U000B2')
       )
     })
-    
   })
   
   observe({
@@ -258,8 +281,9 @@ analysis <- function(input, output, session, sb_vars, p_vars) {
              need(sb_vars$month_2() != '', 'missing month 2'),
              need(sb_vars$prov() != '', 'missing province'),
              need(sb_vars$city() != '', 'missing city'),
-             need(p_vars$statistic() != '', 'missing statistic')
-             
+             need(p_vars$statistic() != '', 'missing statistic'),
+             need(p_vars$location() != '', 'missing location'),
+             need(sb_vars$show_city_lab() != '', 'missing city label option')
     )
     output$month_11 <- renderUI({
       sb_vars$month_1()
@@ -267,63 +291,95 @@ analysis <- function(input, output, session, sb_vars, p_vars) {
     output$month_22 <- renderUI({
       sb_vars$month_2()
     })
-    
-    df_consts <- data.frame('year_to_start' = sb_vars$year_to_start(), 'region' = sb_vars$region(),
-                            'prov'=sb_vars$prov(),'city' = sb_vars$city(), stringsAsFactors = FALSE )
+
+    df_consts <- data.frame('year_to_start' = sb_vars$year_to_start(), 'location' = p_vars$location(), 
+                            'plot_type' = p_vars$plot_type(), 'statistic' = p_vars$statistic(), 'show_city_lab' = 'Disable',
+                            'prov'=sb_vars$prov(),'city' = sb_vars$city(),'region' = sb_vars$region(), stringsAsFactors = FALSE )
+#disabled city lab for now...because if its not on the south or north side..it wont be found ...gives error
     eval_1 <- eval_hist(sb_vars$month_1(), df_consts)
     # print(eval_1)
     # print(eval_1$slope$value$max$mean)
     output$dist_1<- renderUI({
       # eval_1$slope$min
       print(p_vars$statistic())
-        if(p_vars$statistic() == 'Slopes')
-          boxPad(new_des_block_prov_can(eval_1$slope$value$min,eval_1$slope$min, 'SLOPE'))
-        else if(p_vars$statistic() == 'Lower.Bound' | p_vars$statistic() == 'Upper.Bound'){
-          boxPad(new_des_block_prov_can(eval_1$lower$value$min,eval_1$lower$min, 'Lower Bound'),
-          new_des_block_prov_can(eval_1$upper$value$min, eval_1$upper$min,'Upper Bound'))
-        }
-        else if (p_vars$statistic() == 'R\U000B2')
-          boxPad(new_des_block_prov_can(eval_1$r2$value$min, eval_1$r2$min, 'R\U000B2'))
+      if(p_vars$statistic() == 'Slopes')
+        boxPad(new_des_block_prov_can(eval_1$slope$value$min,eval_1$slope$min, 'SLOPE'))
+      else if(p_vars$statistic() == 'Lower.Bound' | p_vars$statistic() == 'Upper.Bound'){
+        boxPad(new_des_block_prov_can(eval_1$lower$value$min,eval_1$lower$min, 'Lower Bound'),
+               new_des_block_prov_can(eval_1$upper$value$min, eval_1$upper$min,'Upper Bound'))
+      }
+      else if (p_vars$statistic() == 'R\U000B2')
+        boxPad(new_des_block_prov_can(eval_1$r2$value$min, eval_1$r2$min, 'R\U000B2'))
+      
+
     })
     output$dist_2<- renderUI({
       # eval_1$slope$max
-        if(p_vars$statistic() == 'Slopes')
-          boxPad(new_des_block_prov_can(eval_1$slope$value$max,eval_1$slope$max, 'SLOPE'))
-        else if(p_vars$statistic() == 'Lower.Bound' | p_vars$statistic() == 'Upper.Bound'){
-          boxPad(new_des_block_prov_can(eval_1$lower$value$max,eval_1$lower$max, 'Lower Bound'),
-          new_des_block_prov_can(eval_1$upper$value$max, eval_1$upper$max,'Upper Bound'))
-        }
-        else if (p_vars$statistic() == 'R\U000B2')
-          boxPad(new_des_block_prov_can(eval_1$r2$value$max, eval_1$r2$max , 'R\U000B2'))
+      if(p_vars$statistic() == 'Slopes')
+        boxPad(new_des_block_prov_can(eval_1$slope$value$max,eval_1$slope$max, 'SLOPE'))
+      else if(p_vars$statistic() == 'Lower.Bound' | p_vars$statistic() == 'Upper.Bound'){
+        boxPad(new_des_block_prov_can(eval_1$lower$value$max,eval_1$lower$max, 'Lower Bound'),
+               new_des_block_prov_can(eval_1$upper$value$max, eval_1$upper$max,'Upper Bound'))
+      }
+      else if (p_vars$statistic() == 'R\U000B2')
+        boxPad(new_des_block_prov_can(eval_1$r2$value$max, eval_1$r2$max , 'R\U000B2'))
+      
+
     })
     
     eval_2 <- eval_hist(sb_vars$month_2(), df_consts)
     
     output$dist_11<- renderUI({
       # eval_2$slope$min
-        if(p_vars$statistic() == 'Slopes')
-          boxPad(new_des_block_prov_can(eval_2$slope$value$min,eval_2$slope$min, 'SLOPE'))
-        else if(p_vars$statistic() == 'Lower.Bound' | p_vars$statistic() == 'Upper.Bound')({
-          boxPad(new_des_block_prov_can(eval_2$lower$value$min,eval_2$lower$min, 'Lower Bound'),
-          new_des_block_prov_can(eval_2$upper$value$min, eval_2$upper$min,'Upper Bound'))
-        })
-        else if (p_vars$statistic() == 'R\U000B2')
-          boxPad(new_des_block_prov_can(eval_2$r2$value$min, eval_2$r2$min , 'R\U000B2'))
-    })
-    output$dist_22<- renderUI({
-      # eval_2$slope$max
-        if(p_vars$statistic() == 'Slopes')
-          boxPad(new_des_block_prov_can(eval_2$slope$value$max,eval_2$slope$max, 'SLOPE'))
-        else if(p_vars$statistic() == 'Lower.Bound' || p_vars$statistic() == 'Upper.Bound'){
-          boxPad(new_des_block_prov_can(eval_2$lower$value$max,eval_2$lower$max, 'Lower Bound'),
-          new_des_block_prov_can(eval_2$upper$value$max, eval_2$upper$max,'Upper Bound')) 
-        }
-        else if (p_vars$statistic() == 'R\U000B2')
-          boxPad(new_des_block_prov_can(eval_2$r2$value$max, eval_2$r2$max , 'R\U000B2'))
+      if(p_vars$statistic() == 'Slopes')
+        boxPad(new_des_block_prov_can(eval_2$slope$value$min,eval_2$slope$min, 'SLOPE'))
+      else if(p_vars$statistic() == 'Lower.Bound' | p_vars$statistic() == 'Upper.Bound')({
+        boxPad(new_des_block_prov_can(eval_2$lower$value$min,eval_2$lower$min, 'Lower Bound'),
+               new_des_block_prov_can(eval_2$upper$value$min, eval_2$upper$min,'Upper Bound'))
+      })
+      else if (p_vars$statistic() == 'R\U000B2')
+        boxPad(new_des_block_prov_can(eval_2$r2$value$min, eval_2$r2$min , 'R\U000B2'))
+      
+
     })
     
-  })
+    output$dist_22<- renderUI({
+      # eval_2$slope$max
+      if(p_vars$statistic() == 'Slopes')
+        boxPad(new_des_block_prov_can(eval_2$slope$value$max,eval_2$slope$max, 'SLOPE'))
+      else if(p_vars$statistic() == 'Lower.Bound' || p_vars$statistic() == 'Upper.Bound'){
+        boxPad(new_des_block_prov_can(eval_2$lower$value$max,eval_2$lower$max, 'Lower Bound'),
+               new_des_block_prov_can(eval_2$upper$value$max, eval_2$upper$max,'Upper Bound')) 
+      }
+      else if (p_vars$statistic() == 'R\U000B2')
+        boxPad(new_des_block_prov_can(eval_2$r2$value$max, eval_2$r2$max , 'R\U000B2'))
+      
+    })
+    
 
+    if (sb_vars$region() == 'Canada'){
+      if(eval_1$slope$min == 'bimodal' || eval_1$slope$max == 'bimodal' ){
+        print("bimodal - month 1 - slope - min n max")
+        # showElement('bimodal_eval_1')
+        output$bimodal_eval_1_n <- renderPlot({
+          setup_plots('min_max_temp',sb_vars$month_1(), df_consts, 'north')
+        })
+        output$bimodal_eval_1_s <- renderPlot({
+          setup_plots('min_max_temp',sb_vars$month_1(), df_consts, 'south')
+        })
+        
+      }else{hideElement('bimodal_eval_1_n');hideElement('bimodal_eval_1_s')}
+      
+      # if(eval_1$slope$min == 'bimodal' || eval_1$slope$max == 'bimodal' ){
+      #   print("bimodal - month 2 - slope - min n max")
+      #   showElement('bimodal_eval_2')
+      # }else{hideElement('bimodal_eval_2_n');hideElement('bimodal_eval_2_s')}
+    }
+    hideElement('bimodal_eval_2_n');hideElement('bimodal_eval_2_s')
+   
+    
+  })
+  
 }
 
 

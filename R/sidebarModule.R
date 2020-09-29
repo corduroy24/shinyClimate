@@ -8,7 +8,7 @@ sidebarLayoutUI <- function(id) {
     menuItem("Preferences", tabName = "pref", icon = icon("cog"),
              startExpanded = TRUE,
              selectInput(ns("region"), "Choose a Region:",
-                         choices = c('City', 'Province', 'Canada')
+                         choices = c('City', 'Province', 'Canada', 'North')
              ),
              selectInput(ns("prov"), "Choose a province:",
                          choices = c()
@@ -36,9 +36,9 @@ sidebarLayoutUI <- function(id) {
              )
       ),
     
-    br(),
-    downloadUI(ns("inner_dl"))
-    
+      br(),
+      addFileUI(ns("inner_af")),
+      downloadUI(ns("inner_dl"))
     )
 }
 
@@ -55,7 +55,10 @@ sidebarLayout <- function(input, output, session, plot_vars) {
       showElement('prov')
       hideElement('city')
     }
-      
+    else if(input$region == 'North'){
+      hideElement('city')
+      hideElement('prov')
+    }
     else if(input$region == 'Canada'){
       hideElement('city')
       hideElement('prov')
@@ -80,8 +83,9 @@ sidebarLayout <- function(input, output, session, plot_vars) {
                       selected = city)
   })
 
+  callModule(addFile, 'inner_af')
   callModule(download, 'inner_dl', plots = plot_vars$pp, rv = plot_vars$rv)
-  
+
   return(
     list(
       region = reactive({input$region}),

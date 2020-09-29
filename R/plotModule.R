@@ -27,6 +27,8 @@ plotUI <- function(id) {
 plots <- function(input, output, session, sb_vars, h_vars) {
   plot_type<-reactiveVal('regression line')
   statistic <- reactiveVal('temperatures vs years')
+  location <- reactiveVal()
+  
 
   pp <- reactiveValues()
   plots <- reactiveValues()
@@ -60,14 +62,17 @@ plots <- function(input, output, session, sb_vars, h_vars) {
 
     
     if(sb_vars$region() == 'City'){
-      location <- paste0(sb_vars$city(),',' ,sb_vars$prov())
+      location(paste0(sb_vars$city(),',' ,sb_vars$prov()))
     }
     else if(sb_vars$region() == 'Province'){
-      location <- sb_vars$prov()
+      location(sb_vars$prov())
     }
-    else if(sb_vars$region() == 'Canada'){
-      location <- 'Canada'
+    else{
+      location(sb_vars$region())
+      # city<- 'CAPPE PARRY'
+      show_city_lab <- 'Disable'
     }
+    
     
     plot_type(trimws((strsplit(tolower(h_vars$plot_ops),'-'))[[1]][1]))
     statistic(trimws((strsplit(h_vars$plot_ops,'-'))[[1]][2]))
@@ -77,11 +82,11 @@ plots <- function(input, output, session, sb_vars, h_vars) {
     # print(region)
     # print(location)
     
-    df_consts <- data.frame(year_to_start, plot_type(), location, region,
+    df_consts <- data.frame(year_to_start, plot_type(), location(), region,
                             statistic(),city,prov, show_city_lab, stringsAsFactors = FALSE)    
     output$plot_1_min_max_temp<-renderCachedPlot({
 
-      pp$p1<-(setup_plots('min_max_temp',sb_vars$month_1(), df_consts))
+      pp$p1<-(setup_plots('min_max_temp',sb_vars$month_1(), df_consts, 'none'))
 
       rv$dfnew[[rv$count]] <- pp$p1
       rv$count = rv$count + 1
@@ -89,20 +94,20 @@ plots <- function(input, output, session, sb_vars, h_vars) {
     }, cacheKeyExpr = {list('min_max_temp', sb_vars$month_1(), df_consts)})
     output$plot_1_mean_temp<-renderCachedPlot({
 
-      pp$p2<-(setup_plots('mean_temp',sb_vars$month_1(), df_consts))
+      pp$p2<-(setup_plots('mean_temp',sb_vars$month_1(), df_consts, 'none'))
       rv$dfnew[[rv$count]] <- pp$p2
       rv$count = rv$count + 1
 
     }, cacheKeyExpr = {list('mean_temp', sb_vars$month_1(), df_consts)})
     output$plot_2_min_max_temp<-renderCachedPlot({
 
-      pp$p3<-(setup_plots('min_max_temp',sb_vars$month_2(),df_consts))
+      pp$p3<-(setup_plots('min_max_temp',sb_vars$month_2(),df_consts, 'none'))
       rv$dfnew[[rv$count]] <- pp$p3
       rv$count = rv$count + 1
 
     }, cacheKeyExpr = {list('min_max_temp', sb_vars$month_2(), df_consts)})
     output$plot_2_mean_temp<-renderCachedPlot({
-      pp$p4<-(setup_plots('mean_temp',sb_vars$month_2(),df_consts))
+      pp$p4<-(setup_plots('mean_temp',sb_vars$month_2(),df_consts, 'none'))
       rv$dfnew[[rv$count]] <- pp$p4
       rv$count = rv$count + 1
 
@@ -122,6 +127,7 @@ plots <- function(input, output, session, sb_vars, h_vars) {
     list(
       plot_type = reactive({plot_type()}),
       statistic = reactive({statistic()}),
+      location = reactive({location()}),
       pp = pp,
       rv = rv
     )

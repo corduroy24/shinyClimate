@@ -4,6 +4,8 @@ library(log4r)
 library(tidyr)
 library(gridExtra)
 library(grid)
+library(LaplacesDemon)
+library(feather)
 
 logger <- create.logger()
 logfile(logger) <- 'debug.log'
@@ -41,29 +43,30 @@ get_data <- function(meas, month, year_to_start){
   return(output_df_all)
 }
 
+
 # Find data files 
 find_meas_data <- function(meas){
   # debug(logger, paste("|IM HERE 2|"))
   # print("finding data...")
   # print(list.files('./Data'))
   if(meas == 'min_temp'){
-    txt_files_ls = list.files(path="./Data/Homog_monthly_min_temp_cleaned", pattern="*.txt", full.names = TRUE)
-    names = list.files(path="./Data/Homog_monthly_min_temp_cleaned", pattern="*.txt")
+    rda_files_ls = list.files(path="./Data/Homog_monthly_min_temp_cleaned", pattern="*.rds", full.names = TRUE)
+    names = list.files(path="./Data/Homog_monthly_min_temp_cleaned", pattern="*.rds")
   }
   else if(meas == 'max_temp'){
-    txt_files_ls = list.files(path="./Data/Homog_monthly_max_temp_cleaned", pattern="*.txt", full.names = TRUE)
-    names = list.files(path="./Data/Homog_monthly_max_temp_cleaned", pattern="*.txt")
+    rda_files_ls = list.files(path="./Data/Homog_monthly_max_temp_cleaned", pattern="*.rds", full.names = TRUE)
+    names = list.files(path="./Data/Homog_monthly_max_temp_cleaned", pattern="*.rds")
   }
   else if(meas == 'mean_temp'){
-    txt_files_ls = list.files(path="./Data/Homog_monthly_mean_temp_cleaned", pattern="*.txt", full.names = TRUE)
-    names = list.files(path="./Data/Homog_monthly_mean_temp_cleaned", pattern="*.txt")
+    rda_files_ls = list.files(path="./Data/Homog_monthly_mean_temp_cleaned", pattern="*.rds", full.names = TRUE)
+    names = list.files(path="./Data/Homog_monthly_mean_temp_cleaned", pattern="*.rds")
   }
   # else if(meas == 'precip'){
   #   debug(logger, paste("|IM HERE 3|"))
-  #   txt_files_ls = list.files(path="../Data/Adj_monthly_total_prec_cleaned", pattern="*.txt", full.names = TRUE)
-  #   names = list.files(path="../Data/Adj_monthly_total_prec_cleaned", pattern="*.txt")
+  #   txt_files_ls = list.files(path="../Data/Adj_monthly_total_prec_cleaned", pattern="*.RData", full.names = TRUE)
+  #   names = list.files(path="../Data/Adj_monthly_total_prec_cleaned", pattern="*.RData")
   # }
-  path_names <- list(txt_files_ls, names) 
+  path_names <- list(rda_files_ls, names) 
   # debug(logger, paste('|FIND TEMP DATA|'))
   return(path_names)
 }
@@ -72,7 +75,7 @@ find_meas_data <- function(meas){
 load_cleaned_data <- function(year_to_start = 1980, month = 'Feb', meas){
   # debug(logger, paste("|IM HERE 1|"))
   path_names <- find_meas_data(meas)
-  txt_files_ls <- path_names[[1]]
+  rda_files_ls <- path_names[[1]]
   names <- path_names[[2]]
   ns = matrix(unlist(strsplit(names,'_',)),ncol = 3,byrow = TRUE)
 
@@ -80,12 +83,13 @@ load_cleaned_data <- function(year_to_start = 1980, month = 'Feb', meas){
   input_df <- data.frame()
   debug(logger, paste('|BEFORE FOR LOOP|'))
   
-  for (i in 1:length(txt_files_ls)){
+  for (i in 1:length(rda_files_ls)){
       nom_city <- ns[i,2]
-      nom_prov <- unlist(strsplit(ns[i,3],'.txt'))
-      txt_files_df <- read.table(file = txt_files_ls[i], header = TRUE, sep = " ",dec = ".", colClasses = "factor")
-
-      years_greater<-txt_files_df[as.numeric(as.character(txt_files_df$Year))>=year_to_start,]
+      nom_prov <- unlist(strsplit(ns[i,3],'.rds'))
+      rda_files_df <- readRDS(rda_files_ls[i])
+      # rda_files_df <- readRDS(file = rda_files_ls[i], header = TRUE, sep = " ",dec = ".", colClasses = "factor")
+      
+      years_greater<-rda_files_df[as.numeric(as.character(rda_files_df$Year))>=year_to_start,]
 
       y_temp <- suppressWarnings(as.numeric(as.character(unlist(years_greater[,month]))))
 
@@ -97,6 +101,52 @@ load_cleaned_data <- function(year_to_start = 1980, month = 'Feb', meas){
   }
   return(input_df)
 }
+
+
+
+clean_user_data <- function(inFile){
+  require(dplyr)
+  df <- read.delim(inFile, skip = 0, header = FALSE, as.is=TRUE, dec=".", sep = ",", na.strings=c(" ", "",'NA'), strip.white = TRUE)
+  stationNum_city_prov <- paste(select(df, V1)[1,1], trimws(select(df, V2)[1,1]), province <- select(df, V3)[1,1], sep="_")
+  stationNum_city_prov<- stringr::str_replace_all(stationNum_city_prov, "/",'-')
+  seq(from = 3, to = 35, by = 2)
+  # print(inFile)
+  df <- select(df, -seq(from = 3, to = 35, by = 2))
+  data <- slice(df, 5:n())
+  (hdr <- slice(df, 3))
+  is.na(hdr)
+  
+  df <- plyr::rename(data, hdr)
+  #filter out -9999.9 - default values
+  df <- data.frame(lapply(df, function(x){
+    gsub("-9999.9", "NA", x)
+  }))
+  
+  # build input data frame. 
+  input_df <- data.frame()
+  debug(logger, paste('|BEFORE FOR LOOP|'))
+  
+  for (i in 1:length(rda_files_ls)){
+    nom_city <- ns[i,2]
+    nom_prov <- unlist(strsplit(ns[i,3],'.rds'))
+    rda_files_df <- readRDS(rda_files_ls[i])
+    # rda_files_df <- readRDS(file = rda_files_ls[i], header = TRUE, sep = " ",dec = ".", colClasses = "factor")
+    
+    years_greater<-rda_files_df[as.numeric(as.character(rda_files_df$Year))>=year_to_start,]
+    
+    y_temp <- suppressWarnings(as.numeric(as.character(unlist(years_greater[,month]))))
+    
+    x_year <- suppressWarnings(as.numeric(as.character(unlist(years_greater[,'Year']))))
+    # debug(logger, paste('|START YEAR|', year_to_start, '|'))
+    temp_df <- data.frame(y_temp, x_year, "city" = nom_city, "prov" = nom_prov, 'meas_name' = meas)
+    # debug(logger, paste('|LOAD CLEANED DATA|', 6, '|'))
+    input_df <- rbind(input_df, temp_df)
+  }
+  return(input_df)
+  
+  # df
+}
+
 
 #########################################################
 # Purpose: Perform Regression 
@@ -139,12 +189,12 @@ regression <- function(input_df){
 # # Draw plots
 # df_consts <- data.frame(year_to_start <- '1980',
 # plot_type <- 'regression line',
-# location <- 'TORONTO,ON',
+# location <- 'CANADA',
 # region <- 'Province',
 # stat<- 'Slopes',
 # meas<-'min_max_temp',
-# month <-'Feb',
-# city <- 'TOROMTO',
+# month <-'Jan',
+# city <- 'TORONTO',
 # prov <- 'ON',
 # city_lab <-'Enable')
 
@@ -155,7 +205,7 @@ regression <- function(input_df){
 # Input: meas, month, dataframe containing more variables 
 # output: grid drawn on UI, and grob object 
 #################################################################
-setup_plots <- function(meas, month, df_consts){
+setup_plots <- function(meas, month, df_consts, grouping){
   year_to_start <- df_consts$year_to_start
   plot_type <- df_consts$plot_type
   location <- df_consts$location
@@ -167,27 +217,50 @@ setup_plots <- function(meas, month, df_consts){
   # print(city)
   # print(prov)
   # debug(logger, paste('-----------df_consts ----------',df_consts ))
-  
   output_df_all <- get_data('temp', month, year_to_start)
-  if(region == 'Province'){
-    index <- which(output_df_all[, "prov"] == location)
-    output_df_all <- output_df_all[index,]
-  }
-  else if(region == 'City'){
-    # city <- strsplit(location, ',')[[1]][1]
-    # prov <- strsplit(location, ',')[[1]][2]
-    index <- which(input_df_all$prov==prov
-                                    & input_df_all$city == city)
-    output_df_all <- input_df_all[index,] # chnage name.. .
-  }
+  prov_vector <- c("ON","AB","BC","YT","NT","NU","SK", "MB", "QC", "NB", "NS", "PE", "NL")
   
-  p<-add_plot_data(meas, output_df_all) # returns a list plot(s)
-  p<-add_plot_type(p, df_consts) #constructs plot(s)
-  # print(p)
-  p<- create_grid(p,month, df_consts)
-  suppressMessages( grid.draw(p))
-  invisible(p)
-
+  
+  # if(grouping  != 'none'){
+  #   print(grouping)
+  #   north_prov <- c('YT', 'NT', 'NU')
+  #   north_df <- output_df_all[output_df_all$prov %in% north_prov,]
+  #   south_df <- output_df_all[!(output_df_all$prov %in% north_prov),]
+  #   if(grouping == 'north')
+  #     p<-add_plot_data(meas, north_df) # returns a list plot(s)
+  #   else if(grouping  == 'south')
+  #     p<-add_plot_data(meas, south_df) # returns a list plot(s)
+  #   
+  #   p<-add_plot_type(p, df_consts) #constructs plot(s)
+  #   # print(p)
+  #   p<- create_grid(p,month, df_consts)
+  #   suppressMessages( grid.draw(p))
+  #   return(invisible(p))
+  # }
+  # else{
+    if(region == 'Province'){
+      index <- which(output_df_all[, "prov"] == location)
+      output_df_all <- output_df_all[index,]
+    }
+    else if(region == 'City'){
+      # city <- strsplit(location, ',')[[1]][1]
+      # prov <- strsplit(location, ',')[[1]][2]
+      index <- which(input_df_all$prov==prov
+                     & input_df_all$city == city)
+      output_df_all <- input_df_all[index,] # chnage name.. .
+    }
+  else if(region == 'North'){
+      north_prov <- c('YT', 'NT', 'NU')
+      output_df_all <- output_df_all[output_df_all$prov %in% north_prov,]
+  }
+    
+    p<-add_plot_data(meas, output_df_all) # returns a list plot(s)
+    p<-add_plot_type(p, df_consts) #constructs plot(s)
+    # print(p)
+    p<- create_grid(p,month, df_consts)
+    suppressMessages( grid.draw(p))
+    invisible(p)
+  
 }
 
 
@@ -225,8 +298,13 @@ add_plot_type<- function(curr_plots, df_consts){
   
   for(i in 1: length(curr_plots)){
     dat <- curr_plots[[i]]$data
-    index <- which(dat$prov==prov& dat$city == city)
-    dat_city <- dat[index,] 
+    # dat_city <- NULL
+    # x_dat <- NULL
+    # if(dat$prov==prov && dat$city == city){
+      index <- which(dat$prov==prov& dat$city == city)
+      dat_city <- dat[index,] 
+    # }
+    print(plot_type)
     if(plot_type == 'histogram'){
       aes <- aes(x = slope)
       # aes_vline<- aes(xintercept=mean(slope))
@@ -544,8 +622,8 @@ stat_eval<-function(stat, output_df_all){
   max_output_df_all <- output_df_all[which(output_df_all$meas_name=='max_temp'),]
   # mean_output_df_all <- output_df_all[which(output_df_all$meas_name=='mean_temp'),]
   # print(LaplacesDemon::is.bimodal(min_output_df_all$slope))
-  skewness<- round(skewness(min_output_df_all[,stat]))
-  print(skewness)
+  skewness<- round(e1071::skewness(min_output_df_all[,stat]))
+  # print(skewness)
   
   if(LaplacesDemon::is.bimodal(min_output_df_all[,stat]))
     min_result <- 'bimodal'
@@ -563,8 +641,8 @@ stat_eval<-function(stat, output_df_all){
     min_result<-"undetected"
   
   # print(LaplacesDemon::is.bimodal(max_output_df_all$slope))
-  skewness<- round(skewness(max_output_df_all[,stat]),2)
-  print(skewness)
+  skewness<- round(e1071::skewness(max_output_df_all[,stat]),2)
+  # print(skewness)
   
   if(LaplacesDemon::is.bimodal(max_output_df_all[,stat]))
     max_result<-'bimodal'
@@ -582,10 +660,11 @@ stat_eval<-function(stat, output_df_all){
     max_result<-"undetected"
   
   density_estimate_1 <- density(min_output_df_all[,stat])
-  print(min_mode <- signif(density_estimate_1$x[which.max(density_estimate_1$y)],1))
+  min_mode <- signif(density_estimate_1$x[which.max(density_estimate_1$y)],1)
+  # print(min_mode)
   density_estimate_1 <- density(max_output_df_all[,stat])
-  print(max_mode <- signif(density_estimate_1$x[which.max(density_estimate_1$y)],1))
-  
+  max_mode <- signif(density_estimate_1$x[which.max(density_estimate_1$y)],1)
+  # print(max_mode)
   values_min = list(mean = mean(min_output_df_all[,stat]), med = median(min_output_df_all[,stat]), mode = min_mode)
   values_max = list(mean = mean(max_output_df_all[,stat]), med = median(max_output_df_all[,stat]), mode = max_mode)
   
@@ -710,34 +789,44 @@ evaluate_r2 <- function(slope){
 # }
 
 
-# # Purpose: Data cleaning step 
-# # Input: @var, @dir 
-# # Output: No return; writes to file 
-# # Not needed for app... 
-# clean_data <- function(var, dir){
-#   for (i in 1:length(var)){
-#     df = read.delim(var[i], skip = 0, header = FALSE, as.is=TRUE, dec=".", sep = ",", na.strings=c(" ", "",'NA'), strip.white = TRUE)
+# Purpose: Data cleaning step
+# Input: @var, @dir
+# Output: No return; writes to file
+# Not needed for app...
+# dir = list.files(path="./Data/Homog_monthly_min_temp", pattern="*.txt", full.names = TRUE)
+# var = list.files(path="./Data/Homog_monthly_min_temp", pattern="*.txt")
+
+# meas_dir = "./Data/Homog_monthly_max_temp"
+# meas_city_data = list.files(path=meas_dir, pattern="*.txt", full.names=TRUE)
+# 
+# clean_data <- function(meas_city_data, meas_dir){
+#   require(dplyr)
+#   for (i in 1:length(meas_city_data)){
+#   # for (i in 1:2){
+#     df = read.delim(meas_city_data[i], skip = 0, header = FALSE, as.is=TRUE, dec=".", sep = ",", na.strings=c(" ", "",'NA'), strip.white = TRUE)
 #     stationNum_city_prov <- paste(select(df, V1)[1,1], trimws(select(df, V2)[1,1]), province <- select(df, V3)[1,1], sep="_")
 #     #forward slash for precipatation files - "7025250_MONTREAL/PIERRE ELLIOTT T_QC"
-#     stationNum_city_prov<- str_replace_all(stationNum_city_prov, "/",'-')
+#     stationNum_city_prov<- stringr::str_replace_all(stationNum_city_prov, "/",'-')
 #     seq(from = 3, to = 35, by = 2)
-#     
+#     # print(meas_city_data[i])
 #     df <- select(df, -seq(from = 3, to = 35, by = 2))
-#     data <- slice(df, 5:n()) 
-#     (hdr <- slice(df, 3)) 
+#     data <- slice(df, 5:n())
+#     (hdr <- slice(df, 3))
 #     is.na(hdr)
-#     
+# 
 #     df <- plyr::rename(data, hdr)
 #     #filter out -9999.9 - default values
 #     df <- data.frame(lapply(df, function(x){
 #       gsub("-9999.9", "NA", x)
 #     }))
 # 
-#     filePath= sprintf("%s_cleaned/%s.txt",dir,stationNum_city_prov)
-#     write.table(df, filePath, append = FALSE, sep = " ", dec = ".",
-#                 row.names = FALSE, col.names = TRUE)
+#     filePath = paste0(meas_dir,"_cleaned/", stationNum_city_prov,".rds")
+#     # filePath= sprintf("%s_cleaned/%s.txt",meas_dir,stationNum_city_prov)
+#     
+#     saveRDS(df, filePath)
 #   }
 # }
+  
 # check_start_year_cutoff <- function(meas){
 #   temp_object <- find_meas_data(meas)
 #   txt_files_ls <- temp_object[[1]]
