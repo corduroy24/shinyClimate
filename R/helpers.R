@@ -796,33 +796,65 @@ evaluate_r2 <- function(slope){
 # dir = list.files(path="./Data/Homog_monthly_min_temp", pattern="*.txt", full.names = TRUE)
 # var = list.files(path="./Data/Homog_monthly_min_temp", pattern="*.txt")
 
-meas_dir = "./R/Data/Adj_monthly_total_prec"
-meas_city_data = list.files(path=meas_dir, pattern="*.txt", full.names=TRUE)
-clean_data <- function(meas_city_data, meas_dir){
+# meas_dir = "./R/Data/Adj_monthly_total_prec"
+# meas_city_data = list.files(path=meas_dir, pattern="*.txt", full.names=TRUE)
+# clean_data_target <- function(meas_city_data, meas_dir){
+#   require(dplyr)
+#   for (i in 1:length(meas_city_data)){
+#   # for (i in 1:2){
+#     df = read.delim(meas_city_data[i], skip = 0, header = FALSE, as.is=TRUE, dec=".", sep = ",", na.strings=c(" ", "",'NA'), strip.white = TRUE)
+#     stationNum_city_prov <- paste(select(df, V1)[1,1], trimws(select(df, V2)[1,1]), province <- select(df, V3)[1,1], sep="_")
+#     #forward slash for precipatation files - "7025250_MONTREAL/PIERRE ELLIOTT T_QC"
+#     stationNum_city_prov<- stringr::str_replace_all(stationNum_city_prov, "/",'-')
+#     seq(from = 3, to = 35, by = 2)
+#     # print(meas_city_data[i])
+#     df <- select(df, -seq(from = 3, to = 35, by = 2))
+#     data <- slice(df, 5:n())
+#     (hdr <- slice(df, 3))
+#     is.na(hdr)
+# 
+#     df <- plyr::rename(data, hdr)
+#     #filter out -9999.9 - default values
+#     df <- data.frame(lapply(df, function(x){
+#       gsub("-9999.9", "NA", x)
+#     }))
+# 
+#     filePath = paste0(meas_dir,"_cleaned/", stationNum_city_prov,".rds")
+#     # filePath= sprintf("%s_cleaned/%s.txt",meas_dir,stationNum_city_prov)
+# 
+#     saveRDS(df, filePath)
+#   }
+# }
+
+
+# folder_path = "./Data/Surface N2O from NOAA"
+# folder_path = "./Data/Surface MH4 from NOAA"
+# folder_path = "./Data/Surface CO2 from NOAA"
+file_path_ls = list.files(path=folder_path, pattern="*.txt", full.names=TRUE)
+file_name_ls = list.files(path=folder_path, pattern="*.txt")
+clean_data_feature <- function(file_path_ls, folder_path, file_name_ls){
   require(dplyr)
-  for (i in 1:length(meas_city_data)){
-  # for (i in 1:2){
-    df = read.delim(meas_city_data[i], skip = 0, header = FALSE, as.is=TRUE, dec=".", sep = ",", na.strings=c(" ", "",'NA'), strip.white = TRUE)
-    stationNum_city_prov <- paste(select(df, V1)[1,1], trimws(select(df, V2)[1,1]), province <- select(df, V3)[1,1], sep="_")
-    #forward slash for precipatation files - "7025250_MONTREAL/PIERRE ELLIOTT T_QC"
-    stationNum_city_prov<- stringr::str_replace_all(stationNum_city_prov, "/",'-')
-    seq(from = 3, to = 35, by = 2)
-    # print(meas_city_data[i])
-    df <- select(df, -seq(from = 3, to = 35, by = 2))
-    data <- slice(df, 5:n())
-    (hdr <- slice(df, 3))
+  for (i in 1:length(file_path_ls)){
+    # for (i in 1:2){
+    # i=1
+    # print(file_path_ls[i])
+    df = read.delim(file_path_ls[i], skip = 0, header = FALSE, as.is=TRUE, dec=".", sep = ",", na.strings=c(" ", "",'NA'), strip.white = TRUE)
+    (num_header_lines<- sub(".*: ", "", df[1,1]) %>% as.numeric())
+    df <- read.delim(file_path_ls[i], skip = (num_header_lines-1) , header = FALSE, as.is=TRUE, dec=".", sep = "", na.strings=c(" ", "",'NA'), strip.white = TRUE)
+    
+    (hdr <- c(df[1,3], df[1,4], df[1,5], df[1,6]))
+    df <- df %>% select(1:4) %>% slice(2:n())
+    
     is.na(hdr)
+    names(df) <- hdr
+    # head(alt_df)
+    # print(file_name_ls[i])
+    file_name <- sub(".txt.*", "", file_name_ls[i])
+    # print(file_name)
+    # print(sum(is.na(df)))
+    new_filePath = paste0(folder_path,"_cleaned/", file_name,".rds")
 
-    df <- plyr::rename(data, hdr)
-    #filter out -9999.9 - default values
-    df <- data.frame(lapply(df, function(x){
-      gsub("-9999.9", "NA", x)
-    }))
-
-    filePath = paste0(meas_dir,"_cleaned/", stationNum_city_prov,".rds")
-    # filePath= sprintf("%s_cleaned/%s.txt",meas_dir,stationNum_city_prov)
-
-    saveRDS(df, filePath)
+    saveRDS(df, new_filePath)
   }
 }
   
