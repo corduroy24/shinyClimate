@@ -829,7 +829,7 @@ evaluate_r2 <- function(slope){
 
 # folder_path = "./Data/Surface N2O from NOAA"
 # folder_path = "./Data/Surface MH4 from NOAA"
-# folder_path = "./Data/Surface CO2 from NOAA"
+folder_path = "./Data/Surface CO2 from NOAA"
 file_path_ls = list.files(path=folder_path, pattern="*.txt", full.names=TRUE)
 file_name_ls = list.files(path=folder_path, pattern="*.txt")
 clean_data_feature <- function(file_path_ls, folder_path, file_name_ls){
@@ -842,11 +842,14 @@ clean_data_feature <- function(file_path_ls, folder_path, file_name_ls){
     (num_header_lines<- sub(".*: ", "", df[1,1]) %>% as.numeric())
     df <- read.delim(file_path_ls[i], skip = (num_header_lines-1) , header = FALSE, as.is=TRUE, dec=".", sep = "", na.strings=c(" ", "",'NA'), strip.white = TRUE)
     
-    (hdr <- c(df[1,3], df[1,4], df[1,5], df[1,6]))
-    df <- df %>% select(1:4) %>% slice(2:n())
+    (hdr <- c(df[1,4], df[1,5], df[1,6]) %>% str_to_title)
+    df <- df %>% select(2:4) %>% slice(2:n())
     
     is.na(hdr)
     names(df) <- hdr
+    df$Month <- plyr::mapvalues(df$Month, 
+                                from=c("12","11","10",'9', '8', '7', '6', '5', '4','3', '2','1'), 
+                                to=c("Dec","Nov","Oct", 'Sep', 'Aug', 'Jul', 'Jun', 'May', 'Apr', 'Mar', 'Feb', 'Jan'))
     # head(alt_df)
     # print(file_name_ls[i])
     file_name <- sub(".txt.*", "", file_name_ls[i])
