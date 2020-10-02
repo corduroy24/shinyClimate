@@ -20,11 +20,11 @@ get_data <- function(meas, month, year_to_start){
   # cc <- list.files(pattern="*.RData", full.names = TRUE)
   # print(cc)
   # if(file.exists(paste('../RData/',meas,month, year_to_start,'.RData'))){
-  if(file.exists(paste('RData/',meas,month, year_to_start,'.RData'))){
-    # load(paste('../R/RData/',meas,month, year_to_start,'.RData'), .GlobalEnv)
-    load(paste('RData/',meas,month, year_to_start,'.RData'), .GlobalEnv)
-    debug(logger, paste("Rdata exists"))
-  } else {
+  # if(file.exists(paste('RData/',meas,month, year_to_start,'.RData'))){
+  #   # load(paste('../R/RData/',meas,month, year_to_start,'.RData'), .GlobalEnv)
+  #   load(paste('RData/',meas,month, year_to_start,'.RData'), .GlobalEnv)
+  #   debug(logger, paste("Rdata exists"))
+  # } else {
     # print("here_1")
     debug(logger, paste("RData does not exists"))
     # ugly...
@@ -39,54 +39,61 @@ get_data <- function(meas, month, year_to_start){
     # save(output_df_all,input_df_all, file = paste('../R/RData/',meas,month, year_to_start,'.RData'))
     # load(paste(meas,month, year_to_start,'.RData'), .GlobalEnv)
     load(paste('RData/',meas,month, year_to_start,'.RData'), .GlobalEnv)
-  }
+  # }
   return(output_df_all)
 }
 
 
 # Find data files 
-find_meas_data <- function(meas){
+find_meas_data <- function(meas_names){
   # debug(logger, paste("|IM HERE 2|"))
   # print("finding data...")
   # print(list.files('./Data'))
-  if(meas == 'min_temp'){
-    rda_files_ls = list.files(path="./Data/Homog_monthly_min_temp_cleaned", pattern="*.rds", full.names = TRUE)
-    names = list.files(path="./Data/Homog_monthly_min_temp_cleaned", pattern="*.rds")
+  path_file_names_ls <- list()
+  for(i in 1:length(meas_names)){
+      meas_name <- meas_names[i]
+      # print(meas_name)
+    if(meas_name == 'min_temp'){
+      path_names_ls = list.files(path="./Data/Homog_monthly_min_temp_cleaned", pattern="*.rds", full.names = TRUE)
+      file_names_ls = list.files(path="./Data/Homog_monthly_min_temp_cleaned", pattern="*.rds")
+    }
+    else if(meas_name == 'max_temp'){
+      path_names_ls = list.files(path="./Data/Homog_monthly_max_temp_cleaned", pattern="*.rds", full.names = TRUE)
+      file_names_ls = list.files(path="./Data/Homog_monthly_max_temp_cleaned", pattern="*.rds")
+    }
+    else if(meas_name == 'mean_temp'){
+      path_names_ls = list.files(path="./Data/Homog_monthly_mean_temp_cleaned", pattern="*.rds", full.names = TRUE)
+      file_names_ls = list.files(path="./Data/Homog_monthly_mean_temp_cleaned", pattern="*.rds")
+    }
+    # else if(meas == 'precip'){
+    #   debug(logger, paste("|IM HERE 3|"))
+    #   txt_files_ls = list.files(path="../Data/Adj_monthly_total_prec_cleaned", pattern="*.RData", full.names = TRUE)
+    #   names = list.files(path="../Data/Adj_monthly_total_prec_cleaned", pattern="*.RData")
+    # }
+      path_file_names_ls[[i]]<- list(path_names_ls, file_names_ls) 
+      
   }
-  else if(meas == 'max_temp'){
-    rda_files_ls = list.files(path="./Data/Homog_monthly_max_temp_cleaned", pattern="*.rds", full.names = TRUE)
-    names = list.files(path="./Data/Homog_monthly_max_temp_cleaned", pattern="*.rds")
-  }
-  else if(meas == 'mean_temp'){
-    rda_files_ls = list.files(path="./Data/Homog_monthly_mean_temp_cleaned", pattern="*.rds", full.names = TRUE)
-    names = list.files(path="./Data/Homog_monthly_mean_temp_cleaned", pattern="*.rds")
-  }
-  # else if(meas == 'precip'){
-  #   debug(logger, paste("|IM HERE 3|"))
-  #   txt_files_ls = list.files(path="../Data/Adj_monthly_total_prec_cleaned", pattern="*.RData", full.names = TRUE)
-  #   names = list.files(path="../Data/Adj_monthly_total_prec_cleaned", pattern="*.RData")
-  # }
-  path_names <- list(rda_files_ls, names) 
+  # path_file_names_ls <- list(path_names_ls, file_names_ls) 
   # debug(logger, paste('|FIND TEMP DATA|'))
-  return(path_names)
+  return(path_file_names_ls)
 }
 
 # Purpose: Load data from cleaning step
 load_cleaned_data <- function(year_to_start = 1980, month = 'Feb', meas){
   # debug(logger, paste("|IM HERE 1|"))
-  path_names <- find_meas_data(meas)
-  rda_files_ls <- path_names[[1]]
-  names <- path_names[[2]]
-  ns = matrix(unlist(strsplit(names,'_',)),ncol = 3,byrow = TRUE)
+  path_file_names_ls <- find_meas_data(meas)
+  path_names_ls <- path_file_names_ls[[1]][[1]]
+  file_names_ls <- path_file_names_ls[[1]][[2]]
+  ns = matrix(unlist(strsplit(file_names_ls,'_',)),ncol = 3,byrow = TRUE)
 
   # build input data frame. 
   input_df <- data.frame()
   debug(logger, paste('|BEFORE FOR LOOP|'))
   
-  for (i in 1:length(rda_files_ls)){
+  for (i in 1:length(path_names_ls)){
       nom_city <- ns[i,2]
       nom_prov <- unlist(strsplit(ns[i,3],'.rds'))
-      rda_files_df <- readRDS(rda_files_ls[i])
+      rda_files_df <- readRDS(path_names_ls[i])
       # rda_files_df <- readRDS(file = rda_files_ls[i], header = TRUE, sep = " ",dec = ".", colClasses = "factor")
       
       years_greater<-rda_files_df[as.numeric(as.character(rda_files_df$Year))>=year_to_start,]
@@ -829,9 +836,9 @@ evaluate_r2 <- function(slope){
 
 # folder_path = "./Data/Surface N2O from NOAA"
 # folder_path = "./Data/Surface MH4 from NOAA"
-folder_path = "./Data/Surface CO2 from NOAA"
-file_path_ls = list.files(path=folder_path, pattern="*.txt", full.names=TRUE)
-file_name_ls = list.files(path=folder_path, pattern="*.txt")
+# folder_path = "./Data/Surface CO2 from NOAA"
+# file_path_ls = list.files(path=folder_path, pattern="*.txt", full.names=TRUE)
+# file_name_ls = list.files(path=folder_path, pattern="*.txt")
 clean_data_feature <- function(file_path_ls, folder_path, file_name_ls){
   require(dplyr)
   for (i in 1:length(file_path_ls)){
